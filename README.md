@@ -7,6 +7,7 @@ A breakout board that drives two brushed DC motors from a Raspberry Pi, ESP32 or
 | Folder | What it is |
 |---|---|
 | [`python/`](python/) | `pingoblin_motor`: Python library for the Raspberry Pi. Controls one board or several daisy-chained boards, with optional current sensing through a PinGoblin ADS1115 board and detection of stalls and other faults |
+| [`micropython/`](micropython/) | The same library as a single MicroPython file for ESP32 and Raspberry Pi Pico. Install with `mpremote mip install github:PinGoblin/DRV8874/micropython` |
 
 ## Quick start (Python)
 

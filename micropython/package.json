@@ -1,0 +1,6 @@
+{
+  "urls": [
+    ["pingoblin_motor.py", "github:PinGoblin/DRV8874/micropython/pingoblin_motor.py"]
+  ],
+  "version": "0.1.0"
+}
