@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pingoblin-motor"
+version = "0.1.0"
+description = "Control library for the PinGoblin Board A dual DC motor driver (DRV8874) on Raspberry Pi"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+pi = ["gpiozero>=2.0", "smbus2>=0.4"]
+hwpwm = ["rpi-hardware-pwm>=0.2"]
+test = ["pytest>=7"]
+
+[tool.setuptools]
+packages = ["pingoblin_motor"]
