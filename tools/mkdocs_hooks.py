@@ -10,10 +10,18 @@ import shutil
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def on_config(config, **kwargs):
-    """Copy the MicroPython module under its documentation alias."""
+def _copy_mp_module():
     dst = os.path.join(ROOT, ".docs_build")
     os.makedirs(dst, exist_ok=True)
     shutil.copyfile(os.path.join(ROOT, "micropython", "pingoblin_motor.py"),
                     os.path.join(dst, "pingoblin_motor_mp.py"))
-    return config
+
+
+# Copy when MkDocs loads this file (while it reads mkdocs.yml). mkdocstrings checks its
+# search paths before any on_config hook runs, so .docs_build must exist by then.
+_copy_mp_module()
+
+
+def on_pre_build(config, **kwargs):
+    """Refresh the copy before each build, so `mkdocs serve` picks up edits."""
+    _copy_mp_module()

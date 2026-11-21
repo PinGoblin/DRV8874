@@ -208,7 +208,7 @@ class MotorFaultError(MotorError):
         Args:
             fault: The latched `Fault`.
         """
-        MotorError.__init__(self, "motor has a latched fault: %s. Call clear_fault() first." % fault)
+        super().__init__("motor has a latched fault: %s. Call clear_fault() first." % fault)
         self.fault = fault
 
 

@@ -69,6 +69,10 @@ def test_source_uses_only_micropython_features():
         elif isinstance(node, ast.Attribute) and node.attr in ("partition", "rpartition", "monotonic"):
             if node.attr != "monotonic" or node.lineno not in shim_lines:   # only in the CPython shim
                 problems.append("%s at line %d" % (node.attr, node.lineno))
+        elif (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+              and node.func.attr == "__init__" and isinstance(node.func.value, ast.Name)):
+            # MicroPython built-in exception types have no __init__ attribute; use super().
+            problems.append("%s.__init__() at line %d" % (node.func.value.id, node.lineno))
     assert problems == []
 
 
