@@ -1,0 +1,25 @@
+# User Guide
+
+Board A drives two brushed DC motors in both directions from any 3.3 V or 5 V
+microcontroller, such as a Raspberry Pi, ESP32, Raspberry Pi Pico or Arduino. Each motor
+has its own TI DRV8874 H-bridge, with speed set by PWM, direction set by one pin, and a
+current-sense output you can read with an ADC.
+
+- Two independent motor channels, motor supply 6–16 V (12 V nominal)
+- Direction + PWM control (PH/EN mode), with a jumper for IN/IN PWM mode
+- Analog current feedback per motor (0.675 V/A) for stall detection
+- Built-in current limit, overcurrent and over-temperature protection
+- Reverse-polarity protection, surge suppressor (TVS) and a 3 A resettable fuse on the motor supply
+- Push buttons to test each motor without writing code
+- Direction LEDs per motor, plus power and fault LEDs
+- Power through-terminal for daisy-chaining several boards from one supply
+- Safe start-up: motors stay off while the host boots
+
+## Where to start
+
+1. Read [Important safety information](safety.md).
+2. Wire the board using [Quick start](quick-start.md).
+3. Check each motor with the [test buttons](buttons-leds.md).
+4. Install the library from the [API](../api/index.md) section and run the first example.
+
+If something doesn't work, see [Troubleshooting](troubleshooting.md).

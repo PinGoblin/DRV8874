@@ -1,4 +1,4 @@
-"""MotorBoard: one Board A (two DRV8874 channels) and its shared lines."""
+"""[`MotorBoard`][pingoblin_motor.board.MotorBoard]: one Board A (two DRV8874 channels) and its shared lines."""
 from __future__ import annotations
 
 import logging
@@ -11,32 +11,30 @@ from .faults import ConfigError, Fault, FaultType
 from .motor import ControlMode, Motor, MotorState
 from .sensors import ADS1115, CurrentSensor, MotorCurrentSensor, make_sensor
 
-log = logging.getLogger("pingoblin_motor")
+_log = logging.getLogger("pingoblin_motor")
 
 ISENSE_V_PER_A = 0.675
+"""Board A ISENSE gain: 0.675 V per amp."""
 WAKE_TIME_S = 0.0015           # DRV8874 wake-up time from sleep is about 1 ms
+"""Seconds to wait after waking the drivers (the DRV8874 needs about 1 ms)."""
 
 
 class MotorBoard:
-    """One Board A (dual DC motor driver).
+    """One Board A dual DC motor driver.
 
-    Pins are BCM GPIO numbers. Motor B pins are optional (single-motor use).
-    Several boards can share ``sleep_pin`` (one e-stop line) and
-    ``fault_pin`` (wired-OR fault line): pass the same GPIO to each board.
+    Pins are BCM GPIO numbers. Motor B is optional. Several boards can share `sleep_pin`
+    (one e-stop line) and `fault_pin` (wired-OR fault line): pass the same GPIO to each
+    board. Boards work as context managers and close on exit.
 
-    :param mode: ``"ph_en"`` (default, JP1 pads 1-2) or ``"pwm"`` (JP1 2-3).
-    :param logic_voltage: VLOGIC (3.3 or 5.0). Sets the board current limit:
-        about 2.0 A at 3.3 V and 3.0 A at 5 V.
-    :param adc: an :class:`ADS1115` for current sensing (optional).
-    :param a_sense_channel, b_sense_channel: ADS1115 inputs wired to
-        A_ISENSE / B_ISENSE.
-    :param a_sensor, b_sensor: any :class:`CurrentSensor` instead of an
-        ADS1115 channel (e.g. a different ADC, or a mock for testing).
-    :param motor_names: names for motors A and B, e.g. ``("left", "right")``.
-    :param a_options, b_options: extra keyword arguments for each
-        :class:`Motor` (``invert``, ``min_speed_pc``, ``ramp_time``,
-        ``stall_current``, ``policy`` ...). ``motor_options`` applies to both.
-    :param fuse_rating: board fuse hold current in amps (3 A).
+    Example:
+        ```python
+        from pingoblin_motor import MotorBoard
+
+        with MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6,
+                        sleep_pin=26, fault_pin=19) as board:
+            board.start_monitor(on_fault=print)
+            board.motor_a.forward(60, duration=2, wait=True)
+        ```
     """
 
     _sleep_groups: Dict[tuple, list] = {}
@@ -53,6 +51,39 @@ class MotorBoard:
                  motor_names=("a", "b"), motor_options: Optional[dict] = None,
                  a_options: Optional[dict] = None, b_options: Optional[dict] = None,
                  fuse_rating: float = 3.0):
+        """
+        Args:
+            name: Board name, used in `"board.motor"` addresses. Must not contain `.`.
+            a_en: GPIO for A_EN (J3 pin 3).
+            a_ph: GPIO for A_PH (J3 pin 4).
+            b_en: GPIO for B_EN (J3 pin 5), or `None` for a single motor.
+            b_ph: GPIO for B_PH (J3 pin 6), or `None`.
+            sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`. Needed to coast in PH/EN mode and
+                for [`sleep()`][pingoblin_motor.board.MotorBoard.sleep].
+            fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection
+                without a current sensor.
+            mode: `"ph_en"` (JP1 pads 1-2, default) or `"pwm"` (JP1 pads 2-3).
+            logic_voltage: VLOGIC (V). Sets the current limit: about 2.0 A at 3.3 V and
+                3.0 A at 5 V.
+            adc: An [`ADS1115`][pingoblin_motor.sensors.ADS1115] for current sensing.
+            a_sense_channel: ADS1115 input wired to A_ISENSE.
+            b_sense_channel: ADS1115 input wired to B_ISENSE.
+            sense_samples: Readings averaged per current measurement.
+            a_sensor: Any [`CurrentSensor`][pingoblin_motor.sensors.CurrentSensor] for motor A,
+                instead of an ADS1115 channel.
+            b_sensor: The same for motor B.
+            backend: Pin [`Backend`][pingoblin_motor.backends.Backend]. Default:
+                [`GpiozeroBackend`][pingoblin_motor.backends.GpiozeroBackend].
+            pwm_frequency: PWM frequency (Hz).
+            motor_names: Names for motors A and B, for example `("left", "right")`.
+            motor_options: Keyword arguments for both [`Motor`][pingoblin_motor.motor.Motor]s.
+            a_options: Keyword arguments for motor A only (override `motor_options`).
+            b_options: Keyword arguments for motor B only.
+            fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
+
+        Raises:
+            ConfigError: Invalid mode, voltage, names or pins.
+        """
         try:
             self.mode = ControlMode(mode)
         except ValueError:
@@ -100,33 +131,44 @@ class MotorBoard:
     # ------------------------------------------------------------ properties
     @property
     def current_limit(self) -> float:
-        """Driver current limit per motor (amps), set by VLOGIC on the board."""
+        """Driver current limit per motor (A), set on the board from VLOGIC.
+
+        VREF = 0.4 × VLOGIC and ITRIP = VREF / 0.675 V/A.
+        """
         vref = self.logic_voltage * 10.0 / 25.0          # 15k / 10k divider
         return vref / ISENSE_V_PER_A
 
     @property
     def motor_a(self) -> Motor:
+        """The first [`Motor`][pingoblin_motor.motor.Motor] (J4)."""
         return list(self.motors.values())[0]
 
     @property
     def motor_b(self) -> Optional[Motor]:
+        """The second [`Motor`][pingoblin_motor.motor.Motor] (J5), or `None` on a single-motor setup."""
         vals = list(self.motors.values())
         return vals[1] if len(vals) > 1 else None
 
     @property
     def is_asleep(self) -> bool:
+        """`True` while nSLEEP is driven low."""
         return self._sleep is not None and not self._sleep.get()
 
     @property
     def fault_active(self) -> Optional[bool]:
-        """True while nFAULT is low (fault or current limiting). None if not wired."""
+        """`True` while nFAULT is low (a fault, or a driver current-limiting).
+        `None` if `fault_pin` isn't wired.
+        """
         if self._fault is None:
             return None
         return not self._fault.read()
 
     @property
     def total_current(self) -> Optional[float]:
-        """Sum of last measured supply-side currents, or None without sensors."""
+        """Sum of the motors' last supply-side current readings (A).
+
+        `None` unless every motor has a sensor and has been read at least once.
+        """
         vals = [m.last_isense_amps for m in self.motors.values() if m.has_sensor]
         if not vals or any(v is None for v in vals):
             return None
@@ -140,7 +182,13 @@ class MotorBoard:
 
     # ------------------------------------------------------------ commands
     def sleep(self) -> None:
-        """Pull nSLEEP low: all motors on this nSLEEP line coast, near-zero current."""
+        """Pull nSLEEP low: every motor on this nSLEEP line coasts and the drivers draw almost no current.
+
+        All motors on the line are stopped first, so they stay stopped when the board wakes.
+
+        Raises:
+            ConfigError: No `sleep_pin` configured.
+        """
         if self._sleep is None:
             raise ConfigError(f"{self.name}: no sleep_pin configured")
         for b in self._sleep_group():
@@ -149,6 +197,7 @@ class MotorBoard:
         self._sleep.set(False)
 
     def wake(self) -> None:
+        """Drive nSLEEP high and wait for the drivers to wake (about 1.5 ms). Run commands wake the board automatically."""
         if self._sleep is not None and not self._sleep.get():
             self._sleep.set(True)
             time.sleep(WAKE_TIME_S)
@@ -159,7 +208,10 @@ class MotorBoard:
             m.stop()
 
     def coast_all(self) -> None:
-        """Coast every motor on this board."""
+        """Coast every motor on this board.
+
+        In PH/EN mode this sleeps the board, so it needs `sleep_pin`. Without one the motors brake.
+        """
         for m in self.motors.values():
             m.stop()
         if self.mode is ControlMode.PWM:
@@ -171,10 +223,21 @@ class MotorBoard:
                 if m.fault is None:
                     m._state = MotorState.COASTING
         else:
-            log.warning("%s: coast needs sleep_pin in PH/EN mode; motors braked", self.name)
+            _log.warning("%s: coast needs sleep_pin in PH/EN mode; motors braked", self.name)
 
     def start_monitor(self, interval: float = 0.05, on_fault=None):
-        """Start a background fault monitor for this board alone."""
+        """Start a background fault monitor for this board alone.
+
+        When the board joins a [`MotorChain`][pingoblin_motor.chain.MotorChain], the chain's
+        monitor takes over.
+
+        Args:
+            interval: Seconds between checks.
+            on_fault: Optional `handler(fault)` called for every fault.
+
+        Returns:
+            The running [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor].
+        """
         from .monitor import FaultMonitor
         if self._monitor is None:
             self._monitor = FaultMonitor([self], interval=interval)
@@ -184,12 +247,13 @@ class MotorBoard:
         return self._monitor
 
     def stop_monitor(self) -> None:
+        """Stop the board's fault monitor, if running."""
         if self._monitor is not None:
             self._monitor.stop()
             self._monitor = None
 
     def close(self) -> None:
-        """Stop the monitor, brake all motors and release every pin."""
+        """Stop the monitor, brake every motor and release every pin."""
         self.stop_monitor()
         for m in self.motors.values():
             m.close()

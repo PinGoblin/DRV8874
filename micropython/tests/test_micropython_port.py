@@ -44,6 +44,10 @@ ALLOWED_IMPORTS = {"time", "asyncio", "uasyncio", "machine"}
 
 def test_source_uses_only_micropython_features():
     tree = ast.parse(open(SRC).read())
+    shim = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "ticks_ms"]
+    shim_lines = set()
+    for f in shim:
+        shim_lines.update(range(f.lineno, f.end_lineno + 1))
     problems = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -63,7 +67,7 @@ def test_source_uses_only_micropython_features():
         elif isinstance(node, ast.NamedExpr):
             problems.append("walrus at line %d" % node.lineno)
         elif isinstance(node, ast.Attribute) and node.attr in ("partition", "rpartition", "monotonic"):
-            if node.attr != "monotonic" or node.lineno > 40:   # monotonic only in the CPython shim
+            if node.attr != "monotonic" or node.lineno not in shim_lines:   # only in the CPython shim
                 problems.append("%s at line %d" % (node.attr, node.lineno))
     assert problems == []
 

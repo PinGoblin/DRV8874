@@ -1,5 +1,5 @@
 # ESP32: drive both motors with blocking helpers (fault checks keep running).
-# Wiring: see README. Copy pingoblin_motor.py (or .mpy) and this file to the board.
+# Wiring: see https://pingoblin.github.io/DRV8874/guide/quick-start/. Copy pingoblin_motor.py (or .mpy) and this file to the board.
 from pingoblin_motor import MotorBoard
 
 board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, sleep_pin=32, fault_pin=39,

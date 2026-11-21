@@ -1,27 +1,12 @@
 """Background fault monitor.
 
-Polls each board's nFAULT line and (if fitted) each motor's current sensor,
-and detects:
+The [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor] polls each board's nFAULT
+line and, where fitted, each motor's current sensor. It detects every
+[`FaultType`][pingoblin_motor.faults.FaultType].
 
-=================  ===========================================  ===============
-Fault              Condition                                    Needs sensor?
-=================  ===========================================  ===============
-STALL              current >= stall_current for stall_time      no (uses nFAULT
-                   while driven (after start_grace)             if no sensor)
-CURRENT_LIMIT      nFAULT low while a motor is driven           no (warning)
-DRIVER_FAULT       nFAULT low with no motor driven, > 0.2 s     no
-OPEN_LOAD          current < open_load_current for              yes
-                   open_load_time while driven >= 20 % duty
-OVERLOAD           current > continuous_current for             yes
-                   overload_time
-BOARD_OVERLOAD     board supply current > fuse_rating for 1 s   yes
-CHAIN_OVERLOAD     chain supply current > chain limit for 1 s   yes
-SENSOR_ERROR       ADS1115 read fails                           yes
-=================  ===========================================  ===============
-
-Without a sensor, a stall is inferred from nFAULT staying low (the driver
-current-limiting) for ``stall_time``. If both motors on a board are running,
-the board can't tell which one is stalled, so both are stopped.
+Without a current sensor, a stall is inferred from nFAULT staying low (the driver
+current-limiting) for `stall_time`. If both motors on a board are running, the board
+can't tell which one stalled, so both are stopped.
 """
 from __future__ import annotations
 
@@ -33,12 +18,16 @@ from typing import Callable, Dict, List, Optional
 
 from .faults import Fault, FaultType, SensorError
 
-log = logging.getLogger("pingoblin_motor")
+_log = logging.getLogger("pingoblin_motor")
 
 DRIVER_FAULT_DEBOUNCE = 0.2
+"""Seconds nFAULT must stay low, with no motor driven, before `DRIVER_FAULT`."""
 OVERLOAD_DEBOUNCE = 1.0
+"""Seconds a board or chain must stay over its limit before `BOARD_OVERLOAD` / `CHAIN_OVERLOAD`."""
 CURRENT_LIMIT_REPEAT = 5.0     # seconds between repeated CURRENT_LIMIT warnings
+"""Minimum seconds between repeated `CURRENT_LIMIT` warnings for one motor."""
 OPEN_LOAD_MIN_DUTY = 0.2
+"""Open-load checks run only at or above this PWM duty (0-1)."""
 
 
 @dataclass
@@ -51,16 +40,26 @@ class _Track:
 
 
 class FaultMonitor:
-    """Watches boards for faults. Use through MotorBoard or MotorChain.
+    """Watches boards for faults: polls nFAULT and the current sensors, and reports through handlers.
 
-    :param boards: boards to watch.
-    :param interval: seconds between checks.
-    :param chain_current_limit: amps for CHAIN_OVERLOAD (None = off).
-    :param clock: time source (for tests).
+    Normally created for you by
+    [`MotorBoard.start_monitor()`][pingoblin_motor.board.MotorBoard.start_monitor] or
+    [`MotorChain`][pingoblin_motor.chain.MotorChain]. See
+    [`FaultType`][pingoblin_motor.faults.FaultType] for what is detected.
     """
 
     def __init__(self, boards, interval: float = 0.05, chain_current_limit: Optional[float] = None,
                  clock: Callable[[], float] = time.monotonic):
+        """
+        Args:
+            boards: Boards to watch.
+            interval: Seconds between checks when running as a thread.
+            chain_current_limit: Amps for `CHAIN_OVERLOAD`, or `None` to disable.
+            clock: Time source in seconds (for tests). Default `time.monotonic`.
+
+        Attributes:
+            faults (list): History of detected faults, oldest first (up to 1000).
+        """
         self.boards = list(boards)
         self.interval = interval
         self.chain_current_limit = chain_current_limit
@@ -77,19 +76,31 @@ class FaultMonitor:
 
     # ------------------------------------------------------------ control
     def add_fault_handler(self, handler: Callable[[Fault], None]) -> None:
+        """Call `handler(fault)` for every fault detected.
+
+        Args:
+            handler: A callable taking one [`Fault`][pingoblin_motor.faults.Fault].
+        """
         self._handlers.append(handler)
 
     def add_board(self, board) -> None:
+        """Watch another board.
+
+        Args:
+            board: The [`MotorBoard`][pingoblin_motor.board.MotorBoard].
+        """
         with self._lock:
             self.boards.append(board)
 
     def start(self) -> None:
+        """Start checking in a background daemon thread."""
         if self._thread is None:
             self._stop.clear()
             self._thread = threading.Thread(target=self._loop, name="pingoblin-fault-monitor", daemon=True)
             self._thread.start()
 
     def stop(self) -> None:
+        """Stop the background thread and wait for it to finish."""
         self._stop.set()
         if self._thread is not None and self._thread is not threading.current_thread():
             self._thread.join(timeout=2.0)
@@ -97,6 +108,7 @@ class FaultMonitor:
 
     @property
     def running(self) -> bool:
+        """`True` while the background thread runs."""
         return self._thread is not None
 
     def _loop(self) -> None:
@@ -104,12 +116,16 @@ class FaultMonitor:
             try:
                 self.check_once()
             except Exception:
-                log.exception("fault monitor check failed")
+                _log.exception("fault monitor check failed")
             self._stop.wait(self.interval)
 
     # ------------------------------------------------------------ checks
     def check_once(self) -> List[Fault]:
-        """Run one check of every board. Returns faults found in this pass."""
+        """Check every board once.
+
+        Returns:
+            The faults found in this pass.
+        """
         now = self.clock()
         found: List[Fault] = []
         chain_total, chain_known = 0.0, True
@@ -268,7 +284,7 @@ class FaultMonitor:
             try:
                 h(fault)
             except Exception:
-                log.exception("fault handler failed")
+                _log.exception("fault handler failed")
 
     def _emit(self, fault: Fault, motor, found: List[Fault]) -> None:
         self._record(fault, found)

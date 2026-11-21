@@ -1,15 +1,33 @@
-# pingoblin_motor for MicroPython - PinGoblin Board A (2 x DRV8874) motor library
-# MIT licence. Copy this one file to the board (or precompile with mpy-cross).
-#
-# Works on ESP32 and Raspberry Pi Pico (RP2040/RP2350) with MicroPython 1.20+.
-# The same names as the Raspberry Pi library: MotorBoard, Motor, MotorChain,
-# forward(), reverse(), run(), start(), stop()/brake(), coast(), speed_pc, current.
-#
-# No threads. Timed runs, ramps and fault checks happen in update(). Call it in
-# one of three ways:
-#   * run the monitor as an asyncio task:  asyncio.create_task(board.run_monitor())
-#   * use the blocking helpers:            board.pause(2)  /  motor.forward(50, 2, wait=True)
-#   * call board.update() from your own main loop every 10-50 ms
+"""`pingoblin_motor` for MicroPython: the PinGoblin Board A (2 × DRV8874) motor library in one file.
+
+Runs on ESP32 and Raspberry Pi Pico / Pico 2 with MicroPython 1.20 or later, and has the
+same class and method names as the Raspberry Pi library: `MotorBoard`, `Motor`,
+`MotorChain`, `forward()`, `reverse()`, `run()`, `start()`, `stop()` / `brake()`,
+`coast()`, `speed_pc` and `current`.
+
+There are no threads. Timed runs, ramps and fault checks happen in `update()`, which
+must be called in one of three ways:
+
+- as an asyncio task: `asyncio.create_task(board.run_monitor())`;
+- through the blocking helpers: `board.pause(2)` or `motor.forward(50, 2, wait=True)`;
+- from your own main loop, every 10-50 ms.
+
+The source is about 63 KB, much of it docstrings. Precompile it with `mpy-cross` and
+copy the `.mpy` to the board: `.mpy` files leave the docstrings out and skip on-board
+compilation, which can run out of RAM on an ESP32 without PSRAM.
+
+Example:
+    ```python
+    from pingoblin_motor import MotorBoard
+
+    board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, sleep_pin=32, fault_pin=39)
+    board.enable_monitor(on_fault=print)
+    board.motor_a.forward(60, duration=2, wait=True)
+    ```
+
+MIT licence. Documentation: https://pingoblin.github.io/DRV8874/
+"""
+
 import time
 
 try:
@@ -21,9 +39,11 @@ except ImportError:  # older MicroPython
         asyncio = None
 
 __version__ = "0.1.0"
+"""Library version."""
 
 # ---------------------------------------------------------------- timing
 _clock_offset = [0]   # test hook (CPython only)
+"""Test hook: milliseconds added to the CPython clock shim."""
 
 if hasattr(time, "ticks_ms"):
     ticks_ms = time.ticks_ms
@@ -31,32 +51,57 @@ if hasattr(time, "ticks_ms"):
     sleep_ms = time.sleep_ms
 else:  # CPython: lets the test suite run off-target
     def ticks_ms():
+        """Milliseconds from a free-running clock. On MicroPython this is `time.ticks_ms`."""
         return int(time.monotonic() * 1000) + _clock_offset[0]
 
     def ticks_diff(a, b):
+        """Milliseconds from tick `b` to tick `a`. On MicroPython this is `time.ticks_diff` (handles wrap-around)."""
         return a - b
 
     def sleep_ms(ms):
+        """Sleep for `ms` milliseconds. On MicroPython this is `time.sleep_ms`."""
         time.sleep(ms / 1000)
 
 
 def _advance_clock(ms):
-    """Test hook: move the CPython clock forward."""
+    """Move the CPython clock shim forward (testing only; no effect on MicroPython).
+
+    Args:
+        ms: Milliseconds to add.
+    """
     _clock_offset[0] += int(ms)
 
 
 ISENSE_V_PER_A = 0.675     # 1.5 kOhm x 450 uA/A (DRV8874 IPROPI)
+"""Board A ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A)."""
 WAKE_MS = 2                # DRV8874 wake-up from sleep is about 1 ms
+"""Milliseconds to wait after waking the drivers (the DRV8874 needs about 1 ms)."""
 
 # ---------------------------------------------------------------- constants
 
 
 class Direction:
+    """Direction of rotation (string constants).
+
+    Attributes:
+        FORWARD: `"forward"`: PH low, OUT2 positive.
+        REVERSE: `"reverse"`: PH high, OUT1 positive.
+    """
+
     FORWARD = "forward"
     REVERSE = "reverse"
 
 
 class MotorState:
+    """What a motor is doing (string constants).
+
+    Attributes:
+        STOPPED: `"stopped"`: braked; both outputs low.
+        COASTING: `"coasting"`: outputs open; spins down freely.
+        RUNNING: `"running"`: driven.
+        FAULT: `"fault"`: a latched fault. Call `clear_fault()`.
+    """
+
     STOPPED = "stopped"     # braked
     COASTING = "coasting"
     RUNNING = "running"
@@ -64,11 +109,32 @@ class MotorState:
 
 
 class ControlMode:
+    """Control mode set by the PMODE jumper JP1 (string constants).
+
+    Attributes:
+        PH_EN: `"ph_en"`: default (JP1 pads 1-2). EN = speed PWM, PH = direction.
+        PWM: `"pwm"`: JP1 pads 2-3. IN1 / IN2; allows per-motor coast.
+    """
+
     PH_EN = "ph_en"         # JP1 pads 1-2 (default): EN = speed PWM, PH = direction
     PWM = "pwm"             # JP1 pads 2-3: IN1 / IN2
 
 
 class FaultType:
+    """Every fault the library can detect (string constants).
+
+    | Constant | Detected when | Needs sensor |
+    |---|---|---|
+    | `STALL` | Current at or above `stall_current` for `stall_time` while driven, or nFAULT low for `stall_time` without a sensor | No |
+    | `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | No |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature | No |
+    | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % or more | Yes |
+    | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
+    | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (3 A) for 1 s | Yes |
+    | `CHAIN_OVERLOAD` | Chain supply current above the chain limit (6 A) for 1 s | Yes |
+    | `SENSOR_ERROR` | The current sensor could not be read | Yes |
+    """
+
     STALL = "stall"
     CURRENT_LIMIT = "current_limit"
     DRIVER_FAULT = "driver_fault"
@@ -80,6 +146,15 @@ class FaultType:
 
 
 class FaultAction:
+    """What to do to a motor when a fault is detected (string constants).
+
+    Attributes:
+        NONE: Record and report only.
+        BRAKE: Brake the motor.
+        COAST: Coast if possible, otherwise brake.
+        SLEEP: Sleep the board (all motors coast). Brakes if there is no sleep pin.
+    """
+
     NONE = "none"
     BRAKE = "brake"
     COAST = "coast"
@@ -96,33 +171,69 @@ DEFAULT_ACTIONS = {
     FaultType.CHAIN_OVERLOAD: FaultAction.BRAKE,
     FaultType.SENSOR_ERROR: FaultAction.NONE,
 }
+"""Default `FaultAction` for each `FaultType`."""
 LATCHING = (FaultType.STALL, FaultType.DRIVER_FAULT, FaultType.OPEN_LOAD, FaultType.OVERLOAD)
+"""Fault types that latch until `clear_fault()`."""
 
 # ---------------------------------------------------------------- faults and errors
 
 
 class MotorError(Exception):
+    """Base class for every exception raised by the library."""
+
     pass
 
 
 class ConfigError(MotorError):
+    """Invalid configuration: pins, modes, names or limits."""
+
     pass
 
 
 class SensorError(MotorError):
+    """The current sensor could not be read."""
+
     pass
 
 
 class MotorFaultError(MotorError):
+    """Raised when you command a motor that has a latched fault. Call `clear_fault()` first.
+
+    Attributes:
+        fault (Fault): The latched fault.
+    """
+
     def __init__(self, fault):
+        """
+        Args:
+            fault: The latched `Fault`.
+        """
         MotorError.__init__(self, "motor has a latched fault: %s. Call clear_fault() first." % fault)
         self.fault = fault
 
 
 class Fault:
-    """One detected fault. ``timestamp`` is in ticks_ms."""
+    """A record of one detected fault. `str(fault)` gives a one-line summary.
+
+    Attributes:
+        type (str): A `FaultType` constant.
+        message (str): Description, including the likely cause.
+        board (str | None): Board name, or `None` for a chain-wide fault.
+        motor (str | None): Motor name, or `None` for a board-wide fault.
+        value (float | None): The measured value that triggered it (A), if any.
+        timestamp (int): `ticks_ms()` when it was detected.
+    """
 
     def __init__(self, type, message, board=None, motor=None, value=None, timestamp=None):
+        """
+        Args:
+            type: A `FaultType` constant.
+            message: Description.
+            board: Board name.
+            motor: Motor name.
+            value: Measured value (A).
+            timestamp: `ticks_ms()` value. Default: now.
+        """
         self.type = type
         self.message = message
         self.board = board
@@ -138,23 +249,56 @@ class Fault:
 
 
 class FaultPolicy:
-    """Per-motor fault response, e.g. FaultPolicy({FaultType.STALL: FaultAction.COAST}, latch=False)."""
+    """Per-motor fault response.
+
+    Example:
+        ```python
+        policy = FaultPolicy({FaultType.STALL: FaultAction.COAST}, latch=False)
+        board = MotorBoard(a_en=25, a_ph=26, a_options=dict(policy=policy))
+        ```
+    """
 
     def __init__(self, actions=None, latch=True):
+        """
+        Args:
+            actions: Dict mapping `FaultType` constants to `FaultAction` constants. Missing
+                types use `DEFAULT_ACTIONS`.
+            latch: Whether `STALL`, `DRIVER_FAULT`, `OPEN_LOAD` and `OVERLOAD` latch.
+        """
         self.actions = actions or {}
         self.latch = latch
 
     def action_for(self, fault_type):
+        """Return the action for a fault type.
+
+        Args:
+            fault_type: A `FaultType` constant.
+
+        Returns:
+            A `FaultAction` constant.
+        """
         return self.actions.get(fault_type, DEFAULT_ACTIONS[fault_type])
 
     def latches(self, fault_type):
+        """Return whether a fault of this type latches the motor.
+
+        Args:
+            fault_type: A `FaultType` constant.
+
+        Returns:
+            `True` if the motor must be cleared with `clear_fault()`.
+        """
         return self.latch and fault_type in LATCHING
 
 # ---------------------------------------------------------------- pins
 
 
 class PinFactory:
-    """Creates pins and shares them by number (for shared nSLEEP / nFAULT lines)."""
+    """Creates pins and shares them by GPIO number, so boards can share nSLEEP and nFAULT.
+
+    A shared pin is closed when the last user releases it. Subclasses implement
+    `_make_output()`, `_make_pwm()` and `_make_input()`.
+    """
 
     def __init__(self):
         self._pins = {}
@@ -174,15 +318,55 @@ class PinFactory:
         return obj
 
     def output(self, pin, initial=False):
+        """Get a digital output, creating it on first use.
+
+        Args:
+            pin: GPIO number.
+            initial: Level when first created.
+
+        Returns:
+            An object with `set(value)` and `get()`.
+
+        Raises:
+            ConfigError: The pin is already used as another kind.
+        """
         return self._get(pin, "output", lambda: self._make_output(pin, initial))
 
     def pwm(self, pin, freq):
+        """Get a PWM output, creating it on first use (duty 0).
+
+        Args:
+            pin: GPIO number.
+            freq: PWM frequency (Hz).
+
+        Returns:
+            An object with `set_duty(0..1)` and `get_duty()`.
+
+        Raises:
+            ConfigError: The pin is already used as another kind.
+        """
         return self._get(pin, "pwm", lambda: self._make_pwm(pin, freq))
 
     def input(self, pin):
+        """Get a digital input, creating it on first use (no internal pull).
+
+        Args:
+            pin: GPIO number.
+
+        Returns:
+            An object with `read()`.
+
+        Raises:
+            ConfigError: The pin is already used as an output.
+        """
         return self._get(pin, "input", lambda: self._make_input(pin))
 
     def release(self, pin):
+        """Drop one reference to a pin, and close it when no one uses it.
+
+        Args:
+            pin: GPIO number, or `None` (ignored).
+        """
         if pin is None or pin not in self._pins:
             return
         self._refs[pin] -= 1
@@ -250,7 +434,7 @@ class _MIn:
 
 
 class MachinePins(PinFactory):
-    """Real hardware through the ``machine`` module."""
+    """Real hardware through the `machine` module: `Pin`, and `PWM` with `duty_u16()`."""
 
     def _make_output(self, pin, initial):
         return _MOut(pin, initial)
@@ -289,10 +473,15 @@ class _Mock:
 
 
 class MockPins(PinFactory):
-    """No hardware: for testing. Inspect ``pins.pins[n]``."""
+    """Hardware-free pins for tests. Inspect `pins.pins[n]`.
+
+    Each pin object has `value` (outputs), `duty` (PWM), `freq` (PWM) and `level` (inputs;
+    starts high like nFAULT's pull-up).
+    """
 
     @property
     def pins(self):
+        """The pins created so far, by GPIO number."""
         return self._pins
 
     def _make_output(self, pin, initial):
@@ -315,13 +504,29 @@ _RATES = {8: 0, 16: 1, 32: 2, 64: 3, 128: 4, 250: 5, 475: 6, 860: 7}
 
 
 class ADS1115:
-    """PinGoblin ADS1115 board (or any ADS1115) on a ``machine.I2C`` bus.
+    """PinGoblin ADS1115 board (or any ADS1115) on a `machine.I2C` bus.
 
-    Each conversion averages over about 1.2 ms (860 samples/s), so a reading
-    is roughly ``PWM duty x motor current``.
+    Each conversion averages over about 1.2 ms (860 samples/s), so with PWM a reading is
+    roughly *duty × motor current*.
+
+    Example:
+        ```python
+        from machine import I2C, Pin
+        adc = ADS1115(I2C(0, sda=Pin(21), scl=Pin(22), freq=400000), address=0x48)
+        ```
     """
 
     def __init__(self, i2c, address=0x48, full_scale=4.096, data_rate=860):
+        """
+        Args:
+            i2c: A `machine.I2C` (or any object with `writeto_mem()` and `readfrom_mem()`).
+            address: 0x48, 0x49, 0x4A or 0x4B.
+            full_scale: Input range (V). 4.096 covers ISENSE at 5 V logic.
+            data_rate: Samples per second.
+
+        Raises:
+            ConfigError: Invalid address, range or rate.
+        """
         if address not in (0x48, 0x49, 0x4A, 0x4B):
             raise ConfigError("invalid ADS1115 address 0x%02X" % address)
         if full_scale not in _PGA:
@@ -335,12 +540,34 @@ class ADS1115:
         self._wait_ms = 1000 // data_rate + 1
 
     def config_word(self, channel):
+        """Build the config-register value for a single-shot read.
+
+        Args:
+            channel: Input 0-3 (AINx against GND).
+
+        Returns:
+            The 16-bit config register value.
+
+        Raises:
+            ConfigError: Channel out of range.
+        """
         if channel not in (0, 1, 2, 3):
             raise ConfigError("ADS1115 channel must be 0-3")
         return ((1 << 15) | ((4 | channel) << 12) | (_PGA[self.full_scale] << 9)
                 | (1 << 8) | (_RATES[self.data_rate] << 5) | 3)
 
     def read_voltage(self, channel):
+        """Start a conversion, wait for it and return the voltage.
+
+        Args:
+            channel: Input 0-3.
+
+        Returns:
+            The input voltage (V).
+
+        Raises:
+            SensorError: The I²C transfer failed.
+        """
         cfg = self.config_word(channel)
         try:
             self.i2c.writeto_mem(self.address, 1, bytes([cfg >> 8, cfg & 0xFF]))
@@ -359,25 +586,47 @@ class ADS1115:
 
 
 class ADS1115Channel:
+    """One ADS1115 input wired to an ISENSE pin."""
+
     def __init__(self, adc, channel):
+        """
+        Args:
+            adc: The `ADS1115`.
+            channel: Input 0-3.
+
+        Raises:
+            ConfigError: Channel out of range.
+        """
         adc.config_word(channel)
         self.adc = adc
         self.channel = channel
 
     def read_voltage(self):
+        """Read this channel.
+
+        Returns:
+            The ISENSE voltage (V).
+
+        Raises:
+            SensorError: The I²C transfer failed.
+        """
         return self.adc.read_voltage(self.channel)
 
 
 class ADCChannel:
-    """The microcontroller's own ADC (ESP32: ADC1 pins 32-39; Pico: GP26-28).
+    """The microcontroller's own ADC on an ISENSE pin (ESP32: ADC1 pins 32-39; Pico: GP26-28).
 
-    The built-in ADC samples instantly, so with PWM each reading is either
-    the full motor current or zero. Averaging many samples (``samples`` on
-    the board, default 16 for ADCChannel) gives the duty-weighted mean.
-    ``vref`` is used only where ``read_uv()`` isn't available (Pico).
+    The built-in ADC samples instantly, so with PWM each sample is either the full motor
+    current or zero. Boards average 16 samples per reading by default for this sensor.
+    On the ESP32 the input range is set to about 0-3.1 V (11 dB attenuation).
     """
 
     def __init__(self, pin, vref=3.3):
+        """
+        Args:
+            pin: ADC-capable GPIO.
+            vref: ADC reference (V), used only where `read_uv()` isn't available (Pico).
+        """
         import machine
         self._adc = machine.ADC(machine.Pin(pin))
         if hasattr(self._adc, "atten") and hasattr(machine.ADC, "ATTN_11DB"):
@@ -386,6 +635,14 @@ class ADCChannel:
         self.vref = vref
 
     def read_voltage(self):
+        """Take one sample.
+
+        Returns:
+            The ISENSE voltage (V).
+
+        Raises:
+            SensorError: The ADC read failed.
+        """
         try:
             if self._uv:
                 return self._adc.read_uv() / 1000000
@@ -395,25 +652,58 @@ class ADCChannel:
 
 
 class MockSensor:
-    """Test sensor: ``amps`` = current at the ISENSE pin; ``fail`` = raise."""
+    """Mock current sensor for tests.
+
+    Attributes:
+        amps (float): Current at the ISENSE pin (A): the duty-weighted average.
+        fail (bool): Set `True` to make reads raise `SensorError`.
+    """
 
     def __init__(self, amps=0.0):
+        """
+        Args:
+            amps: Initial ISENSE current (A).
+        """
         self.amps = amps
         self.fail = False
 
     def read_voltage(self):
+        """Return `amps × 0.675`.
+
+        Returns:
+            The simulated ISENSE voltage (V).
+
+        Raises:
+            SensorError: `fail` is set.
+        """
         if self.fail:
             raise SensorError("mock sensor failure")
         return self.amps * ISENSE_V_PER_A
 
 
 class MotorCurrentSensor:
+    """Converts ISENSE readings to amps, averaging several samples."""
+
     def __init__(self, source, samples=4, v_per_a=ISENSE_V_PER_A):
+        """
+        Args:
+            source: Any object with `read_voltage()` (`ADS1115Channel`, `ADCChannel`, `MockSensor`).
+            samples: Samples averaged per reading.
+            v_per_a: ISENSE gain (V/A): 0.675 on Board A.
+        """
         self.source = source
         self.samples = samples if samples > 0 else 1
         self.v_per_a = v_per_a
 
     def read_isense_amps(self):
+        """Return the average ISENSE current: the supply-side current for this motor.
+
+        Returns:
+            Amps, never negative.
+
+        Raises:
+            SensorError: A sample failed.
+        """
         total = 0.0
         for _ in range(self.samples):
             total += self.source.read_voltage()
@@ -424,6 +714,17 @@ class MotorCurrentSensor:
 
 
 def _check_speed(v):
+    """Validate a speed.
+
+    Args:
+        v: Speed (%).
+
+    Returns:
+        The speed as a float.
+
+    Raises:
+        ValueError: Outside 0-100.
+    """
     v = float(v)
     if v < 0 or v > 100:
         raise ValueError("speed_pc must be 0-100, got %s" % v)
@@ -431,17 +732,43 @@ def _check_speed(v):
 
 
 class Motor:
-    """One motor channel. Create through MotorBoard.
+    """One motor channel. Create motors through `MotorBoard`, not directly.
 
-    Options (seconds / amps): invert, min_speed_pc, ramp_time, reverse_delay,
-    stall_current (default 80 % of the board limit), stall_time, start_grace,
-    open_load_current, open_load_time, continuous_current, overload_time, policy.
+    Pass options to both motors with `motor_options=`, or to one with `a_options=` /
+    `b_options=`. Speeds are percentages, 0-100; `run()` takes a signed speed.
     """
 
     def __init__(self, name, board, en_pin, ph_pin, mode, pins, sensor=None, invert=False,
                  pwm_freq=20000, min_speed_pc=0, ramp_time=0.0, reverse_delay=0.1,
                  stall_current=None, stall_time=0.5, start_grace=0.3, open_load_current=0.03,
                  open_load_time=1.0, continuous_current=1.5, overload_time=5.0, policy=None):
+        """
+        Args:
+            name: Motor name within its board.
+            board: The owning `MotorBoard`.
+            en_pin: GPIO for EN (PH/EN mode) or IN1 (PWM mode).
+            ph_pin: GPIO for PH (PH/EN mode) or IN2 (PWM mode).
+            mode: The board's `ControlMode` constant.
+            pins: The `PinFactory`.
+            sensor: Optional `MotorCurrentSensor`.
+            invert: Swap forward and reverse.
+            pwm_freq: PWM frequency (Hz).
+            min_speed_pc: Non-zero speeds below this are raised to it. 0 disables.
+            ramp_time: Seconds to ramp from 0 to 100 %. 0 = instant. Ramps advance in `update()`.
+            reverse_delay: Seconds of braking before a direction change while running.
+            stall_current: Motor current (A) treated as a stall. Default: 80 % of the board limit.
+            stall_time: Seconds the stall condition must last.
+            start_grace: Seconds after a start or speed change during which stall and open-load
+                checks are skipped.
+            open_load_current: Current (A) below which a driven motor counts as disconnected.
+            open_load_time: Seconds the open-load condition must last.
+            continuous_current: Current (A) the motor may carry continuously.
+            overload_time: Seconds above `continuous_current` before an overload fault.
+            policy: `FaultPolicy` for this motor.
+
+        Raises:
+            ConfigError: An option is out of range.
+        """
         if min_speed_pc < 0 or min_speed_pc >= 100:
             raise ConfigError("min_speed_pc must be 0-99")
         if ramp_time < 0 or reverse_delay < 0:
@@ -483,43 +810,59 @@ class Motor:
     # ---- properties
     @property
     def full_name(self):
+        """The name including the board, for example `"front.a"`."""
         return "%s.%s" % (self.board.name, self.name)
 
     @property
     def state(self):
+        """The current `MotorState` constant."""
         return self._state
 
     @property
     def direction(self):
+        """Direction of the last run command, kept after a stop for `start()`. `None` if never run."""
         return self._direction
 
     @property
     def is_running(self):
+        """`True` while the motor is driven."""
         return self._state == MotorState.RUNNING
 
     @property
     def duty(self):
+        """PWM duty currently applied, 0-1."""
         return self._duty
 
     @property
     def running_since(self):
+        """`ticks_ms()` of the last start or speed change."""
         return self._since
 
     @property
     def fault(self):
+        """The latched `Fault`, or `None`."""
         return self._fault
 
     @property
     def has_sensor(self):
+        """`True` if the motor has a current sensor."""
         return self.sensor is not None
 
     @property
     def busy(self):
-        """True while a timed run or a ramp is still in progress."""
+        """`True` while a timed run or a ramp is still in progress (both advance in `update()`)."""
         return self._stop_at is not None or self._ramp is not None
 
     @property
     def speed_pc(self):
+        """Commanded speed, 0-100 %.
+
+        Setting it while running changes the speed (ramped if `ramp_time` is set); 0 stops.
+        While stopped it stores the speed for `start()`.
+
+        Raises:
+            ValueError: Outside 0-100.
+        """
         return self._speed_pc
 
     @speed_pc.setter
@@ -535,18 +878,52 @@ class Motor:
 
     @property
     def current(self):
-        """Motor amps (reads the sensor), or None without one."""
+        """Motor current (A), read now and corrected for PWM duty, or `None` without a sensor."""
         return self.read_current() if self.sensor is not None else None
 
     # ---- commands
     def forward(self, speed_pc=100, duration=None, wait=False):
+        """Run forward.
+
+        Args:
+            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            duration: Seconds to run before braking, or `None` to run until told otherwise.
+                The stop happens inside `update()`.
+            wait: With `duration`, block until the run ends (calls `update()` while waiting).
+
+        Raises:
+            ValueError: Speed outside 0-100, or `duration` not positive.
+            MotorFaultError: The motor has a latched fault.
+        """
         self._run(Direction.FORWARD, speed_pc, duration, wait)
 
     def reverse(self, speed_pc=100, duration=None, wait=False):
+        """Run in reverse.
+
+        Args:
+            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            duration: Seconds to run before braking, or `None` to run until told otherwise.
+                The stop happens inside `update()`.
+            wait: With `duration`, block until the run ends (calls `update()` while waiting).
+
+        Raises:
+            ValueError: Speed outside 0-100, or `duration` not positive.
+            MotorFaultError: The motor has a latched fault.
+        """
         self._run(Direction.REVERSE, speed_pc, duration, wait)
 
     def run(self, speed_pc, duration=None, wait=False):
-        """Signed speed: +50 forward, -50 reverse, 0 stop."""
+        """Run with a signed speed.
+
+        Args:
+            speed_pc: -100 to 100. Positive is forward, negative is reverse, 0 stops.
+            duration: Seconds to run before braking, or `None`.
+            wait: With `duration`, block until the run ends.
+
+        Raises:
+            ValueError: Speed out of range, or `duration` not positive.
+            MotorFaultError: The motor has a latched fault.
+        """
         if speed_pc == 0:
             self.stop()
         else:
@@ -554,10 +931,19 @@ class Motor:
                       abs(speed_pc), duration, wait)
 
     def start(self, duration=None, wait=False):
+        """Resume the last direction and speed (forward at 100 % if never run).
+
+        Args:
+            duration: Seconds to run before braking, or `None`.
+            wait: With `duration`, block until the run ends.
+
+        Raises:
+            MotorFaultError: The motor has a latched fault.
+        """
         self._run(self._direction or Direction.FORWARD, self._speed_pc or 100, duration, wait)
 
     def stop(self):
-        """Brake (outputs low): stops quickly."""
+        """Brake (both outputs low): stops quickly. Cancels any timed run or ramp. `brake()` is an alias."""
         self._stop_at = None
         self._ramp = None
         self._apply_brake()
@@ -565,10 +951,17 @@ class Motor:
             self._state = MotorState.STOPPED
 
     brake = stop
+    """Alias of `stop()`."""
 
     def coast(self):
-        """Spin down freely. In PH/EN mode only if no other motor on the nSLEEP line runs;
-        otherwise brakes and returns False."""
+        """Let the motor spin down freely.
+
+        In PWM mode this is per motor. In PH/EN mode it sleeps the nSLEEP line, so it happens
+        only when every other motor on that line is idle; otherwise the motor brakes.
+
+        Returns:
+            `True` if coasting, `False` if it had to brake instead.
+        """
         self._stop_at = None
         self._ramp = None
         if self.mode == ControlMode.PWM:
@@ -582,8 +975,14 @@ class Motor:
         return ok
 
     def wait(self, timeout=None):
-        """Block until a timed run or ramp finishes, keeping update() running.
-        Returns False on timeout."""
+        """Block until a timed run or ramp finishes, calling `update()` on the board (or its chain) meanwhile.
+
+        Args:
+            timeout: Maximum seconds, or `None`.
+
+        Returns:
+            `False` if the timeout expired first.
+        """
         t0 = ticks_ms()
         owner = self.board._owner()
         while self.busy:
@@ -594,6 +993,17 @@ class Motor:
         return True
 
     def read_current(self):
+        """Read the sensor now and return the estimated motor current.
+
+        Updates `last_current` and `last_isense_amps`. Below 10 % duty the raw reading is returned.
+
+        Returns:
+            Motor current (A).
+
+        Raises:
+            ConfigError: No sensor.
+            SensorError: The reading failed.
+        """
         if self.sensor is None:
             raise ConfigError("%s has no current sensor" % self.full_name)
         isense = self.sensor.read_isense_amps()
@@ -603,14 +1013,23 @@ class Motor:
         return amps
 
     def add_fault_handler(self, handler):
+        """Call `handler(fault)` whenever a fault is reported for this motor.
+
+        Handlers run inside `update()`. Exceptions are printed and ignored.
+
+        Args:
+            handler: A callable taking one `Fault`.
+        """
         self._handlers.append(handler)
 
     def clear_fault(self):
+        """Clear a latched fault so the motor can run again. It stays stopped."""
         self._fault = None
         if self._state == MotorState.FAULT:
             self._state = MotorState.STOPPED
 
     def close(self):
+        """Brake and release the motor's pins."""
         try:
             self.stop()
         finally:
@@ -734,12 +1153,17 @@ _sleep_groups = {}
 
 
 class MotorBoard:
-    """One Board A. Pins are GPIO numbers.
+    """One Board A dual DC motor driver. Pins are GPIO numbers.
 
-    mode: "ph_en" (default, JP1 1-2) or "pwm" (JP1 2-3).
-    logic_voltage: VLOGIC; sets the current limit (2.0 A at 3.3 V, 3.0 A at 5 V).
-    Current sensing: pass ``adc`` (ADS1115) with a_sense_channel / b_sense_channel,
-    or ``a_sensor`` / ``b_sensor`` (e.g. ADCChannel(34) for the ESP32's own ADC).
+    Example:
+        ```python
+        board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, sleep_pin=32, fault_pin=39,
+                           a_sensor=ADCChannel(34), b_sensor=ADCChannel(35))
+        board.enable_monitor(on_fault=print)
+        board.motor_a.forward(60)
+        board.pause(2)
+        board.stop_all()
+        ```
     """
 
     def __init__(self, name="board", a_en=None, a_ph=None, b_en=None, b_ph=None,
@@ -748,6 +1172,34 @@ class MotorBoard:
                  a_sensor=None, b_sensor=None, sense_samples=None, pins=None,
                  pwm_freq=20000, motor_names=("a", "b"), motor_options=None,
                  a_options=None, b_options=None, fuse_rating=3.0):
+        """
+        Args:
+            name: Board name, used in `"board.motor"` addresses. Must not contain `.`.
+            a_en: GPIO for A_EN (J3 pin 3).
+            a_ph: GPIO for A_PH (J3 pin 4).
+            b_en: GPIO for B_EN (J3 pin 5), or `None` for a single motor.
+            b_ph: GPIO for B_PH (J3 pin 6), or `None`.
+            sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`.
+            fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection without a sensor.
+            mode: `"ph_en"` (JP1 pads 1-2, default) or `"pwm"` (JP1 pads 2-3).
+            logic_voltage: VLOGIC (V). Sets the current limit: 2.0 A at 3.3 V, 3.0 A at 5 V.
+            adc: An `ADS1115` for current sensing.
+            a_sense_channel: ADS1115 input wired to A_ISENSE.
+            b_sense_channel: ADS1115 input wired to B_ISENSE.
+            a_sensor: Any sensor with `read_voltage()` for motor A, such as `ADCChannel(34)`.
+            b_sensor: The same for motor B.
+            sense_samples: Samples per reading. Default: 16 for `ADCChannel`, otherwise 4.
+            pins: `PinFactory`. Default: `MachinePins()`.
+            pwm_freq: PWM frequency (Hz). Default 20 kHz.
+            motor_names: Names for motors A and B.
+            motor_options: Keyword arguments for both `Motor`s.
+            a_options: Keyword arguments for motor A only.
+            b_options: Keyword arguments for motor B only.
+            fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
+
+        Raises:
+            ConfigError: Invalid mode, voltage, names or pins.
+        """
         if a_en is None or a_ph is None:
             raise ConfigError("a_en and a_ph are required")
         if mode not in (ControlMode.PH_EN, ControlMode.PWM):
@@ -798,27 +1250,32 @@ class MotorBoard:
     # ---- properties
     @property
     def current_limit(self):
+        """Driver current limit per motor (A): 0.4 × VLOGIC / 0.675 V/A."""
         return self.logic_voltage * 0.4 / ISENSE_V_PER_A
 
     @property
     def motor_a(self):
+        """The first `Motor` (J4)."""
         return self.motors[self._order[0]]
 
     @property
     def motor_b(self):
+        """The second `Motor` (J5), or `None`."""
         return self.motors[self._order[1]] if len(self._order) > 1 else None
 
     @property
     def is_asleep(self):
+        """`True` while nSLEEP is driven low."""
         return self._sleep is not None and not self._sleep.get()
 
     @property
     def fault_active(self):
-        """True while nFAULT is low; None if fault_pin isn't wired."""
+        """`True` while nFAULT is low; `None` if `fault_pin` isn't wired."""
         return None if self._fault is None else (not self._fault.read())
 
     @property
     def total_current(self):
+        """Sum of the motors' last supply-side readings (A), or `None` unless every motor has been read."""
         vals = [m.last_isense_amps for m in self.motors.values() if m.has_sensor]
         if not vals or None in vals:
             return None
@@ -832,6 +1289,11 @@ class MotorBoard:
 
     # ---- commands
     def sleep(self):
+        """Stop every motor on this nSLEEP line, then pull nSLEEP low (motors coast).
+
+        Raises:
+            ConfigError: No `sleep_pin`.
+        """
         if self._sleep is None:
             raise ConfigError("%s: no sleep_pin configured" % self.name)
         for b in self._sleep_group():
@@ -840,15 +1302,18 @@ class MotorBoard:
         self._sleep.set(False)
 
     def wake(self):
+        """Drive nSLEEP high and wait 2 ms. Run commands wake the board automatically."""
         if self._sleep is not None and not self._sleep.get():
             self._sleep.set(True)
             sleep_ms(WAKE_MS)
 
     def stop_all(self):
+        """Brake every motor on this board."""
         for m in self.motors.values():
             m.stop()
 
     def coast_all(self):
+        """Coast every motor (sleeps the board in PH/EN mode; brakes without a sleep pin)."""
         self.stop_all()
         if self.mode == ControlMode.PWM:
             for m in self.motors.values():
@@ -860,7 +1325,15 @@ class MotorBoard:
                     m._state = MotorState.COASTING
 
     def enable_monitor(self, interval=0.05, on_fault=None):
-        """Turn on fault checking inside update(). Returns the FaultMonitor."""
+        """Turn on fault checking inside `update()`.
+
+        Args:
+            interval: Minimum seconds between fault checks.
+            on_fault: Optional `handler(fault)`.
+
+        Returns:
+            The `FaultMonitor`.
+        """
         if self.monitor is None:
             self.monitor = FaultMonitor([self], interval)
         if on_fault:
@@ -868,7 +1341,7 @@ class MotorBoard:
         return self.monitor
 
     def update(self):
-        """Advance ramps and timed runs, and run fault checks. Call often (10-50 ms)."""
+        """Advance ramps and timed runs, and run fault checks if enabled. Call every 10-50 ms."""
         now = ticks_ms()
         for m in self.motors.values():
             m._tick(now)
@@ -876,11 +1349,26 @@ class MotorBoard:
             self.monitor.poll(now)
 
     def pause(self, seconds):
-        """Blocking sleep that keeps update() running."""
+        """Blocking sleep that keeps calling `update()`.
+
+        Args:
+            seconds: How long to pause.
+        """
         _pause(self, seconds)
 
     async def run_monitor(self, interval=0.02):
-        """asyncio task: ``asyncio.create_task(board.run_monitor())``."""
+        """Coroutine that calls `update()` forever. Run it as an asyncio task.
+
+        Enables the fault monitor if it isn't already.
+
+        Args:
+            interval: Seconds between updates.
+
+        Example:
+            ```python
+            asyncio.create_task(board.run_monitor())
+            ```
+        """
         if self.monitor is None:
             self.enable_monitor()
         while True:
@@ -888,6 +1376,7 @@ class MotorBoard:
             await asyncio.sleep(interval)
 
     def close(self):
+        """Brake every motor and release every pin."""
         for m in self.motors.values():
             m.close()
         if self._sleep_pin is not None:
@@ -934,6 +1423,12 @@ class MotorBoard:
 
 
 def _pause(owner, seconds):
+    """Blocking pause that keeps calling `owner.update()`.
+
+    Args:
+        owner: A `MotorBoard` or `MotorChain`.
+        seconds: How long to pause.
+    """
     t0 = ticks_ms()
     ms = int(seconds * 1000)
     while ticks_diff(ticks_ms(), t0) < ms:
@@ -944,9 +1439,22 @@ def _pause(owner, seconds):
 
 
 class MotorChain:
-    """Several daisy-chained boards as one system; motors as "board.motor" or aliases."""
+    """Several daisy-chained boards as one system, with one fault monitor.
+
+    Motors are addressed as `"board.motor"` or by an alias. `chain[name]` looks one up.
+    """
 
     def __init__(self, boards=(), chain_current_limit=6.0, monitor=True, interval=0.05):
+        """
+        Args:
+            boards: Boards to add. Names must be unique.
+            chain_current_limit: Total supply current allowed through the chain (A).
+            monitor: Create the chain's fault monitor.
+            interval: Minimum seconds between fault checks.
+
+        Raises:
+            ConfigError: Duplicate board names.
+        """
         self.boards = {}
         self._aliases = {}
         self.chain_current_limit = chain_current_limit
@@ -955,6 +1463,17 @@ class MotorChain:
             self.add_board(b)
 
     def add_board(self, board):
+        """Add a board. Its own monitor is replaced by the chain's.
+
+        Args:
+            board: The `MotorBoard`.
+
+        Returns:
+            The board.
+
+        Raises:
+            ConfigError: Duplicate board name.
+        """
         if board.name in self.boards:
             raise ConfigError("duplicate board name '%s'" % board.name)
         board.monitor = None          # the chain monitor takes over
@@ -965,6 +1484,19 @@ class MotorChain:
         return board
 
     def alias(self, alias, target):
+        """Give a motor a friendly name.
+
+        Args:
+            alias: The new name (no `.`).
+            target: `"board.motor"` or an existing alias.
+
+        Returns:
+            The `Motor`.
+
+        Raises:
+            ConfigError: The alias contains `.`.
+            KeyError: No such motor.
+        """
         if "." in alias:
             raise ConfigError("aliases must not contain '.'")
         m = self.motor(target)
@@ -972,6 +1504,17 @@ class MotorChain:
         return m
 
     def motor(self, name):
+        """Look up a motor by alias or `"board.motor"`.
+
+        Args:
+            name: The alias or address.
+
+        Returns:
+            The `Motor`.
+
+        Raises:
+            KeyError: No such motor.
+        """
         if name in self._aliases:
             return self._aliases[name]
         parts = name.split(".", 1)
@@ -981,9 +1524,11 @@ class MotorChain:
             raise KeyError("no motor '%s' (use 'board.motor' or an alias)" % name)
 
     __getitem__ = motor
+    """`chain[name]` is the same as `chain.motor(name)`."""
 
     @property
     def motors(self):
+        """Every motor on every board."""
         out = []
         for b in self.boards.values():
             out.extend(list(b))
@@ -994,43 +1539,59 @@ class MotorChain:
 
     @property
     def faults(self):
+        """Fault history, oldest first (up to 50)."""
         return list(self.monitor.faults) if self.monitor else []
 
     @property
     def active_faults(self):
+        """Latched faults currently blocking motors."""
         return [m.fault for m in self.motors if m.fault is not None]
 
     @property
     def total_current(self):
+        """Total supply-side current (A) from the last readings, or `None`."""
         vals = [b.total_current for b in self.boards.values()]
         if not vals or None in vals:
             return None
         return sum(vals)
 
     def add_fault_handler(self, handler):
+        """Call `handler(fault)` for every fault on any board.
+
+        Args:
+            handler: A callable taking one `Fault`.
+
+        Raises:
+            ConfigError: The chain was created with `monitor=False`.
+        """
         if self.monitor is None:
             raise ConfigError("chain was created with monitor=False")
         self.monitor.add_fault_handler(handler)
 
     def stop_all(self):
+        """Brake every motor."""
         for m in self.motors:
             m.stop()
 
     def coast_all(self):
+        """Coast every motor."""
         for b in self.boards.values():
             b.coast_all()
 
     def emergency_stop(self):
+        """Brake every motor, then sleep every board with a sleep pin."""
         self.stop_all()
         for b in self.boards.values():
             if b._sleep is not None:
                 b.sleep()
 
     def clear_faults(self):
+        """Clear the latched fault on every motor."""
         for m in self.motors:
             m.clear_fault()
 
     def update(self):
+        """Advance every motor's ramps and timed runs, and run fault checks. Call every 10-50 ms."""
         now = ticks_ms()
         for m in self.motors:
             m._tick(now)
@@ -1038,18 +1599,33 @@ class MotorChain:
             self.monitor.poll(now)
 
     def check_faults(self):
-        """Run one fault check now (ignores the interval)."""
+        """Run one fault check now, ignoring the interval.
+
+        Returns:
+            The faults found.
+        """
         return self.monitor.check_once() if self.monitor else []
 
     def pause(self, seconds):
+        """Blocking sleep that keeps calling `update()`.
+
+        Args:
+            seconds: How long to pause.
+        """
         _pause(self, seconds)
 
     async def run_monitor(self, interval=0.02):
+        """Coroutine that calls `update()` forever. Run it as an asyncio task.
+
+        Args:
+            interval: Seconds between updates.
+        """
         while True:
             self.update()
             await asyncio.sleep(interval)
 
     def close(self):
+        """Close every board."""
         for b in self.boards.values():
             b.close()
 
@@ -1062,9 +1638,13 @@ class MotorChain:
 # ---------------------------------------------------------------- fault monitor
 
 DRIVER_FAULT_DEBOUNCE_MS = 200
+"""Milliseconds nFAULT must stay low, with no motor driven, before `DRIVER_FAULT`."""
 OVERLOAD_DEBOUNCE_MS = 1000
+"""Milliseconds over the limit before `BOARD_OVERLOAD` / `CHAIN_OVERLOAD`."""
 CURRENT_LIMIT_REPEAT_MS = 5000
+"""Minimum milliseconds between repeated `CURRENT_LIMIT` warnings."""
 OPEN_LOAD_MIN_DUTY = 0.2
+"""Open-load checks run only at or above this duty (0-1)."""
 
 
 class _Track:
@@ -1077,10 +1657,24 @@ class _Track:
 
 
 class FaultMonitor:
-    """Detects STALL, CURRENT_LIMIT, DRIVER_FAULT, OPEN_LOAD, OVERLOAD,
-    BOARD_OVERLOAD, CHAIN_OVERLOAD and SENSOR_ERROR. Runs inside update()."""
+    """Detects every `FaultType`. Runs inside `update()`; you rarely create one yourself.
+
+    Without a current sensor, a stall is inferred from nFAULT staying low for `stall_time`.
+    If both motors on a board are running, both are stopped.
+
+    Attributes:
+        faults (list): Fault history, oldest first.
+        max_history (int): History length (default 50).
+    """
 
     def __init__(self, boards, interval=0.05, chain_current_limit=None, clock=None):
+        """
+        Args:
+            boards: Boards to watch.
+            interval: Minimum seconds between checks in `poll()`.
+            chain_current_limit: Amps for `CHAIN_OVERLOAD`, or `None` to disable.
+            clock: Function returning milliseconds (for tests). Default `ticks_ms`.
+        """
         self.boards = list(boards)
         self.interval_ms = int(interval * 1000)
         self.chain_current_limit = chain_current_limit
@@ -1095,10 +1689,22 @@ class FaultMonitor:
         self._last = None
 
     def add_fault_handler(self, handler):
+        """Call `handler(fault)` for every fault detected.
+
+        Args:
+            handler: A callable taking one `Fault`.
+        """
         self._handlers.append(handler)
 
     def poll(self, now=None):
-        """check_once() if at least ``interval`` has passed since the last check."""
+        """Run `check_once()` if at least `interval` has passed since the last check.
+
+        Args:
+            now: Current `ticks_ms()`, or `None` to read the clock.
+
+        Returns:
+            The faults found, or an empty list if it wasn't time to check.
+        """
         now = self.clock() if now is None else now
         if self._last is None or ticks_diff(now, self._last) >= self.interval_ms:
             self._last = now
@@ -1106,6 +1712,14 @@ class FaultMonitor:
         return []
 
     def check_once(self, now=None):
+        """Check every board once.
+
+        Args:
+            now: Current `ticks_ms()`, or `None` to read the clock.
+
+        Returns:
+            The faults found in this pass.
+        """
         now = self.clock() if now is None else now
         found = []
         total = 0.0

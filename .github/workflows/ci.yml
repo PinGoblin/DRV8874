@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install pytest
+      - name: Raspberry Pi package tests (mock backend)
+        working-directory: python
+        run: python -m pytest -q
+      - name: MicroPython module tests under CPython
+        working-directory: micropython
+        run: python -m pytest -q tests
+
+  micropython:
+    runs-on: ubuntu-latest
+    env:
+      MP_VERSION: v1.25.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache the MicroPython build
+        id: mpcache
+        uses: actions/cache@v4
+        with:
+          path: mp
+          key: micropython-${{ env.MP_VERSION }}-unix-v1
+      - name: Build MicroPython (unix port and mpy-cross)
+        if: steps.mpcache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update && sudo apt-get install -y libffi-dev pkg-config
+          git clone --depth 1 --branch "$MP_VERSION" https://github.com/micropython/micropython.git mp
+          make -C mp/mpy-cross -j4 CFLAGS_EXTRA=-Wno-error
+          make -C mp/ports/unix submodules
+          make -C mp/ports/unix -j4 CFLAGS_EXTRA=-Wno-error
+      - name: Smoke test under MicroPython
+        working-directory: micropython
+        run: ../mp/ports/unix/build-standard/micropython tests/mp_smoke.py
+      - name: Compile to .mpy and smoke-test the compiled file
+        run: |
+          mkdir -p build/mpy/tests
+          mp/mpy-cross/build/mpy-cross -o build/mpy/pingoblin_motor.mpy micropython/pingoblin_motor.py
+          cp micropython/tests/mp_smoke.py build/mpy/tests/
+          ls -l micropython/pingoblin_motor.py build/mpy/pingoblin_motor.mpy | tee -a "$GITHUB_STEP_SUMMARY"
+          cd build/mpy && ../../mp/ports/unix/build-standard/micropython tests/mp_smoke.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pingoblin_motor-mpy-${{ env.MP_VERSION }}
+          path: build/mpy/pingoblin_motor.mpy
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-docs.txt
+      - name: Build documentation (warnings are errors)
+        run: mkdocs build --strict
+
+  deploy-docs:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, micropython, docs]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-docs.txt
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Publish to the gh-pages branch
+        run: mkdocs gh-deploy --force

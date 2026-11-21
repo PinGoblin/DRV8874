@@ -1,13 +1,24 @@
-"""pingoblin_motor - control library for the PinGoblin Board A dual DC motor driver.
+"""`pingoblin_motor`: control library for the PinGoblin Board A dual DC motor driver (2 × DRV8874) on a Raspberry Pi.
 
-Quick start (Raspberry Pi)::
+The main classes are importable from the package:
 
+| Class | Purpose |
+|---|---|
+| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One board: two motors plus shared nSLEEP / nFAULT |
+| [`Motor`][pingoblin_motor.motor.Motor] | One motor channel |
+| [`MotorChain`][pingoblin_motor.chain.MotorChain] | Several daisy-chained boards |
+| [`ADS1115`][pingoblin_motor.sensors.ADS1115] | Current sensing through a PinGoblin ADS1115 board |
+| [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor] | Background fault detection |
+
+Example:
+    ```python
     from pingoblin_motor import MotorBoard
 
     board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19)
     board.start_monitor()
     board.motor_a.forward(60, duration=2, wait=True)
     board.close()
+    ```
 """
 from .backends import Backend, GpiozeroBackend, MockBackend
 from .board import MotorBoard

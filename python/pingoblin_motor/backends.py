@@ -1,15 +1,14 @@
 """Hardware pin backends.
 
-A backend creates three kinds of pin: digital outputs, PWM outputs and
-digital inputs. Pins are cached by number, so several boards in a daisy
-chain can share one nSLEEP or nFAULT GPIO: ask for the same pin twice and
-you get the same object back.
+A backend creates three kinds of pin: digital outputs, PWM outputs and digital inputs.
+Pins are cached by GPIO number, so several boards in a daisy chain can share one
+nSLEEP or nFAULT line: ask for the same pin twice and you get the same object back.
+A shared pin is released when the last user closes it.
 
-Backends:
-
-* :class:`GpiozeroBackend` – the default on a Raspberry Pi (works on Pi 5).
-  Uses software PWM unless ``hardware_pwm=True``.
-* :class:`MockBackend` – no hardware; for tests and dry runs.
+| Backend | Use |
+|---|---|
+| [`GpiozeroBackend`][pingoblin_motor.backends.GpiozeroBackend] | Default on a Raspberry Pi (Pi 5 supported). Software PWM, or hardware PWM on GPIO12/13/18/19 |
+| [`MockBackend`][pingoblin_motor.backends.MockBackend] | No hardware: tests, dry runs and CI |
 """
 from __future__ import annotations
 
@@ -21,43 +20,78 @@ from .faults import ConfigError
 
 # Raspberry Pi GPIOs that have a hardware PWM channel (Pi 4 and Pi 5 header).
 HW_PWM_CHANNELS = {12: 0, 13: 1, 18: 0, 19: 1}
+"""Raspberry Pi GPIOs with a hardware PWM channel, mapped to the channel number."""
 
 
 class OutputPin(abc.ABC):
-    @abc.abstractmethod
-    def set(self, value: bool) -> None: ...
+    """Interface for a digital output pin."""
 
     @abc.abstractmethod
-    def get(self) -> bool: ...
+    def set(self, value: bool) -> None:
+        """Drive the pin.
+
+        Args:
+            value: `True` for high, `False` for low.
+        """
+
+    @abc.abstractmethod
+    def get(self) -> bool:
+        """Return the level the pin is driven to.
+
+        Returns:
+            `True` if high.
+        """
 
     def close(self) -> None:
+        """Release the pin. The default does nothing."""
         pass
 
 
 class PwmPin(abc.ABC):
-    """PWM output. ``duty`` is 0.0-1.0."""
+    """Interface for a PWM output pin. Duty cycles are fractions from 0.0 to 1.0."""
 
     @abc.abstractmethod
-    def set_duty(self, duty: float) -> None: ...
+    def set_duty(self, duty: float) -> None:
+        """Set the duty cycle.
+
+        Args:
+            duty: 0.0 (always low) to 1.0 (always high). Out-of-range values are clamped.
+        """
 
     @abc.abstractmethod
-    def get_duty(self) -> float: ...
+    def get_duty(self) -> float:
+        """Return the current duty cycle.
+
+        Returns:
+            The duty cycle, 0.0 to 1.0.
+        """
 
     def close(self) -> None:
+        """Release the pin. The default does nothing."""
         pass
 
 
 class InputPin(abc.ABC):
+    """Interface for a digital input pin."""
+
     @abc.abstractmethod
     def read(self) -> bool:
-        """Return the electrical level (True = high)."""
+        """Return the electrical level.
+
+        Returns:
+            `True` if the pin is high.
+        """
 
     def close(self) -> None:
+        """Release the pin. The default does nothing."""
         pass
 
 
 class Backend(abc.ABC):
-    """Creates and caches pins. Shared pins are reference-counted."""
+    """Base class for backends: creates, caches and reference-counts pins.
+
+    Subclasses implement `_make_output()`, `_make_pwm()` and `_make_input()`.
+    """
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
@@ -78,16 +112,55 @@ class Backend(abc.ABC):
             return obj
 
     def output(self, pin: int, initial: bool = False) -> OutputPin:
+        """Get a digital output, creating it on first use.
+
+        Args:
+            pin: BCM GPIO number.
+            initial: Level to drive when the pin is first created.
+
+        Returns:
+            An [`OutputPin`][pingoblin_motor.backends.OutputPin].
+
+        Raises:
+            ConfigError: The pin is already in use as a PWM output or input.
+        """
         return self._get(pin, "output", lambda: self._make_output(pin, initial))
 
     def pwm(self, pin: int, frequency: float) -> PwmPin:
+        """Get a PWM output, creating it on first use (duty 0).
+
+        Args:
+            pin: BCM GPIO number.
+            frequency: PWM frequency (Hz). Ignored if the pin already exists.
+
+        Returns:
+            A [`PwmPin`][pingoblin_motor.backends.PwmPin].
+
+        Raises:
+            ConfigError: The pin is already in use as a digital output or input.
+        """
         return self._get(pin, "pwm", lambda: self._make_pwm(pin, frequency))
 
     def input(self, pin: int) -> InputPin:
+        """Get a digital input, creating it on first use (no internal pull resistor).
+
+        Args:
+            pin: BCM GPIO number.
+
+        Returns:
+            An [`InputPin`][pingoblin_motor.backends.InputPin].
+
+        Raises:
+            ConfigError: The pin is already in use as an output.
+        """
         return self._get(pin, "input", lambda: self._make_input(pin))
 
     def release(self, pin: Optional[int]) -> None:
-        """Drop one reference to a pin; close it when nobody uses it."""
+        """Drop one reference to a pin, and close it when no one uses it.
+
+        Args:
+            pin: BCM GPIO number, or `None` (ignored).
+        """
         if pin is None:
             return
         with self._lock:
@@ -175,15 +248,25 @@ class _HwPwm(PwmPin):
 
 
 class GpiozeroBackend(Backend):
-    """Raspberry Pi backend using gpiozero (BCM pin numbers).
+    """Raspberry Pi backend using [gpiozero](https://gpiozero.readthedocs.io/) (BCM pin numbers).
 
-    :param hardware_pwm: use hardware PWM on GPIO12/13/18/19 (needs the
-        ``rpi-hardware-pwm`` package and the PWM overlay enabled). Other EN
-        pins fall back to software PWM.
-    :param pwm_chip: PWM chip number: 0 on Pi 4, 2 on Pi 5 (kernel dependent).
+    gpiozero's software PWM is reliable only up to about 1 kHz, which makes motors whine.
+    For silent 20 kHz PWM, set `hardware_pwm=True` and use GPIO12, 13, 18 or 19 for the EN
+    pins. This needs the `rpi-hardware-pwm` package and `dtoverlay=pwm-2chan` in
+    `/boot/firmware/config.txt`. The Pi has two hardware PWM channels, so it covers one board.
     """
 
     def __init__(self, hardware_pwm: bool = False, pwm_chip: int = 0, pin_factory=None):
+        """
+        Args:
+            hardware_pwm: Use hardware PWM on GPIO12/13/18/19. Other EN pins fall back to
+                software PWM.
+            pwm_chip: PWM chip number for `rpi-hardware-pwm`: 0 on a Pi 4, 2 on some Pi 5 kernels.
+            pin_factory: Optional gpiozero pin factory (for example a remote or mock factory).
+
+        Raises:
+            ConfigError: gpiozero is not installed.
+        """
         super().__init__()
         try:
             import gpiozero  # noqa: F401
@@ -211,40 +294,120 @@ class GpiozeroBackend(Backend):
 
 # ---------------------------------------------------------------------- mock
 class MockOutput(OutputPin):
+    """Mock digital output for tests.
+
+    Attributes:
+        pin (int): GPIO number.
+        value (bool): The driven level.
+    """
+
     def __init__(self, pin, initial):
+        """
+        Args:
+            pin: GPIO number.
+            initial: Initial level.
+        """
         self.pin, self.value = pin, bool(initial)
 
     def set(self, value):
+        """Set `value`.
+
+        Args:
+            value: The new level.
+        """
         self.value = bool(value)
 
     def get(self):
+        """Return `value`.
+
+        Returns:
+            The driven level.
+        """
         return self.value
 
 
 class MockPwm(PwmPin):
+    """Mock PWM output for tests.
+
+    Attributes:
+        pin (int): GPIO number.
+        frequency (float): PWM frequency (Hz).
+        duty (float): Duty cycle, 0.0 to 1.0.
+    """
+
     def __init__(self, pin, frequency):
+        """
+        Args:
+            pin: GPIO number.
+            frequency: PWM frequency (Hz).
+        """
         self.pin, self.frequency, self.duty = pin, frequency, 0.0
 
     def set_duty(self, duty):
+        """Set `duty`, clamped to 0.0-1.0.
+
+        Args:
+            duty: The new duty cycle.
+        """
         self.duty = max(0.0, min(1.0, duty))
 
     def get_duty(self):
+        """Return `duty`.
+
+        Returns:
+            The duty cycle.
+        """
         return self.duty
 
 
 class MockInput(InputPin):
+    """Mock digital input for tests. Set `level` to simulate the pin.
+
+    Attributes:
+        pin (int): GPIO number.
+        level (bool): The simulated level. Starts high, like nFAULT's pull-up.
+    """
+
     def __init__(self, pin):
+        """
+        Args:
+            pin: GPIO number.
+        """
         self.pin, self.level = pin, True  # nFAULT idles high (pulled up)
 
     def read(self):
+        """Return `level`.
+
+        Returns:
+            The simulated level.
+        """
         return self.level
 
 
 class MockBackend(Backend):
-    """Hardware-free backend. Inspect ``backend.pins[gpio]`` in tests."""
+    """Hardware-free backend for tests and dry runs.
+
+    Example:
+        ```python
+        from pingoblin_motor import MockBackend, MotorBoard
+
+        be = MockBackend()
+        board = MotorBoard(a_en=12, a_ph=5, fault_pin=19, backend=be)
+        board.motor_a.forward(50)
+        assert be.pins[12].duty == 0.5
+        be.pins[19].level = False        # simulate nFAULT going low
+        ```
+    """
 
     @property
     def pins(self):
+        """The pins created so far, by GPIO number.
+
+        Returns:
+            A dict of [`MockOutput`][pingoblin_motor.backends.MockOutput],
+            [`MockPwm`][pingoblin_motor.backends.MockPwm] and
+            [`MockInput`][pingoblin_motor.backends.MockInput] objects.
+        """
         return self._pins
 
     def _make_output(self, pin, initial):
@@ -258,5 +421,9 @@ class MockBackend(Backend):
 
 
 def default_backend() -> Backend:
-    """Return a GpiozeroBackend (on a Pi)."""
+    """Return the default backend for this platform.
+
+    Returns:
+        A new [`GpiozeroBackend`][pingoblin_motor.backends.GpiozeroBackend].
+    """
     return GpiozeroBackend()

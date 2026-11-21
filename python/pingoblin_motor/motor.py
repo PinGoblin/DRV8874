@@ -1,4 +1,4 @@
-"""The Motor class: one brushed DC motor on one DRV8874 channel."""
+"""The [`Motor`][pingoblin_motor.motor.Motor] class: one brushed DC motor on one DRV8874 channel."""
 from __future__ import annotations
 
 import enum
@@ -14,15 +14,34 @@ from .sensors import MotorCurrentSensor
 if TYPE_CHECKING:  # pragma: no cover
     from .board import MotorBoard
 
-log = logging.getLogger("pingoblin_motor")
+_log = logging.getLogger("pingoblin_motor")
 
 
 class Direction(enum.Enum):
+    """Direction of rotation.
+
+    "Forward" follows the board's convention: PH low, OUT2 positive. Which way the shaft
+    turns depends on the wiring; use `invert=True` to swap.
+
+    Attributes:
+        FORWARD: PH low (OUT2 positive).
+        REVERSE: PH high (OUT1 positive).
+    """
+
     FORWARD = "forward"
     REVERSE = "reverse"
 
 
 class MotorState(enum.Enum):
+    """What a motor is doing.
+
+    Attributes:
+        STOPPED: Braked: both outputs low. Stops quickly and resists turning.
+        COASTING: Outputs open. Spins down freely.
+        RUNNING: Driven.
+        FAULT: A latched fault. Call `clear_fault()`.
+    """
+
     STOPPED = "stopped"      #: braked (outputs shorted low): stops quickly, holds lightly
     COASTING = "coasting"    #: outputs open: spins down freely
     RUNNING = "running"
@@ -30,6 +49,13 @@ class MotorState(enum.Enum):
 
 
 class ControlMode(enum.Enum):
+    """Control mode, set by the PMODE jumper JP1 on the board.
+
+    Attributes:
+        PH_EN: Default (JP1 pads 1-2): EN = speed PWM, PH = direction.
+        PWM: JP1 pads 2-3: IN1 / IN2. Allows per-motor coast.
+    """
+
     PH_EN = "ph_en"   #: default (JP1 pads 1-2): EN = speed PWM, PH = direction
     PWM = "pwm"       #: JP1 pads 2-3: IN1/IN2
 
@@ -37,29 +63,22 @@ class ControlMode(enum.Enum):
 class Motor:
     """One brushed DC motor.
 
-    Create motors through :class:`~pingoblin_motor.MotorBoard`, not directly.
+    Create motors through [`MotorBoard`][pingoblin_motor.board.MotorBoard], not directly.
+    Pass options to both motors with `motor_options=`, or to one with `a_options=` /
+    `b_options=`.
 
-    Speeds are percentages, 0-100. ``run()`` takes a signed speed:
-    positive = forward, negative = reverse.
+    Speeds are percentages, 0-100. [`run()`][pingoblin_motor.motor.Motor.run] takes a signed
+    speed: positive is forward, negative is reverse. Commands are thread-safe.
 
-    "Forward" follows the manual (PH low, OUT2 positive). If your motor turns
-    the wrong way, pass ``invert=True`` rather than swapping wires.
-
-    :param min_speed_pc: speeds between 0 and this value are raised to it
-        (many motors don't turn below 15-25 %). 0 disables.
-    :param ramp_time: seconds to ramp from 0 to 100 % (soft start/stop of
-        speed changes). 0 = instant.
-    :param reverse_delay: brake time before a direction change at speed.
-    :param stall_current: motor amps treated as a stall. Default 80 % of the
-        board current limit.
-    :param stall_time: how long the stall condition must last.
-    :param start_grace: ignore stall/open-load checks for this long after a
-        start or speed change (start-up surge).
-    :param open_load_current: amps below which a running motor counts as disconnected.
-    :param open_load_time: how long the open-load condition must last.
-    :param continuous_current: amps the motor/driver may carry continuously.
-    :param overload_time: how long above ``continuous_current`` before OVERLOAD.
-    :param policy: :class:`FaultPolicy`, how to react to each fault.
+    Example:
+        ```python
+        m = board.motor_a
+        m.forward(60, duration=2, wait=True)   # 60 % for 2 s, then brake
+        m.reverse(40)
+        m.speed_pc = 80                        # change speed while running
+        print(m.current)                       # amps, if a sensor is fitted
+        m.coast()
+        ```
     """
 
     def __init__(self, name: str, board: "MotorBoard", en_pin: int, ph_pin: int, *,
@@ -70,6 +89,36 @@ class Motor:
                  start_grace: float = 0.3, open_load_current: float = 0.03,
                  open_load_time: float = 1.0, continuous_current: float = 1.5,
                  overload_time: float = 5.0, policy: Optional[FaultPolicy] = None):
+        """
+        Args:
+            name: Motor name within its board, for example `"a"` or `"left"`.
+            board: The owning [`MotorBoard`][pingoblin_motor.board.MotorBoard].
+            en_pin: GPIO for EN (PH/EN mode) or IN1 (PWM mode).
+            ph_pin: GPIO for PH (PH/EN mode) or IN2 (PWM mode).
+            mode: The board's [`ControlMode`][pingoblin_motor.motor.ControlMode].
+            backend: The [`Backend`][pingoblin_motor.backends.Backend] that creates the pins.
+            sensor: Optional [`MotorCurrentSensor`][pingoblin_motor.sensors.MotorCurrentSensor].
+            invert: Swap forward and reverse (instead of swapping the motor wires).
+            pwm_frequency: PWM frequency (Hz).
+            min_speed_pc: Non-zero speeds below this are raised to it, to overcome the motor's
+                deadband. 0 disables.
+            ramp_time: Seconds to ramp from 0 to 100 %. Speed changes ramp proportionally.
+                0 = instant.
+            reverse_delay: Seconds of braking before a direction change while running.
+            stall_current: Motor current (A) treated as a stall. Default: 80 % of the board's
+                current limit.
+            stall_time: Seconds the stall condition must last.
+            start_grace: Seconds after a start or speed change during which stall and open-load
+                checks are skipped (start-up surge).
+            open_load_current: Current (A) below which a driven motor counts as disconnected.
+            open_load_time: Seconds the open-load condition must last.
+            continuous_current: Current (A) the motor may carry continuously.
+            overload_time: Seconds above `continuous_current` before an overload fault.
+            policy: [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy] for this motor.
+
+        Raises:
+            ConfigError: An option is out of range.
+        """
         if not 0 <= min_speed_pc < 100:
             raise ConfigError("min_speed_pc must be 0-99")
         if ramp_time < 0 or reverse_delay < 0:
@@ -120,42 +169,57 @@ class Motor:
     # ------------------------------------------------------------ properties
     @property
     def full_name(self) -> str:
+        """The motor's name including its board, for example `"front.a"`."""
         return f"{self.board.name}.{self.name}"
 
     @property
     def state(self) -> MotorState:
+        """The current [`MotorState`][pingoblin_motor.motor.MotorState]."""
         return self._state
 
     @property
     def direction(self) -> Optional[Direction]:
-        """Direction of the last run command (kept after stop for ``start()``)."""
+        """Direction of the last run command, kept after a stop for
+        [`start()`][pingoblin_motor.motor.Motor.start]. `None` if never run.
+        """
         return self._direction
 
     @property
     def is_running(self) -> bool:
+        """`True` while the motor is driven."""
         return self._state is MotorState.RUNNING
 
     @property
     def duty(self) -> float:
-        """PWM duty currently applied (0-1)."""
+        """PWM duty currently applied to the bridge, 0-1. 0 when stopped."""
         return self._duty
 
     @property
     def running_since(self) -> float:
+        """`time.monotonic()` of the last start or speed change."""
         return self._last_change
 
     @property
     def fault(self) -> Optional[Fault]:
-        """The latched fault, or None."""
+        """The latched [`Fault`][pingoblin_motor.faults.Fault], or `None`."""
         return self._fault
 
     @property
     def has_sensor(self) -> bool:
+        """`True` if the motor has a current sensor."""
         return self.sensor is not None
 
     @property
     def speed_pc(self) -> float:
-        """Commanded speed, 0-100 %. Setting it while running changes speed."""
+        """Commanded speed, 0-100 %.
+
+        Setting it while the motor runs changes the speed (ramped if `ramp_time` is set).
+        Setting 0 stops the motor. Setting it while stopped stores the speed for
+        [`start()`][pingoblin_motor.motor.Motor.start].
+
+        Raises:
+            ValueError: Outside 0-100.
+        """
         return self._speed_pc
 
     @speed_pc.setter
@@ -172,9 +236,10 @@ class Motor:
 
     @property
     def current(self) -> Optional[float]:
-        """Motor current in amps (reads the sensor), or None without a sensor.
+        """Motor current (A), read from the sensor now, or `None` without a sensor.
 
-        While running, this is corrected for PWM duty. When stopped it is 0.
+        While running, the reading is corrected for PWM duty. See
+        [`read_current()`][pingoblin_motor.motor.Motor.read_current].
         """
         if self.sensor is None:
             return None
@@ -182,28 +247,69 @@ class Motor:
 
     # ------------------------------------------------------------ commands
     def forward(self, speed_pc: float = 100.0, duration: Optional[float] = None, wait: bool = False) -> None:
-        """Run forward at ``speed_pc`` %. With ``duration``, stop (brake) after that many seconds."""
+        """Run forward.
+
+        Args:
+            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            duration: Seconds to run before braking. `None` runs until told otherwise.
+            wait: With `duration`, block until the run ends.
+
+        Raises:
+            ValueError: Speed outside 0-100, or `duration` not positive.
+            MotorFaultError: The motor has a latched fault.
+        """
         self._run(Direction.FORWARD, speed_pc, duration, wait)
 
     def reverse(self, speed_pc: float = 100.0, duration: Optional[float] = None, wait: bool = False) -> None:
-        """Run in reverse at ``speed_pc`` %."""
+        """Run in reverse.
+
+        Args:
+            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            duration: Seconds to run before braking. `None` runs until told otherwise.
+            wait: With `duration`, block until the run ends.
+
+        Raises:
+            ValueError: Speed outside 0-100, or `duration` not positive.
+            MotorFaultError: The motor has a latched fault.
+        """
         self._run(Direction.REVERSE, speed_pc, duration, wait)
 
     def run(self, speed_pc: float, duration: Optional[float] = None, wait: bool = False) -> None:
-        """Signed speed: +50 = forward at 50 %, -50 = reverse at 50 %, 0 = stop."""
+        """Run with a signed speed.
+
+        Args:
+            speed_pc: -100 to 100. Positive is forward, negative is reverse, 0 stops.
+            duration: Seconds to run before braking. `None` runs until told otherwise.
+            wait: With `duration`, block until the run ends.
+
+        Raises:
+            ValueError: Speed outside -100 to 100, or `duration` not positive.
+            MotorFaultError: The motor has a latched fault.
+        """
         if speed_pc == 0:
             self.stop()
             return
         self._run(Direction.FORWARD if speed_pc > 0 else Direction.REVERSE, abs(speed_pc), duration, wait)
 
     def start(self, duration: Optional[float] = None, wait: bool = False) -> None:
-        """Resume the last direction and speed (forward 100 % if never run)."""
+        """Resume the last direction and speed (forward at 100 % if never run).
+
+        Args:
+            duration: Seconds to run before braking. `None` runs until told otherwise.
+            wait: With `duration`, block until the run ends.
+
+        Raises:
+            MotorFaultError: The motor has a latched fault.
+        """
         direction = self._direction or Direction.FORWARD
         speed = self._speed_pc or 100.0
         self._run(direction, speed, duration, wait)
 
     def stop(self) -> None:
-        """Brake: both outputs low. The motor stops quickly."""
+        """Brake: both outputs low. The motor stops quickly.
+
+        Cancels any timed run or ramp. `brake()` is an alias.
+        """
         with self._lock:
             self._cancel_timer()
             self._cancel_ramp()
@@ -213,14 +319,18 @@ class Motor:
             self._done.set()
 
     brake = stop
+    """Alias of [`stop()`][pingoblin_motor.motor.Motor.stop]."""
 
     def coast(self) -> bool:
         """Let the motor spin down freely (outputs open).
 
-        In PWM mode this is per motor. In PH/EN mode the DRV8874 can only
-        coast by sleeping, which affects every motor sharing the nSLEEP line,
-        so it only happens when all those motors are idle. Otherwise the
-        motor brakes and this returns False.
+        In PWM mode this is per motor. In PH/EN mode the DRV8874 can only coast by sleeping,
+        which affects every motor on the same nSLEEP line (both motors on the board, and any
+        board sharing the GPIO). So it coasts only if all those motors are idle. Otherwise the
+        motor brakes.
+
+        Returns:
+            `True` if the motor is coasting, `False` if it had to brake instead.
         """
         with self._lock:
             self._cancel_timer()
@@ -232,7 +342,7 @@ class Motor:
                 self._apply_brake()   # EN low first, so waking later is safe
                 ok = self.board._coast_request(self)
                 if not ok:
-                    log.warning("%s: coast not possible in PH/EN mode while other motors on the "
+                    _log.warning("%s: coast not possible in PH/EN mode while other motors on the "
                                 "same nSLEEP line run; braking instead", self.full_name)
             if self._state is not MotorState.FAULT:
                 self._state = MotorState.COASTING if ok else MotorState.STOPPED
@@ -240,11 +350,29 @@ class Motor:
             return ok
 
     def wait(self, timeout: Optional[float] = None) -> bool:
-        """Block until a timed run (``duration=``) finishes. Returns False on timeout."""
+        """Block until a timed run (`duration=`) finishes.
+
+        Args:
+            timeout: Maximum seconds to wait, or `None` to wait indefinitely.
+
+        Returns:
+            `False` if the timeout expired first.
+        """
         return self._done.wait(timeout)
 
     def read_current(self) -> float:
-        """Read the sensor now: estimated motor amps. Raises SensorError / ConfigError."""
+        """Read the sensor now and return the estimated motor current.
+
+        Also updates `last_current` (motor amps) and `last_isense_amps` (supply-side amps).
+        Below 10 % duty the raw reading is returned.
+
+        Returns:
+            Motor current (A).
+
+        Raises:
+            ConfigError: The motor has no sensor.
+            SensorError: The reading failed.
+        """
         if self.sensor is None:
             raise ConfigError(f"{self.full_name} has no current sensor")
         isense = self.sensor.read_isense_amps()
@@ -255,11 +383,18 @@ class Motor:
 
     # ------------------------------------------------------------ faults
     def add_fault_handler(self, handler: Callable[[Fault], None]) -> None:
-        """Call ``handler(fault)`` whenever a fault is reported for this motor."""
+        """Call `handler(fault)` whenever a fault is reported for this motor.
+
+        Handlers run on the monitor thread, so keep them short. Exceptions in a handler are
+        logged and ignored.
+
+        Args:
+            handler: A callable taking one [`Fault`][pingoblin_motor.faults.Fault].
+        """
         self._handlers.append(handler)
 
     def clear_fault(self) -> None:
-        """Clear a latched fault so the motor can run again."""
+        """Clear a latched fault so the motor can run again. The motor stays stopped."""
         with self._lock:
             self._fault = None
             if self._state is MotorState.FAULT:
@@ -280,12 +415,12 @@ class Motor:
             if self.policy.latches(fault.type):
                 self._fault = fault
                 self._state = MotorState.FAULT
-        log.warning("%s", fault)
+        _log.warning("%s", fault)
         for h in list(self._handlers):
             try:
                 h(fault)
             except Exception:  # never let a user callback kill the monitor
-                log.exception("fault handler failed")
+                _log.exception("fault handler failed")
 
     # ------------------------------------------------------------ internals
     def _check_speed(self, value: float) -> float:
@@ -410,7 +545,7 @@ class Motor:
             self._ph.set_duty(0.0)
 
     def close(self) -> None:
-        """Brake and release the pins."""
+        """Brake and release the motor's pins."""
         try:
             self.stop()
         finally:

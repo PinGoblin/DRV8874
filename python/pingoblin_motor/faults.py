@@ -1,4 +1,11 @@
-"""Fault types, fault records, fault policies and exceptions."""
+"""Fault types, fault records, fault policies and the library's exceptions.
+
+A fault is detected by the [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor] and
+delivered as a [`Fault`][pingoblin_motor.faults.Fault] record. Each motor then reacts
+according to its [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy]: brake, coast,
+sleep the board, or report only. Serious faults *latch*, so the motor refuses to run
+until you call [`Motor.clear_fault()`][pingoblin_motor.motor.Motor.clear_fault].
+"""
 from __future__ import annotations
 
 import enum
@@ -10,8 +17,19 @@ from typing import Optional
 class FaultType(enum.Enum):
     """Every fault the library can detect.
 
-    ``needs_sensor`` faults are only detected when an ADS1115 current sensor
-    is attached to the motor. The others work from the board's nFAULT line.
+    Faults marked *needs sensor* are only detected when the motor has a current sensor
+    (for example a PinGoblin ADS1115 board). The others work from the board's nFAULT line.
+
+    | Member | Detected when | Needs sensor |
+    |---|---|---|
+    | `STALL` | Motor current at or above `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` when there is no sensor | No |
+    | `CURRENT_LIMIT` | nFAULT low while a motor is driven. A warning, repeated at most every 5 s | No |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | No |
+    | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % duty or more: motor disconnected, broken wire, motor supply off or board fuse tripped | Yes |
+    | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
+    | `BOARD_OVERLOAD` | Board supply current above the 3 A fuse rating for 1 s | Yes |
+    | `CHAIN_OVERLOAD` | Daisy-chain supply current above the chain limit (6 A) for 1 s | Yes |
+    | `SENSOR_ERROR` | The current sensor could not be read (reported once until it recovers) | Yes |
     """
 
     #: Motor is driven but not turning: current at or near the limit for
@@ -39,7 +57,15 @@ class FaultType(enum.Enum):
 
 
 class FaultAction(enum.Enum):
-    """What the library does to a motor when a fault is detected."""
+    """What the library does to a motor when a fault is detected.
+
+    | Member | Action |
+    |---|---|
+    | `NONE` | Record and report only |
+    | `BRAKE` | Stop the motor with the brake (EN low) |
+    | `COAST` | Let the motor coast if possible, otherwise brake |
+    | `SLEEP` | Put the whole board to sleep (all motors coast). Brakes if the board has no sleep pin |
+    """
 
     NONE = "none"        #: Record and report only.
     BRAKE = "brake"      #: Stop the motor with the brake (EN low).
@@ -58,33 +84,76 @@ DEFAULT_ACTIONS = {
     FaultType.CHAIN_OVERLOAD: FaultAction.BRAKE,
     FaultType.SENSOR_ERROR: FaultAction.NONE,
 }
+"""Default [`FaultAction`][pingoblin_motor.faults.FaultAction] for each [`FaultType`][pingoblin_motor.faults.FaultType]. Override per motor with a [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy]."""
 
 #: Faults that latch: the motor refuses to run until ``clear_fault()``.
 LATCHING = {FaultType.STALL, FaultType.DRIVER_FAULT, FaultType.OPEN_LOAD, FaultType.OVERLOAD}
+"""Fault types that latch: the motor refuses to run until `clear_fault()` is called."""
 
 
 @dataclass
 class FaultPolicy:
-    """Per-motor fault response.
+    """Per-motor fault response: the action for each fault type, and whether faults latch.
 
-    Example::
+    Fault types not listed in `actions` use the defaults in `DEFAULT_ACTIONS`. With
+    `latch=True`, `STALL`, `DRIVER_FAULT`, `OPEN_LOAD` and `OVERLOAD` latch.
 
-        policy = FaultPolicy(actions={FaultType.STALL: FaultAction.COAST}, latch=False)
+    Attributes:
+        actions (dict): Maps a [`FaultType`][pingoblin_motor.faults.FaultType] to a
+            [`FaultAction`][pingoblin_motor.faults.FaultAction].
+        latch (bool): Whether latching fault types latch for this motor.
+
+    Example:
+        ```python
+        from pingoblin_motor import FaultAction, FaultPolicy, FaultType
+
+        # Coast on a stall, and don't latch (e.g. homing against an end stop)
+        policy = FaultPolicy({FaultType.STALL: FaultAction.COAST}, latch=False)
+        board = MotorBoard(a_en=12, a_ph=5, a_options=dict(policy=policy))
+        ```
     """
 
     actions: dict = field(default_factory=dict)
     latch: bool = True
 
     def action_for(self, fault_type: FaultType) -> FaultAction:
+        """Return the action for a fault type.
+
+        Args:
+            fault_type: The [`FaultType`][pingoblin_motor.faults.FaultType] detected.
+
+        Returns:
+            The [`FaultAction`][pingoblin_motor.faults.FaultAction] from `actions`, or the default.
+        """
         return self.actions.get(fault_type, DEFAULT_ACTIONS[fault_type])
 
     def latches(self, fault_type: FaultType) -> bool:
+        """Return whether a fault of this type latches the motor.
+
+        Args:
+            fault_type: The [`FaultType`][pingoblin_motor.faults.FaultType] detected.
+
+        Returns:
+            `True` if the motor must be cleared with `clear_fault()` before it runs again.
+        """
         return self.latch and fault_type in LATCHING
 
 
 @dataclass(frozen=True)
 class Fault:
-    """A record of one detected fault."""
+    """A record of one detected fault. Immutable.
+
+    `str(fault)` gives a one-line summary such as
+    `[stall] front.a: motor stalled: 1.82 A for 0.5 s`.
+
+    Attributes:
+        type (FaultType): What was detected.
+        message (str): Human-readable description, including the likely cause.
+        board (str | None): Board name, or `None` for a chain-wide fault.
+        motor (str | None): Motor name, or `None` for a board-wide fault.
+        value (float | None): The measured value that triggered it (amps), if any.
+        timestamp (float): `time.monotonic()` when it was detected.
+    """
 
     type: FaultType
     message: str
@@ -100,20 +169,30 @@ class Fault:
 
 # --------------------------------------------------------------------- errors
 class MotorError(Exception):
-    """Base class for all library errors."""
+    """Base class for every exception raised by the library."""
 
 
 class ConfigError(MotorError):
-    """Invalid configuration (pins, modes, limits)."""
+    """Invalid configuration: pins, modes, names or limits."""
 
 
 class MotorFaultError(MotorError):
-    """Raised when commanding a motor that has a latched fault."""
+    """Raised when you command a motor that has a latched fault.
+
+    Call [`Motor.clear_fault()`][pingoblin_motor.motor.Motor.clear_fault] once the cause is fixed.
+
+    Attributes:
+        fault (Fault): The latched fault.
+    """
 
     def __init__(self, fault: Fault):
+        """
+        Args:
+            fault: The latched [`Fault`][pingoblin_motor.faults.Fault].
+        """
         super().__init__(f"motor has a latched fault: {fault}. Call clear_fault() first.")
         self.fault = fault
 
 
 class SensorError(MotorError):
-    """The current sensor could not be read."""
+    """The current sensor (for example the ADS1115) could not be read."""

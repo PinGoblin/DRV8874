@@ -1,0 +1,114 @@
+site_name: PinGoblin Dual DC Motor Board
+site_description: User guide and Python / MicroPython library for the PinGoblin Board A dual DC motor driver (2 × DRV8874)
+site_url: https://pingoblin.github.io/DRV8874/
+repo_url: https://github.com/PinGoblin/DRV8874
+repo_name: PinGoblin/DRV8874
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 PinGoblin. MIT licence.
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Light mode
+
+nav:
+  - Home: index.md
+  - User Guide:
+      - guide/index.md
+      - Specifications: guide/specifications.md
+      - Important safety information: guide/safety.md
+      - Connectors: guide/connectors.md
+      - J3 logic header: guide/j3-header.md
+      - Quick start: guide/quick-start.md
+      - Controlling the motors: guide/controlling-motors.md
+      - Test buttons and LEDs: guide/buttons-leds.md
+      - Current sensing and current limit: guide/current-sensing.md
+      - "Configuration: PMODE jumper": guide/configuration.md
+      - Daisy-chaining boards: guide/daisy-chain.md
+      - Troubleshooting: guide/troubleshooting.md
+  - API:
+      - api/index.md
+      - Guide:
+          - Installation: api/guide/install.md
+          - Concepts: api/guide/concepts.md
+          - Faults and stall detection: api/guide/faults.md
+          - Current sensing: api/guide/current-sensing.md
+          - Daisy-chained boards: api/guide/daisy-chain.md
+          - MicroPython notes: api/guide/micropython.md
+          - Testing without hardware: api/guide/testing.md
+      - Raspberry Pi reference:
+          - Motor: api/reference/motor.md
+          - MotorBoard: api/reference/board.md
+          - MotorChain: api/reference/chain.md
+          - Faults: api/reference/faults.md
+          - Fault monitor: api/reference/monitor.md
+          - Current sensing: api/reference/sensors.md
+          - Pin backends: api/reference/backends.md
+      - MicroPython reference: api/reference/micropython.md
+
+hooks:
+  - tools/mkdocs_hooks.py
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          # .docs_build holds pingoblin_motor_mp.py, a copy of the MicroPython file made by
+          # tools/mkdocs_hooks.py (both libraries are called pingoblin_motor).
+          paths: [python, .docs_build]
+          options:
+            docstring_style: google
+            docstring_options:
+              warn_missing_types: false
+            docstring_section_style: table
+            merge_init_into_class: true
+            show_signature_annotations: true
+            separate_signature: true
+            signature_crossrefs: true
+            show_source: false
+            show_root_heading: false
+            show_root_toc_entry: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            filters: ["!^_"]
+            heading_level: 2
