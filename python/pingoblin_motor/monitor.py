@@ -27,7 +27,7 @@ OVERLOAD_DEBOUNCE = 1.0
 CURRENT_LIMIT_REPEAT = 5.0     # seconds between repeated CURRENT_LIMIT warnings
 """Minimum seconds between repeated `CURRENT_LIMIT` warnings for one motor."""
 OPEN_LOAD_MIN_DUTY = 0.2
-"""Open-load checks run only at or above this PWM duty (0-1)."""
+"""Open-load checks run only at or above this PWM duty (0–1)."""
 
 
 @dataclass

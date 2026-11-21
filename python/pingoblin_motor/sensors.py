@@ -81,7 +81,7 @@ class ADS1115:
         """Build the config-register value for a single-shot read.
 
         Args:
-            channel: Input 0-3 (AIN0 to AIN3, measured against GND).
+            channel: Input 0–3 (AIN0 to AIN3, measured against GND).
 
         Returns:
             The 16-bit config register value.
@@ -102,7 +102,7 @@ class ADS1115:
         """Start a conversion, wait for it and return the voltage.
 
         Args:
-            channel: Input 0-3.
+            channel: Input 0–3.
 
         Returns:
             The input voltage (V).
@@ -160,7 +160,7 @@ class ADS1115Channel(CurrentSensor):
         """
         Args:
             adc: The [`ADS1115`][pingoblin_motor.sensors.ADS1115].
-            channel: Input 0-3.
+            channel: Input 0–3.
 
         Raises:
             ConfigError: Channel out of range.
@@ -210,7 +210,7 @@ class MotorCurrentSensor:
         """Estimate the motor current, correcting for PWM duty.
 
         Args:
-            duty: The applied PWM duty, 0-1. Below 0.1 the raw reading is returned, because
+            duty: The applied PWM duty, 0–1. Below 0.1 the raw reading is returned, because
                 the correction becomes unreliable.
 
         Returns:
@@ -260,7 +260,7 @@ def make_sensor(adc: Optional[ADS1115], channel: Optional[int], samples: int = 4
 
     Args:
         adc: The ADS1115, or `None`.
-        channel: Input 0-3, or `None`.
+        channel: Input 0–3, or `None`.
         samples: Readings averaged per measurement.
 
     Returns:

@@ -52,8 +52,8 @@ class ControlMode(enum.Enum):
     """Control mode, set by the PMODE jumper JP1 on the board.
 
     Attributes:
-        PH_EN: Default (JP1 pads 1-2): EN = speed PWM, PH = direction.
-        PWM: JP1 pads 2-3: IN1 / IN2. Allows per-motor coast.
+        PH_EN: Default (JP1 pads 1–2): EN = speed PWM, PH = direction.
+        PWM: JP1 pads 2–3: IN1 / IN2. Allows per-motor coast.
     """
 
     PH_EN = "ph_en"   #: default (JP1 pads 1-2): EN = speed PWM, PH = direction
@@ -67,7 +67,7 @@ class Motor:
     Pass options to both motors with `motor_options=`, or to one with `a_options=` /
     `b_options=`.
 
-    Speeds are percentages, 0-100. [`run()`][pingoblin_motor.motor.Motor.run] takes a signed
+    Speeds are percentages, 0–100. [`run()`][pingoblin_motor.motor.Motor.run] takes a signed
     speed: positive is forward, negative is reverse. Commands are thread-safe.
 
     Example:
@@ -191,7 +191,7 @@ class Motor:
 
     @property
     def duty(self) -> float:
-        """PWM duty currently applied to the bridge, 0-1. 0 when stopped."""
+        """PWM duty currently applied to the bridge, 0–1. 0 when stopped."""
         return self._duty
 
     @property
@@ -211,14 +211,14 @@ class Motor:
 
     @property
     def speed_pc(self) -> float:
-        """Commanded speed, 0-100 %.
+        """Commanded speed, 0–100 %.
 
         Setting it while the motor runs changes the speed (ramped if `ramp_time` is set).
         Setting 0 stops the motor. Setting it while stopped stores the speed for
         [`start()`][pingoblin_motor.motor.Motor.start].
 
         Raises:
-            ValueError: Outside 0-100.
+            ValueError: Outside 0–100.
         """
         return self._speed_pc
 
@@ -250,12 +250,12 @@ class Motor:
         """Run forward.
 
         Args:
-            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            speed_pc: Speed, 0–100 %. 0 stops the motor.
             duration: Seconds to run before braking. `None` runs until told otherwise.
             wait: With `duration`, block until the run ends.
 
         Raises:
-            ValueError: Speed outside 0-100, or `duration` not positive.
+            ValueError: Speed outside 0–100, or `duration` not positive.
             MotorFaultError: The motor has a latched fault.
         """
         self._run(Direction.FORWARD, speed_pc, duration, wait)
@@ -264,12 +264,12 @@ class Motor:
         """Run in reverse.
 
         Args:
-            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            speed_pc: Speed, 0–100 %. 0 stops the motor.
             duration: Seconds to run before braking. `None` runs until told otherwise.
             wait: With `duration`, block until the run ends.
 
         Raises:
-            ValueError: Speed outside 0-100, or `duration` not positive.
+            ValueError: Speed outside 0–100, or `duration` not positive.
             MotorFaultError: The motor has a latched fault.
         """
         self._run(Direction.REVERSE, speed_pc, duration, wait)

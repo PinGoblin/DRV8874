@@ -14,24 +14,20 @@ This site is the reference for the board and its software. It has two parts:
 
 <div class="grid cards" markdown>
 
--   :material-book-open-variant: **User Guide**
+-   **[User Guide](guide/index.md)**
 
     ---
 
-    Specifications, safety, wiring, the J3 header, current sensing, the PMODE jumper
-    and troubleshooting.
+    Setting up and using the board: specifications, safety, wiring, the J3 pinout,
+    current sensing, the PMODE jumper and troubleshooting.
 
-    [:octicons-arrow-right-24: Read the User Guide](guide/index.md)
-
--   :material-language-python: **API**
+-   **[API](api/index.md)**
 
     ---
 
     The `pingoblin_motor` library for the Raspberry Pi, and the single-file version for
-    MicroPython (ESP32 and Pico). Stall and fault detection, current sensing and
+    MicroPython (ESP32 and Pico): stall and fault detection, current sensing and
     daisy-chained boards.
-
-    [:octicons-arrow-right-24: Go to the API](api/index.md)
 
 </div>
 

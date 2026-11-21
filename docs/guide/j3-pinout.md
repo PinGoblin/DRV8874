@@ -1,4 +1,4 @@
-# J3 logic header
+# J3 pinout
 
 J3 is a single row of 10 pins on the left edge of the board. Looking at the component
 side, pin 10 (nFAULT) is at the top and pin 1 (GND, square pad) is at the bottom, nearest

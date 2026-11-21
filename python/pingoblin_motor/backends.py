@@ -344,7 +344,7 @@ class MockPwm(PwmPin):
         self.pin, self.frequency, self.duty = pin, frequency, 0.0
 
     def set_duty(self, duty):
-        """Set `duty`, clamped to 0.0-1.0.
+        """Set `duty`, clamped to 0.0–1.0.
 
         Args:
             duty: The new duty cycle.

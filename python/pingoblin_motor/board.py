@@ -62,7 +62,7 @@ class MotorBoard:
                 for [`sleep()`][pingoblin_motor.board.MotorBoard.sleep].
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection
                 without a current sensor.
-            mode: `"ph_en"` (JP1 pads 1-2, default) or `"pwm"` (JP1 pads 2-3).
+            mode: `"ph_en"` (JP1 pads 1–2, default) or `"pwm"` (JP1 pads 2–3).
             logic_voltage: VLOGIC (V). Sets the current limit: about 2.0 A at 3.3 V and
                 3.0 A at 5 V.
             adc: An [`ADS1115`][pingoblin_motor.sensors.ADS1115] for current sensing.

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 532" role="img" aria-label="J3 logic header pinout" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">
 <rect width="760" height="532" fill="#ffffff"/>
-<text x="24" y="30" font-size="15" font-weight="600" fill="#1f1f1f" text-anchor="start">J3 pinout: pins 3-6 change function with the PMODE jumper (JP1)</text>
+<text x="24" y="30" font-size="15" font-weight="600" fill="#1f1f1f" text-anchor="start">J3 pinout: pins 3–6 change function with the PMODE jumper (JP1)</text>
 <text x="24" y="50" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">Top view as placed: left edge, pin 10 at the top, pin 1 (square pad) at the bottom. Outline not to scale.</text>
 <rect x="24" y="64" width="12" height="12" rx="0" fill="#2f6fd6" fill-opacity="0.25" stroke="#2f6fd6" stroke-width="1.5"/>
 <text x="42" y="74" font-size="11.5" font-weight="400" fill="#1f1f1f" text-anchor="start">Power</text>
@@ -12,9 +12,9 @@
 <text x="438" y="74" font-size="11.5" font-weight="400" fill="#1f1f1f" text-anchor="start">Depends on JP1</text>
 <rect x="16" y="252" width="498" height="128" rx="6" fill="#ececec" fill-opacity="1" stroke="none" stroke-width="0"/>
 <text x="154" y="100" font-size="11.5" font-weight="600" fill="#1f1f1f" text-anchor="start">PH/EN mode (default)</text>
-<text x="154" y="114" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">JP1 pads 1-2 bridged</text>
+<text x="154" y="114" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">JP1 pads 1–2 bridged</text>
 <text x="342" y="100" font-size="11.5" font-weight="600" fill="#1f1f1f" text-anchor="start">PWM mode (IN1/IN2)</text>
-<text x="342" y="114" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">JP1 pads 2-3 bridged</text>
+<text x="342" y="114" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">JP1 pads 2–3 bridged</text>
 <line x1="24" y1="122" x2="510" y2="122" stroke="#c9c9c9"/>
 <rect x="516" y="88" width="220" height="420" rx="8" fill="none" fill-opacity="1" stroke="#6b6b6b" stroke-width="1.25"/>
 <text x="626" y="254" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="middle">Board A, top view</text>
@@ -86,7 +86,7 @@
 <text x="508" y="400" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="end">2</text>
 <text x="24" y="400" font-size="13" font-weight="600" fill="#1f1f1f" text-anchor="start">VLOGIC</text>
 <text x="104" y="400" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">power</text>
-<text x="154" y="400" font-size="13" font-weight="400" fill="#1f1f1f" text-anchor="start">Logic supply in, 3.3-5 V</text>
+<text x="154" y="400" font-size="13" font-weight="400" fill="#1f1f1f" text-anchor="start">Logic supply in, 3.3–5 V</text>
 <text x="342" y="400" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">same</text>
 <rect x="526" y="420" width="16" height="16" rx="0" fill="#2f6fd6" fill-opacity="0.25" stroke="#2f6fd6" stroke-width="1.5"/>
 <text x="508" y="432" font-size="11.5" font-weight="600" fill="#1f1f1f" text-anchor="end">1</text>

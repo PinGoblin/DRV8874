@@ -1,3 +1,3 @@
-# Current sensing
+# Current sensors
 
 ::: pingoblin_motor.sensors

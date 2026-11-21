@@ -10,7 +10,7 @@ must be called in one of three ways:
 
 - as an asyncio task: `asyncio.create_task(board.run_monitor())`;
 - through the blocking helpers: `board.pause(2)` or `motor.forward(50, 2, wait=True)`;
-- from your own main loop, every 10-50 ms.
+- from your own main loop, every 10–50 ms.
 
 The source is about 63 KB, much of it docstrings. Precompile it with `mpy-cross` and
 copy the `.mpy` to the board: `.mpy` files leave the docstrings out and skip on-board
@@ -112,8 +112,8 @@ class ControlMode:
     """Control mode set by the PMODE jumper JP1 (string constants).
 
     Attributes:
-        PH_EN: `"ph_en"`: default (JP1 pads 1-2). EN = speed PWM, PH = direction.
-        PWM: `"pwm"`: JP1 pads 2-3. IN1 / IN2; allows per-motor coast.
+        PH_EN: `"ph_en"`: default (JP1 pads 1–2). EN = speed PWM, PH = direction.
+        PWM: `"pwm"`: JP1 pads 2–3. IN1 / IN2; allows per-motor coast.
     """
 
     PH_EN = "ph_en"         # JP1 pads 1-2 (default): EN = speed PWM, PH = direction
@@ -543,7 +543,7 @@ class ADS1115:
         """Build the config-register value for a single-shot read.
 
         Args:
-            channel: Input 0-3 (AINx against GND).
+            channel: Input 0–3 (AINx against GND).
 
         Returns:
             The 16-bit config register value.
@@ -560,7 +560,7 @@ class ADS1115:
         """Start a conversion, wait for it and return the voltage.
 
         Args:
-            channel: Input 0-3.
+            channel: Input 0–3.
 
         Returns:
             The input voltage (V).
@@ -592,7 +592,7 @@ class ADS1115Channel:
         """
         Args:
             adc: The `ADS1115`.
-            channel: Input 0-3.
+            channel: Input 0–3.
 
         Raises:
             ConfigError: Channel out of range.
@@ -614,11 +614,11 @@ class ADS1115Channel:
 
 
 class ADCChannel:
-    """The microcontroller's own ADC on an ISENSE pin (ESP32: ADC1 pins 32-39; Pico: GP26-28).
+    """The microcontroller's own ADC on an ISENSE pin (ESP32: ADC1 pins 32–39; Pico: GP26-28).
 
     The built-in ADC samples instantly, so with PWM each sample is either the full motor
     current or zero. Boards average 16 samples per reading by default for this sensor.
-    On the ESP32 the input range is set to about 0-3.1 V (11 dB attenuation).
+    On the ESP32 the input range is set to about 0–3.1 V (11 dB attenuation).
     """
 
     def __init__(self, pin, vref=3.3):
@@ -723,7 +723,7 @@ def _check_speed(v):
         The speed as a float.
 
     Raises:
-        ValueError: Outside 0-100.
+        ValueError: Outside 0–100.
     """
     v = float(v)
     if v < 0 or v > 100:
@@ -735,7 +735,7 @@ class Motor:
     """One motor channel. Create motors through `MotorBoard`, not directly.
 
     Pass options to both motors with `motor_options=`, or to one with `a_options=` /
-    `b_options=`. Speeds are percentages, 0-100; `run()` takes a signed speed.
+    `b_options=`. Speeds are percentages, 0–100; `run()` takes a signed speed.
     """
 
     def __init__(self, name, board, en_pin, ph_pin, mode, pins, sensor=None, invert=False,
@@ -830,7 +830,7 @@ class Motor:
 
     @property
     def duty(self):
-        """PWM duty currently applied, 0-1."""
+        """PWM duty currently applied, 0–1."""
         return self._duty
 
     @property
@@ -855,13 +855,13 @@ class Motor:
 
     @property
     def speed_pc(self):
-        """Commanded speed, 0-100 %.
+        """Commanded speed, 0–100 %.
 
         Setting it while running changes the speed (ramped if `ramp_time` is set); 0 stops.
         While stopped it stores the speed for `start()`.
 
         Raises:
-            ValueError: Outside 0-100.
+            ValueError: Outside 0–100.
         """
         return self._speed_pc
 
@@ -886,13 +886,13 @@ class Motor:
         """Run forward.
 
         Args:
-            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            speed_pc: Speed, 0–100 %. 0 stops the motor.
             duration: Seconds to run before braking, or `None` to run until told otherwise.
                 The stop happens inside `update()`.
             wait: With `duration`, block until the run ends (calls `update()` while waiting).
 
         Raises:
-            ValueError: Speed outside 0-100, or `duration` not positive.
+            ValueError: Speed outside 0–100, or `duration` not positive.
             MotorFaultError: The motor has a latched fault.
         """
         self._run(Direction.FORWARD, speed_pc, duration, wait)
@@ -901,13 +901,13 @@ class Motor:
         """Run in reverse.
 
         Args:
-            speed_pc: Speed, 0-100 %. 0 stops the motor.
+            speed_pc: Speed, 0–100 %. 0 stops the motor.
             duration: Seconds to run before braking, or `None` to run until told otherwise.
                 The stop happens inside `update()`.
             wait: With `duration`, block until the run ends (calls `update()` while waiting).
 
         Raises:
-            ValueError: Speed outside 0-100, or `duration` not positive.
+            ValueError: Speed outside 0–100, or `duration` not positive.
             MotorFaultError: The motor has a latched fault.
         """
         self._run(Direction.REVERSE, speed_pc, duration, wait)
@@ -1181,7 +1181,7 @@ class MotorBoard:
             b_ph: GPIO for B_PH (J3 pin 6), or `None`.
             sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`.
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection without a sensor.
-            mode: `"ph_en"` (JP1 pads 1-2, default) or `"pwm"` (JP1 pads 2-3).
+            mode: `"ph_en"` (JP1 pads 1–2, default) or `"pwm"` (JP1 pads 2–3).
             logic_voltage: VLOGIC (V). Sets the current limit: 2.0 A at 3.3 V, 3.0 A at 5 V.
             adc: An `ADS1115` for current sensing.
             a_sense_channel: ADS1115 input wired to A_ISENSE.
@@ -1341,7 +1341,7 @@ class MotorBoard:
         return self.monitor
 
     def update(self):
-        """Advance ramps and timed runs, and run fault checks if enabled. Call every 10-50 ms."""
+        """Advance ramps and timed runs, and run fault checks if enabled. Call every 10–50 ms."""
         now = ticks_ms()
         for m in self.motors.values():
             m._tick(now)
@@ -1591,7 +1591,7 @@ class MotorChain:
             m.clear_fault()
 
     def update(self):
-        """Advance every motor's ramps and timed runs, and run fault checks. Call every 10-50 ms."""
+        """Advance every motor's ramps and timed runs, and run fault checks. Call every 10–50 ms."""
         now = ticks_ms()
         for m in self.motors:
             m._tick(now)
@@ -1644,7 +1644,7 @@ OVERLOAD_DEBOUNCE_MS = 1000
 CURRENT_LIMIT_REPEAT_MS = 5000
 """Minimum milliseconds between repeated `CURRENT_LIMIT` warnings."""
 OPEN_LOAD_MIN_DUTY = 0.2
-"""Open-load checks run only at or above this duty (0-1)."""
+"""Open-load checks run only at or above this duty (0–1)."""
 
 
 class _Track:

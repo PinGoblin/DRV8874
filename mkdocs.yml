@@ -34,12 +34,12 @@ nav:
       - Specifications: guide/specifications.md
       - Important safety information: guide/safety.md
       - Connectors: guide/connectors.md
-      - J3 logic header: guide/j3-header.md
+      - J3 pinout: guide/j3-pinout.md
       - Quick start: guide/quick-start.md
       - Controlling the motors: guide/controlling-motors.md
       - Test buttons and LEDs: guide/buttons-leds.md
       - Current sensing and current limit: guide/current-sensing.md
-      - "Configuration: PMODE jumper": guide/configuration.md
+      - "Configuration: PMODE jumper (JP1)": guide/configuration.md
       - Daisy-chaining boards: guide/daisy-chain.md
       - Troubleshooting: guide/troubleshooting.md
   - API:
@@ -58,7 +58,7 @@ nav:
           - MotorChain: api/reference/chain.md
           - Faults: api/reference/faults.md
           - Fault monitor: api/reference/monitor.md
-          - Current sensing: api/reference/sensors.md
+          - Current sensors: api/reference/sensors.md
           - Pin backends: api/reference/backends.md
       - MicroPython reference: api/reference/micropython.md
 
