@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Control library for the PinGoblin Board A dual DC motor driver (DRV8874) on Raspberry Pi"
 readme = "README.md"
 requires-python = ">=3.8"
+license = { text = "MIT" }
 dependencies = []
 
 [project.optional-dependencies]

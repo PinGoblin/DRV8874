@@ -25,3 +25,7 @@ board.close()
 ```
 
 See [`python/README.md`](python/README.md) for the full API, fault handling and daisy-chain examples.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
