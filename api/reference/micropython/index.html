@@ -534,14 +534,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guide/j3-header/" class="md-nav__link">
+      <a href="../../../guide/j3-pinout/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    J3 logic header
+    J3 pinout
   
 
     
@@ -681,7 +681,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration: PMODE jumper
+    Configuration: PMODE jumper (JP1)
   
 
     
@@ -1336,7 +1336,7 @@
   <span class="md-ellipsis">
     
   
-    Current sensing
+    Current sensors
   
 
     
@@ -3990,7 +3990,7 @@ must be called in one of three ways:</p>
 <ul>
 <li>as an asyncio task: <code>asyncio.create_task(board.run_monitor())</code>;</li>
 <li>through the blocking helpers: <code>board.pause(2)</code> or <code>motor.forward(50, 2, wait=True)</code>;</li>
-<li>from your own main loop, every 10-50 ms.</li>
+<li>from your own main loop, every 10–50 ms.</li>
 </ul>
 <p>The source is about 63 KB, much of it docstrings. Precompile it with <code>mpy-cross</code> and
 copy the <code>.mpy</code> to the board: <code>.mpy</code> files leave the docstrings out and skip on-board
@@ -4210,7 +4210,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Open-load checks run only at or above this duty (0-1).</p>
+        <p>Open-load checks run only at or above this duty (0–1).</p>
 
     </div>
 
@@ -4432,7 +4432,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"ph_en"</code>: default (JP1 pads 1-2). EN = speed PWM, PH = direction.</p>
+                <p><code>"ph_en"</code>: default (JP1 pads 1–2). EN = speed PWM, PH = direction.</p>
               </div>
             </td>
           </tr>
@@ -4442,7 +4442,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"pwm"</code>: JP1 pads 2-3. IN1 / IN2; allows per-motor coast.</p>
+                <p><code>"pwm"</code>: JP1 pads 2–3. IN1 / IN2; allows per-motor coast.</p>
               </div>
             </td>
           </tr>
@@ -6071,7 +6071,7 @@ roughly <em>duty × motor current</em>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Input 0-3 (AINx against GND).</p>
+                <p>Input 0–3 (AINx against GND).</p>
               </div>
             </td>
             <td>
@@ -6166,7 +6166,7 @@ roughly <em>duty × motor current</em>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Input 0-3.</p>
+                <p>Input 0–3.</p>
               </div>
             </td>
             <td>
@@ -6288,7 +6288,7 @@ roughly <em>duty × motor current</em>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Input 0-3.</p>
+                <p>Input 0–3.</p>
               </div>
             </td>
             <td>
@@ -6431,10 +6431,10 @@ roughly <em>duty × motor current</em>.</p>
 
 
 
-        <p>The microcontroller's own ADC on an ISENSE pin (ESP32: ADC1 pins 32-39; Pico: GP26-28).</p>
+        <p>The microcontroller's own ADC on an ISENSE pin (ESP32: ADC1 pins 32–39; Pico: GP26-28).</p>
 <p>The built-in ADC samples instantly, so with PWM each sample is either the full motor
 current or zero. Boards average 16 samples per reading by default for this sensor.
-On the ESP32 the input range is set to about 0-3.1 V (11 dB attenuation).</p>
+On the ESP32 the input range is set to about 0–3.1 V (11 dB attenuation).</p>
 
 
 
@@ -6956,7 +6956,7 @@ On the ESP32 the input range is set to about 0-3.1 V (11 dB attenuation).</p>
 
         <p>One motor channel. Create motors through <code>MotorBoard</code>, not directly.</p>
 <p>Pass options to both motors with <code>motor_options=</code>, or to one with <code>a_options=</code> /
-<code>b_options=</code>. Speeds are percentages, 0-100; <code>run()</code> takes a signed speed.</p>
+<code>b_options=</code>. Speeds are percentages, 0–100; <code>run()</code> takes a signed speed.</p>
 
 
 
@@ -7430,7 +7430,7 @@ checks are skipped.</p>
 
     <div class="doc doc-contents ">
 
-        <p>PWM duty currently applied, 0-1.</p>
+        <p>PWM duty currently applied, 0–1.</p>
 
     </div>
 
@@ -7551,7 +7551,7 @@ checks are skipped.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Commanded speed, 0-100 %.</p>
+        <p>Commanded speed, 0–100 %.</p>
 <p>Setting it while running changes the speed (ramped if <code>ramp_time</code> is set); 0 stops.
 While stopped it stores the speed for <code>start()</code>.</p>
 
@@ -7571,7 +7571,7 @@ While stopped it stores the speed for <code>start()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Outside 0-100.</p>
+                <p>Outside 0–100.</p>
               </div>
             </td>
           </tr>
@@ -7669,7 +7669,7 @@ While stopped it stores the speed for <code>start()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed, 0-100 %. 0 stops the motor.</p>
+                <p>Speed, 0–100 %. 0 stops the motor.</p>
               </div>
             </td>
             <td>
@@ -7726,7 +7726,7 @@ The stop happens inside <code>update()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed outside 0-100, or <code>duration</code> not positive.</p>
+                <p>Speed outside 0–100, or <code>duration</code> not positive.</p>
               </div>
             </td>
           </tr>
@@ -7783,7 +7783,7 @@ The stop happens inside <code>update()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed, 0-100 %. 0 stops the motor.</p>
+                <p>Speed, 0–100 %. 0 stops the motor.</p>
               </div>
             </td>
             <td>
@@ -7840,7 +7840,7 @@ The stop happens inside <code>update()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed outside 0-100, or <code>duration</code> not positive.</p>
+                <p>Speed outside 0–100, or <code>duration</code> not positive.</p>
               </div>
             </td>
           </tr>
@@ -8529,7 +8529,7 @@ only when every other motor on that line is idle; otherwise the motor brakes.</p
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"ph_en"</code> (JP1 pads 1-2, default) or <code>"pwm"</code> (JP1 pads 2-3).</p>
+                <p><code>"ph_en"</code> (JP1 pads 1–2, default) or <code>"pwm"</code> (JP1 pads 2–3).</p>
               </div>
             </td>
             <td>
@@ -9140,7 +9140,7 @@ only when every other motor on that line is idle; otherwise the motor brakes.</p
 
     <div class="doc doc-contents ">
 
-        <p>Advance ramps and timed runs, and run fault checks if enabled. Call every 10-50 ms.</p>
+        <p>Advance ramps and timed runs, and run fault checks if enabled. Call every 10–50 ms.</p>
 
 
     </div>
@@ -9997,7 +9997,7 @@ only when every other motor on that line is idle; otherwise the motor brakes.</p
 
     <div class="doc doc-contents ">
 
-        <p>Advance every motor's ramps and timed runs, and run fault checks. Call every 10-50 ms.</p>
+        <p>Advance every motor's ramps and timed runs, and run fault checks. Call every 10–50 ms.</p>
 
 
     </div>

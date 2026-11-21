@@ -536,14 +536,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guide/j3-header/" class="md-nav__link">
+      <a href="../../../guide/j3-pinout/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    J3 logic header
+    J3 pinout
   
 
     
@@ -683,7 +683,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration: PMODE jumper
+    Configuration: PMODE jumper (JP1)
   
 
     
@@ -1679,7 +1679,7 @@
   <span class="md-ellipsis">
     
   
-    Current sensing
+    Current sensors
   
 
     
@@ -2355,7 +2355,7 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Default (JP1 pads 1-2): EN = speed PWM, PH = direction.</p>
+                <p>Default (JP1 pads 1–2): EN = speed PWM, PH = direction.</p>
               </div>
             </td>
           </tr>
@@ -2365,7 +2365,7 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>JP1 pads 2-3: IN1 / IN2. Allows per-motor coast.</p>
+                <p>JP1 pads 2–3: IN1 / IN2. Allows per-motor coast.</p>
               </div>
             </td>
           </tr>
@@ -2426,7 +2426,7 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
 <p>Create motors through <a class="autorefs autorefs-internal" title="            MotorBoard" href="../board/#pingoblin_motor.board.MotorBoard"><code>MotorBoard</code></a>, not directly.
 Pass options to both motors with <code>motor_options=</code>, or to one with <code>a_options=</code> /
 <code>b_options=</code>.</p>
-<p>Speeds are percentages, 0-100. <a class="autorefs autorefs-internal" title="            run" href="#pingoblin_motor.motor.Motor.run"><code>run()</code></a> takes a signed
+<p>Speeds are percentages, 0–100. <a class="autorefs autorefs-internal" title="            run" href="#pingoblin_motor.motor.Motor.run"><code>run()</code></a> takes a signed
 speed: positive is forward, negative is reverse. Commands are thread-safe.</p>
 
 
@@ -2945,7 +2945,7 @@ checks are skipped (start-up surge).</p>
 
     <div class="doc doc-contents ">
 
-        <p>PWM duty currently applied to the bridge, 0-1. 0 when stopped.</p>
+        <p>PWM duty currently applied to the bridge, 0–1. 0 when stopped.</p>
 
     </div>
 
@@ -3052,7 +3052,7 @@ checks are skipped (start-up surge).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Commanded speed, 0-100 %.</p>
+        <p>Commanded speed, 0–100 %.</p>
 <p>Setting it while the motor runs changes the speed (ramped if <code>ramp_time</code> is set).
 Setting 0 stops the motor. Setting it while stopped stores the speed for
 <a class="autorefs autorefs-internal" title="            start" href="#pingoblin_motor.motor.Motor.start"><code>start()</code></a>.</p>
@@ -3073,7 +3073,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Outside 0-100.</p>
+                <p>Outside 0–100.</p>
               </div>
             </td>
           </tr>
@@ -3174,7 +3174,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed, 0-100 %. 0 stops the motor.</p>
+                <p>Speed, 0–100 %. 0 stops the motor.</p>
               </div>
             </td>
             <td>
@@ -3232,7 +3232,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed outside 0-100, or <code>duration</code> not positive.</p>
+                <p>Speed outside 0–100, or <code>duration</code> not positive.</p>
               </div>
             </td>
           </tr>
@@ -3290,7 +3290,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed, 0-100 %. 0 stops the motor.</p>
+                <p>Speed, 0–100 %. 0 stops the motor.</p>
               </div>
             </td>
             <td>
@@ -3348,7 +3348,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Speed outside 0-100, or <code>duration</code> not positive.</p>
+                <p>Speed outside 0–100, or <code>duration</code> not positive.</p>
               </div>
             </td>
           </tr>
