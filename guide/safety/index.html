@@ -1468,12 +1468,13 @@
 <h1 id="important-safety-information">Important safety information<a class="headerlink" href="#important-safety-information" title="Permanent link">&para;</a></h1>
 <p>Read these before connecting power.</p>
 <div class="admonition danger">
-<p class="admonition-title">Never connect VIN (6–16 V) to J3</p>
+<p class="admonition-title">Never connect VIN (6–18 V) to J3</p>
 <p>J3 is logic only. VIN on any J3 pin will destroy the host and the drivers.</p>
 </div>
 <ul>
-<li><strong>Do not exceed 16 V on VIN.</strong> The surge suppressor starts conducting at about 20 V and
-  is not meant to carry continuous current.</li>
+<li><strong>Do not exceed 18 V on VIN, including supply tolerance.</strong> A supply labelled 18 V can
+  measure higher: check it with a meter, or use a lower voltage. The surge suppressor
+  starts conducting at about 20 V and is not meant to carry continuous current.</li>
 <li><strong>Connect GND between the board and the host.</strong> J3 pin 1 must go to a host GND pin.</li>
 <li><strong>Wire with the power off.</strong> Connect and disconnect motors only while the supply is off.</li>
 <li><strong>The drivers get hot.</strong> At high currents the chips and the board around them can exceed
