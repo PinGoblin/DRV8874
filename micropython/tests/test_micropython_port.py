@@ -81,10 +81,10 @@ def test_forward_reverse_stop():
     b, pins, *_ = make_board()
     a = b.motor_a
     a.forward(50)
-    assert P(pins)[5].value is False and P(pins)[12].duty == 0.5
+    assert P(pins)[5].value is True and P(pins)[12].duty == 0.5
     assert a.state == MotorState.RUNNING and a.direction == Direction.FORWARD
     a.reverse(75)
-    assert P(pins)[5].value is True and P(pins)[12].duty == 0.75
+    assert P(pins)[5].value is False and P(pins)[12].duty == 0.75
     a.stop()
     assert P(pins)[12].duty == 0 and a.state == MotorState.STOPPED
     b.close()
@@ -99,7 +99,7 @@ def test_default_pwm_frequency_is_20k():
 def test_run_signed_invert_and_min_speed():
     b, pins, *_ = make_board(a_options=dict(invert=True, min_speed_pc=20, reverse_delay=0))
     b.motor_a.run(-10)
-    assert P(pins)[5].value is False and P(pins)[12].duty == pytest.approx(0.2)
+    assert P(pins)[5].value is True and P(pins)[12].duty == pytest.approx(0.2)
     with pytest.raises(ValueError):
         b.motor_a.forward(101)
     b.close()
@@ -151,9 +151,9 @@ def test_pwm_mode_slow_decay_and_coast():
     b, pins, *_ = make_board(mode="pwm")
     a = b.motor_a
     a.forward(30)
-    assert P(pins)[12].duty == pytest.approx(0.7) and P(pins)[5].duty == 1.0
-    a.reverse(30)
     assert P(pins)[12].duty == 1.0 and P(pins)[5].duty == pytest.approx(0.7)
+    a.reverse(30)
+    assert P(pins)[12].duty == pytest.approx(0.7) and P(pins)[5].duty == 1.0
     assert a.coast() is True and P(pins)[12].duty == 0 and P(pins)[5].duty == 0
     b.close()
 

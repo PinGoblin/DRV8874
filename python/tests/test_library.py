@@ -39,10 +39,10 @@ def test_forward_reverse_ph_en():
     board, be, *_ = make_board()
     a = board.motor_a
     a.forward(50)
-    assert pins(be)[5].value is False and pins(be)[12].duty == 0.5
+    assert pins(be)[5].value is True and pins(be)[12].duty == 0.5
     assert a.state is MotorState.RUNNING and a.direction is Direction.FORWARD
     a.reverse(75)
-    assert pins(be)[5].value is True and pins(be)[12].duty == 0.75
+    assert pins(be)[5].value is False and pins(be)[12].duty == 0.75
     a.stop()
     assert pins(be)[12].duty == 0 and a.state is MotorState.STOPPED
     board.close()
@@ -51,7 +51,7 @@ def test_forward_reverse_ph_en():
 def test_run_signed_and_invert():
     board, be, *_ = make_board(a_options=dict(invert=True))
     board.motor_a.run(-40)
-    assert pins(be)[5].value is False          # inverted: reverse drives PH low
+    assert pins(be)[5].value is True           # inverted: reverse drives PH high
     assert board.motor_a.direction is Direction.REVERSE
     board.motor_a.run(0)
     assert board.motor_a.state is MotorState.STOPPED
@@ -113,10 +113,10 @@ def test_ramp():
 def test_pwm_mode_slow_decay():
     board, be, *_ = make_board(mode="pwm")
     a = board.motor_a
-    a.forward(30)             # IN1 = 1 - duty, IN2 = 1
-    assert pins(be)[12].duty == pytest.approx(0.7) and pins(be)[5].duty == 1.0
-    a.reverse(30)
+    a.forward(30)             # IN1 = 1, IN2 = 1 - duty (OUT1 positive)
     assert pins(be)[12].duty == 1.0 and pins(be)[5].duty == pytest.approx(0.7)
+    a.reverse(30)             # IN1 = 1 - duty, IN2 = 1 (OUT2 positive)
+    assert pins(be)[12].duty == pytest.approx(0.7) and pins(be)[5].duty == 1.0
     a.stop()                  # brake = both high
     assert pins(be)[12].duty == 1.0 and pins(be)[5].duty == 1.0
     assert a.coast() is True  # coast = both low

@@ -84,8 +84,8 @@ class Direction:
     """Direction of rotation (string constants).
 
     Attributes:
-        FORWARD: `"forward"`: PH low, OUT2 positive.
-        REVERSE: `"reverse"`: PH high, OUT1 positive.
+        FORWARD: `"forward"`: PH high, OUT1 positive (TI's convention).
+        REVERSE: `"reverse"`: PH low, OUT2 positive.
     """
 
     FORWARD = "forward"
@@ -1124,14 +1124,14 @@ class Motor:
         self._duty = duty
         fwd = (self._direction == Direction.FORWARD) != self.invert
         if self.mode == ControlMode.PH_EN:
-            self._ph.set(not fwd)               # forward = PH low
+            self._ph.set(fwd)                   # forward = PH high (OUT1 positive)
             self._en.set_duty(duty)
-        elif fwd:                               # PWM mode, slow decay: IN1 = 1-duty, IN2 = 1
-            self._ph.set_duty(1.0)
-            self._en.set_duty(1.0 - duty)
-        else:
+        elif fwd:                               # PWM mode, slow decay: IN1 = 1, IN2 = 1-duty
             self._en.set_duty(1.0)
             self._ph.set_duty(1.0 - duty)
+        else:
+            self._ph.set_duty(1.0)
+            self._en.set_duty(1.0 - duty)
 
     def _apply_brake(self):
         self._duty = 0.0

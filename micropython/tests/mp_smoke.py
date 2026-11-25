@@ -22,7 +22,7 @@ a.forward(60)
 assert a.is_running and a.direction == pm.Direction.FORWARD, a
 assert abs(pins.pins[12].duty - 0.6) < 0.01
 a.reverse(30)
-assert a.direction == pm.Direction.REVERSE and pins.pins[5].value == 1
+assert a.direction == pm.Direction.REVERSE and pins.pins[5].value == 0
 a.stop()
 assert a.state == pm.MotorState.STOPPED
 

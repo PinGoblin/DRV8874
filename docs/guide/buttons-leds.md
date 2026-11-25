@@ -5,8 +5,8 @@ check the wiring before writing any code.
 
 | Button | What it does |
 | --- | --- |
-| SW1 A FWD | Motor A forward (EN high, PH low) |
-| SW2 A REV | Motor A reverse (EN high, PH high) |
+| SW1 A FWD | Motor A forward (EN high, PH high: OUT1 positive) |
+| SW2 A REV | Motor A reverse (EN high, PH low: OUT2 positive) |
 | SW3 B FWD | Motor B forward |
 | SW4 B REV | Motor B reverse |
 
@@ -16,9 +16,9 @@ check the wiring before writing any code.
   low: 1 kΩ resistors protect the host's GPIOs.
 - They work only in PH/EN mode (the default jumper setting).
 
-!!! info "Pressing FWD and REV together gives reverse"
-    REV drives both EN and PH high, while FWD only drives EN, so REV wins. The result is
-    the same as pressing REV alone and can't harm the board or the host. Release one
+!!! info "Pressing FWD and REV together gives forward"
+    FWD drives both EN and PH high, while REV only drives EN, so FWD wins. The result is
+    the same as pressing FWD alone and can't harm the board or the host. Release one
     button before pressing the other: flipping from forward to reverse at full speed
     causes a current surge (the fault LED flickers as the current limit catches it) and is
     hard on gearboxes.
@@ -29,8 +29,8 @@ check the wiring before writing any code.
 | --- | --- | --- |
 | Power | Green | Motor supply present (after the reverse-polarity switch) |
 | Fault | Red | A driver is limiting current or has detected a fault (same signal as nFAULT) |
-| Motor A / B direction | Green | Motor running forward (OUT2 positive). Brightness follows PWM duty |
-| Motor A / B direction | Red | Motor running reverse (OUT1 positive). Brightness follows PWM duty |
+| Motor A / B direction | Green | Motor running forward (OUT1 positive). Brightness follows PWM duty |
+| Motor A / B direction | Red | Motor running reverse (OUT2 positive). Brightness follows PWM duty |
 
 A direction LED may glow faintly if you spin an unpowered motor by hand. This is normal:
 the motor is acting as a generator.

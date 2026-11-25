@@ -33,8 +33,8 @@ See [Test buttons and LEDs](buttons-leds.md) for how the buttons behave with a h
 | --- | --- | --- |
 | D3 | Green | PWR: motor supply present |
 | D4 | Red | FAULT: a driver is limiting current or has a fault |
-| D9 / D14 | Green | Motor A / B running forward |
-| D8 / D13 | Red | Motor A / B running reverse |
+| D8 / D13 | Green | Motor A / B running forward (OUT1 positive) |
+| D9 / D14 | Red | Motor A / B running reverse (OUT2 positive) |
 
 ## Main parts
 

@@ -22,13 +22,13 @@ Motor A; motor B is the same.
 | IN1 (pin 3) | IN2 (pin 4) | OUT1 | OUT2 | Motor |
 | --- | --- | --- | --- | --- |
 | Low | Low | Open | Open | Coast |
-| Low | High | Low | High | Forward |
-| High | Low | High | Low | Reverse |
+| High | Low | High | Low | Forward |
+| Low | High | Low | High | Reverse |
 | High | High | Low | Low | Brake |
 
 PWM mode suits libraries written for two-input drivers such as the L298N or DRV8833
 (gpiozero `Motor`, Arduino `analogWrite` on either pin). With gpiozero's `Motor` class,
-pass `forward=` J3 pin 4 (IN2) and `backward=` J3 pin 3 (IN1) so its directions match the
+pass `forward=` J3 pin 3 (IN1) and `backward=` J3 pin 4 (IN2) so its directions match the
 table above.
 
 In PWM mode each motor can coast on its own, without sleeping the board.

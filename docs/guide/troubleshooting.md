@@ -6,7 +6,7 @@
 | Power LED on, motors do nothing, buttons do nothing | VLOGIC missing, or nSLEEP held low | Feed 3.3–5 V to J3 pin 2 and connect GND (pin 1). Disconnect or drive nSLEEP (pin 9) high |
 | Buttons work, host code does nothing | Wrong GPIO numbers, no common GND, or EN never goes high | Check the pin mapping and the GND link. Measure EN (pin 3/5) while the code runs |
 | Buttons do nothing but host code works | PMODE jumper set to PWM mode | Buttons work only in PH/EN mode (JP1 pads 1–2) |
-| Motor runs only one direction | PH not connected or not changing | Check pin 4/6 wiring. With PH open, the motor always runs forward |
+| Motor runs only one direction | PH not connected or not changing | Check pin 4/6 wiring. With PH open, the motor always runs in reverse (PH has a pull-down) |
 | Motor turns the wrong way | Motor wires swapped | Swap the wires at J4/J5, or set the library's `invert=True` option |
 | Motor stutters, fault LED flickers | Current limit active (load near 2 A at 3.3 V logic, 3 A at 5 V) | Reduce load or speed. A larger motor needs 5 V logic or a bigger driver |
 | Motor runs, then stops and restarts every few seconds | Driver overheating, or the board fuse tripping | Improve airflow and reduce continuous current. Keep the total under 3 A |

@@ -20,12 +20,12 @@ _log = logging.getLogger("pingoblin_motor")
 class Direction(enum.Enum):
     """Direction of rotation.
 
-    "Forward" follows the board's convention: PH low, OUT2 positive. Which way the shaft
+    "Forward" follows the board's (and TI's) convention: PH high, OUT1 positive. Which way the shaft
     turns depends on the wiring; use `invert=True` to swap.
 
     Attributes:
-        FORWARD: PH low (OUT2 positive).
-        REVERSE: PH high (OUT1 positive).
+        FORWARD: PH high (OUT1 positive).
+        REVERSE: PH low (OUT2 positive).
     """
 
     FORWARD = "forward"
@@ -513,22 +513,22 @@ class Motor:
         self._ramp_thread = threading.Thread(target=worker, name=f"ramp-{self.full_name}", daemon=True)
         self._ramp_thread.start()
 
-    # Pin level control. PH/EN: forward = PH low. PWM mode uses slow decay
+    # Pin level control. PH/EN: forward = PH high (OUT1 positive). PWM mode uses slow decay
     # (off-time = brake) so speed response matches PH/EN mode.
     def _apply_drive(self, duty: float) -> None:
         duty = max(0.0, min(1.0, duty))
         self._duty = duty
         fwd = (self._direction is Direction.FORWARD) != self.invert
         if self.mode is ControlMode.PH_EN:
-            self._ph.set(not fwd)
+            self._ph.set(fwd)
             self._en.set_duty(duty)
-        else:  # IN1=en, IN2=ph. Forward: IN1 low, IN2 high.
+        else:  # IN1=en, IN2=ph. Forward: IN1 high, IN2 low (OUT1 positive).
             if fwd:
-                self._ph.set_duty(1.0)
-                self._en.set_duty(1.0 - duty)
-            else:
                 self._en.set_duty(1.0)
                 self._ph.set_duty(1.0 - duty)
+            else:
+                self._ph.set_duty(1.0)
+                self._en.set_duty(1.0 - duty)
 
     def _apply_brake(self) -> None:
         self._duty = 0.0

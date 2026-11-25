@@ -2,13 +2,13 @@
 
 In the default PH/EN mode, each motor needs two pins: **EN** turns it on and sets the
 speed with PWM, and **PH** sets the direction. This is the same scheme as gpiozero's
-`PhaseEnableMotor`. The table is for motor A; motor B is identical using B_EN and B_PH.
+`PhaseEnableMotor`, except that gpiozero calls PH low "forward" (see below). The table is for motor A; motor B is identical using B_EN and B_PH.
 
 | nSLEEP | A_EN | A_PH | OUT1 | OUT2 | Motor | LED |
 | --- | --- | --- | --- | --- | --- | --- |
 | High (default) | Low | Any | Low | Low | Brake (stops quickly) | Off |
-| High | High / PWM | Low | Low | High | Forward | Green |
-| High | High / PWM | High | High | Low | Reverse | Red |
+| High | High / PWM | High | High | Low | Forward | Green |
+| High | High / PWM | Low | Low | High | Reverse | Red |
 | Low | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
 
 **Speed:** drive EN with PWM. The duty cycle sets the speed, and in the PWM off-time the
@@ -26,8 +26,9 @@ drivers are awake whenever VLOGIC is present.
 **Start-up behaviour:** EN and PH have pull-down resistors, so while the host is booting
 (pins floating) both motors are held in brake.
 
-"Forward" and "reverse" here follow the gpiozero convention (PH low = forward). Which way
-the shaft actually turns depends on how the motor is wired.
+"Forward" and "reverse" here follow TI's convention for the DRV8874: PH high = forward, with
+OUT1 positive (green LED). Which way the shaft actually turns depends on how the motor is
+wired; swap its two leads, or use `invert=True` in the library, to change it.
 
 !!! note "Coast and nSLEEP"
     In PH/EN mode the only way to coast is to sleep the driver, and nSLEEP is shared by
@@ -51,8 +52,8 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
     FAULT = Pin(39, Pin.IN)                       # J3 pin 10 (pulled up on board)
 
     def drive(en, ph, speed):
-        """speed -1.0..1.0; positive = forward (PH low)."""
-        ph.value(1 if speed < 0 else 0)
+        """speed -1.0..1.0; positive = forward (PH high, OUT1 positive)."""
+        ph.value(1 if speed > 0 else 0)
         en.duty_u16(int(min(abs(speed), 1.0) * 65535))
 
     def amps(adc):
@@ -81,8 +82,10 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
     motor_b.enable_device.frequency = 1000
     fault = DigitalInputDevice(19, pull_up=None, active_state=False)  # J3 pin 10
 
-    motor_a.forward(0.5)
-    motor_b.backward(0.75)
+    # gpiozero's forward() drives PH low, which is this board's reverse,
+    # so backward() runs a motor forward here.
+    motor_a.backward(0.5)   # forward (OUT1 positive, green LED)
+    motor_b.forward(0.75)   # reverse (OUT2 positive, red LED)
     sleep(2)
     print("Fault or current limit:", fault.is_active)
     motor_a.stop()   # brake
