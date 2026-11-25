@@ -29,8 +29,8 @@ check the wiring before writing any code.
 | --- | --- | --- |
 | Power | Green | Motor supply present (after the reverse-polarity switch) |
 | Fault | Red | A driver is limiting current or has detected a fault (same signal as nFAULT) |
-| Motor A / B direction | Red | Motor running forward (OUT2 positive). Brightness follows PWM duty |
-| Motor A / B direction | Green | Motor running reverse (OUT1 positive) |
+| Motor A / B direction | Green | Motor running forward (OUT2 positive). Brightness follows PWM duty |
+| Motor A / B direction | Red | Motor running reverse (OUT1 positive). Brightness follows PWM duty |
 
 A direction LED may glow faintly if you spin an unpowered motor by hand. This is normal:
 the motor is acting as a generator.

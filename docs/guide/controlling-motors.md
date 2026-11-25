@@ -7,8 +7,8 @@ speed with PWM, and **PH** sets the direction. This is the same scheme as gpioze
 | nSLEEP | A_EN | A_PH | OUT1 | OUT2 | Motor | LED |
 | --- | --- | --- | --- | --- | --- | --- |
 | High (default) | Low | Any | Low | Low | Brake (stops quickly) | Off |
-| High | High / PWM | Low | Low | High | Forward | Red |
-| High | High / PWM | High | High | Low | Reverse | Green |
+| High | High / PWM | Low | Low | High | Forward | Green |
+| High | High / PWM | High | High | Low | Reverse | Red |
 | Low | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
 
 **Speed:** drive EN with PWM. The duty cycle sets the speed, and in the PWM off-time the
