@@ -12,7 +12,7 @@
 | Current-sense output | 0.675 V per amp |
 | PWM frequency | Up to 100 kHz (20 kHz recommended, which is above human hearing) |
 | Driver IC | TI DRV8874 (×2) |
-| Connectors | 5.08 mm screw terminals (power), 3.5 mm screw terminals (motors), 2.54 mm 10-pin header (logic) |
+| Connectors | XT30 right-angle male and 5.08 mm screw terminal (power), 3.5 mm screw terminals (motors), 2.54 mm 10-pin header (logic) |
 | Mounting | M2.5 holes |
 
 !!! note "20 kHz and pets"

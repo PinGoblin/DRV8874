@@ -2,7 +2,7 @@
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| Power LED off | No supply, supply reversed, or fuse tripped | Check VIN+ goes to J1 pin 1. If it was reversed, fix the wiring. A tripped fuse resets about a minute after power is removed |
+| Power LED off | No supply, supply reversed, or fuse tripped | Check the battery is switched on and charged, or that VIN+ goes to J2 pin 1. If a wired supply was reversed, fix the wiring. A tripped fuse resets about a minute after power is removed |
 | Power LED on, motors do nothing, buttons do nothing | VLOGIC missing, or nSLEEP held low | Feed 3.3–5 V to J3 pin 2 and connect GND (pin 1). Disconnect or drive nSLEEP (pin 9) high |
 | Buttons work, host code does nothing | Wrong GPIO numbers, no common GND, or EN never goes high | Check the pin mapping and the GND link. Measure EN (pin 3/5) while the code runs |
 | Buttons do nothing but host code works | PMODE jumper set to PWM mode | Buttons work only in PH/EN mode (JP1 pads 1–2) |

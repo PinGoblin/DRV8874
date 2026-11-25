@@ -4,8 +4,9 @@ Several boards can share one motor supply and one host.
 
 ## Power
 
-- Feed the supply into J1 of the first board and take it on from J2 (VIN THRU) to J1 of
-  the next.
+- Connect one power source to the first board (J1 or J2), then wire J2 of each board to
+  J2 of the next. Only one power source for the whole chain: see
+  [Powering the board](power.md).
 - J1 and J2 are wired in parallel, so every board's terminals carry the current of all the
   boards after it. **Keep the total current through any board's terminals at or below
   6 A.** For more boards, run a separate supply lead (a star) to each group.

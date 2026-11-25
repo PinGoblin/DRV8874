@@ -34,6 +34,7 @@ nav:
       - Specifications: guide/specifications.md
       - Important safety information: guide/safety.md
       - Connectors: guide/connectors.md
+      - Powering the board: guide/power.md
       - J3 pinout: guide/j3-pinout.md
       - Quick start: guide/quick-start.md
       - Controlling the motors: guide/controlling-motors.md
