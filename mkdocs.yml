@@ -31,6 +31,7 @@ nav:
   - Home: index.md
   - User Guide:
       - guide/index.md
+      - Board overview: guide/board-overview.md
       - Specifications: guide/specifications.md
       - Important safety information: guide/safety.md
       - Connectors: guide/connectors.md

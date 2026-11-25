@@ -17,3 +17,10 @@ to about 18 AWG. You can also solder wires straight into the pads.
 
 The connectors are supplied loose, so you can fit screw terminals, headers or solder wires
 directly.
+
+!!! tip "Reduce motor noise"
+    Brushed motors spark at their brushes and are the main source of electrical noise in a
+    motor project. Solder a **100 nF ceramic capacitor directly across the motor's own
+    terminals** (at the motor, not at the board), and **twist the two motor wires together**
+    along their length. This keeps the noise out of your host's ADC readings, wireless
+    signals and nearby electronics.
