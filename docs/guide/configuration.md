@@ -9,8 +9,8 @@ pads 1–2 bridged (PH/EN mode).
 
 | JP1 setting | Mode | J3 pin 3 / 5 | J3 pin 4 / 6 | Test buttons | Library |
 | --- | --- | --- | --- | --- | --- |
-| 1–2 bridged (default) | PH/EN | EN: on/off + PWM speed | PH: direction | Work | `mode="ph_en"` |
-| 2–3 bridged | PWM (IN1/IN2) | IN1 | IN2 | Do not use | `mode="pwm"` |
+| 1–2 bridged (default) | PH/EN | EN: on/off + PWM speed | PH: direction | Forward / reverse control | `mode="ph_en"` |
+| 2–3 bridged | PWM (IN1/IN2) | IN1 | IN2 | Not supported: FWD brakes the motor and REV runs it forward | `mode="pwm"` |
 
 To change it, cut the thin trace between pads 1 and 2 with a craft knife, check with a
 multimeter that they're open, then bridge pads 2 and 3 with solder.
