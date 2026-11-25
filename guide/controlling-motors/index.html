@@ -1649,7 +1649,9 @@ speed with PWM, and <strong>PH</strong> sets the direction. This is the same sch
 </table>
 <p><strong>Speed:</strong> drive EN with PWM. The duty cycle sets the speed, and in the PWM off-time the
 motor brakes, which gives a firm, linear response. Use 20 kHz to keep the motor quiet.
-1–5 kHz also works but makes the motor whine.</p>
+1–5 kHz also works but makes the motor whine.
+See <a href="../configuration/#speed-control-in-each-mode">Speed control in each mode</a> for how
+duty cycle maps to speed in each mode, and the limits at very low and 100% duty.</p>
 <p><strong>Changing direction:</strong> change PH at any time. To protect gearboxes, slow down or stop
 briefly before reversing a heavily loaded motor. The library does this for you: it brakes
 for <code>reverse_delay</code> (0.1 s by default) before reversing a running motor.</p>
