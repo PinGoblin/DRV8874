@@ -14,6 +14,8 @@ speed with PWM, and **PH** sets the direction. This is the same scheme as gpioze
 **Speed:** drive EN with PWM. The duty cycle sets the speed, and in the PWM off-time the
 motor brakes, which gives a firm, linear response. Use 20 kHz to keep the motor quiet.
 1–5 kHz also works but makes the motor whine.
+See [Speed control in each mode](configuration.md#speed-control-in-each-mode) for how
+duty cycle maps to speed in each mode, and the limits at very low and 100% duty.
 
 **Changing direction:** change PH at any time. To protect gearboxes, slow down or stop
 briefly before reversing a heavily loaded motor. The library does this for you: it brakes

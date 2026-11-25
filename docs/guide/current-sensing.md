@@ -23,7 +23,9 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
 | 5.0 V | About 3.0 A | About 2.0 V |
 
 - While limiting, the red fault LED lights and nFAULT goes low. Normal operation resumes
-  automatically when the load drops.
+  on the next PWM cycle once the load drops. At exactly 100% duty there is no next cycle,
+  so the motor stays braked until the input changes: see
+  [100% duty and the current limit](configuration.md#practical-limits).
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
 - Both motors share the 3 A board fuse. If both run near their limit at 5 V logic for more
