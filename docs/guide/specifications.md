@@ -2,7 +2,7 @@
 
 | Parameter | Value |
 | --- | --- |
-| Motor supply (VIN) | 6–16 V DC, 12 V nominal |
+| Motor supply (VIN) | 6–18 V DC (18 V maximum, including supply tolerance), 12 V nominal |
 | Logic supply (VLOGIC) | 3.3–5 V, from the host |
 | Logic input high | 1.5 V min (3.3 V and 5 V logic both work) |
 | Motor channels | 2, bidirectional |

@@ -5,7 +5,7 @@ Wire J3 to the host first, then the motors, then the motor supply last.
 1. With everything unpowered, connect J3 to the host using the table below. You need at
    least GND, VLOGIC, and one EN and one PH pin per motor.
 2. Connect each motor to J4 (A) or J5 (B).
-3. Connect a 6–16 V supply to J1: positive to VIN+, negative to GND. The green power LED
+3. Connect a 6–18 V supply to J1: positive to VIN+, negative to GND. The green power LED
    lights.
 4. Power the host. Motors stay stopped (braked) until the host drives an EN pin high.
 5. Optional: press a FWD or REV [test button](buttons-leds.md) to check each motor turns

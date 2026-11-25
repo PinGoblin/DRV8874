@@ -5,7 +5,7 @@ The board has five connectors: two for power, two for motors and one logic heade
 
 | Connector | Type | Pin 1 | Pin 2 | Use |
 | --- | --- | --- | --- | --- |
-| J1 VIN | 5.08 mm screw terminal | VIN+ (6–16 V) | GND | Motor power in |
+| J1 VIN | 5.08 mm screw terminal | VIN+ (6–18 V) | GND | Motor power in |
 | J2 VIN THRU | 5.08 mm screw terminal | VIN+ | GND | Wired in parallel with J1. Takes power on to the next board |
 | J4 MOTOR A | 3.5 mm screw terminal | OUT1 | OUT2 | Motor A |
 | J5 MOTOR B | 3.5 mm screw terminal | OUT1 | OUT2 | Motor B |
