@@ -1593,8 +1593,24 @@
 
 
 <h1 id="controlling-the-motors">Controlling the motors<a class="headerlink" href="#controlling-the-motors" title="Permanent link">&para;</a></h1>
-<p>In the default PH/EN mode, each motor needs two pins: <strong>EN</strong> turns it on and sets the
-speed with PWM, and <strong>PH</strong> sets the direction. This is the same scheme as gpiozero's
+<div class="admonition info">
+<p class="admonition-title">Terms used on this page</p>
+<ul>
+<li><strong>PWM (pulse-width modulation):</strong> the host switches a pin on and off rapidly, many
+  thousands of times a second. The <strong>duty cycle</strong> is the percentage of each cycle the pin
+  is on, and it sets the average power, and so the speed, of the motor.</li>
+<li><strong>PH (phase):</strong> the direction input. High runs the motor forward, low runs it in
+  reverse.</li>
+<li><strong>EN (enable):</strong> the drive input. High drives the motor, low brakes it. Feeding it PWM
+  sets the speed.</li>
+<li><strong>IN1 / IN2 (input 1 / input 2):</strong> in PWM mode, the same two pins become two direct
+  inputs, each controlling one side of the motor (OUT1 and OUT2).</li>
+<li><strong>nSLEEP / nFAULT:</strong> the leading <em>n</em> means the signal is active when low: nSLEEP low
+  puts the drivers to sleep, and nFAULT goes low on a fault or current limiting.</li>
+</ul>
+</div>
+<p>In the default PH/EN (phase/enable) mode, each motor needs two pins: <strong>EN</strong> (enable) turns it
+on and sets the speed with PWM (pulse-width modulation), and <strong>PH</strong> (phase) sets the direction. This is the same scheme as gpiozero's
 <code>PhaseEnableMotor</code>, except that gpiozero calls PH low "forward" (see below). The table is for motor A; motor B is identical using B_EN and B_PH.</p>
 <table>
 <thead>

@@ -1651,6 +1651,14 @@
 <h1 id="configuration-pmode-jumper-jp1">Configuration: PMODE jumper (JP1)<a class="headerlink" href="#configuration-pmode-jumper-jp1" title="Permanent link">&para;</a></h1>
 <p>JP1 is a 3-pad solder jumper that sets the control mode for both drivers. It ships with
 pads 1–2 bridged (PH/EN mode).</p>
+<ul>
+<li><strong>PH/EN mode (phase/enable, default):</strong> one pin per motor sets the direction (PH) and the
+  other turns the motor on and sets its speed (EN). One PWM channel per motor is enough.</li>
+<li><strong>PWM mode (IN1/IN2, input 1 / input 2):</strong> each pin drives one side of the motor
+  directly. This matches two-input drivers such as the L298N and DRV8833, and lets each
+  motor coast on its own, but needs PWM on both pins for full control.</li>
+</ul>
+<p>See <a href="../controlling-motors/">Terms</a> for PWM and duty cycle.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Never leave all three pads open: that selects a half-bridge mode this board isn't
