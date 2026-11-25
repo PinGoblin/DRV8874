@@ -24,4 +24,8 @@ All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC
 have pull-downs (pull-up on nSLEEP), so unused inputs can be left open. nFAULT is
 open-drain with a 10 kΩ pull-up to VLOGIC. The ISENSE outputs never exceed VLOGIC.
 
+Signal names: **EN** = enable (on/off and PWM speed), **PH** = phase (direction),
+**IN1 / IN2** = input 1 / input 2 (PWM mode), **ISENSE** = current sense output. A leading
+**n** (nSLEEP, nFAULT) means the signal is active when low.
+
 The mode is set by the [PMODE jumper](configuration.md).

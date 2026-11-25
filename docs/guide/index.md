@@ -8,7 +8,8 @@ has its own TI DRV8874 H-bridge, with speed set by PWM, direction set by one pin
 current-sense output you can read with an ADC.
 
 - Two independent motor channels, motor supply 6–18 V (12 V nominal)
-- Direction + PWM control (PH/EN mode), with a jumper for IN/IN PWM mode
+- Direction + speed control (PH/EN, phase/enable mode), with a jumper for two-input
+  PWM (pulse-width modulation) mode
 - Analog current feedback per motor (0.675 V/A) for stall detection
 - Built-in current limit, overcurrent and over-temperature protection
 - Reverse-polarity protection, surge suppressor (TVS) and a 3 A resettable fuse on the motor supply

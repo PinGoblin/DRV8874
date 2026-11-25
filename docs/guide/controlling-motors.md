@@ -1,7 +1,20 @@
 # Controlling the motors
 
-In the default PH/EN mode, each motor needs two pins: **EN** turns it on and sets the
-speed with PWM, and **PH** sets the direction. This is the same scheme as gpiozero's
+!!! info "Terms used on this page"
+    - **PWM (pulse-width modulation):** the host switches a pin on and off rapidly, many
+      thousands of times a second. The **duty cycle** is the percentage of each cycle the pin
+      is on, and it sets the average power, and so the speed, of the motor.
+    - **PH (phase):** the direction input. High runs the motor forward, low runs it in
+      reverse.
+    - **EN (enable):** the drive input. High drives the motor, low brakes it. Feeding it PWM
+      sets the speed.
+    - **IN1 / IN2 (input 1 / input 2):** in PWM mode, the same two pins become two direct
+      inputs, each controlling one side of the motor (OUT1 and OUT2).
+    - **nSLEEP / nFAULT:** the leading *n* means the signal is active when low: nSLEEP low
+      puts the drivers to sleep, and nFAULT goes low on a fault or current limiting.
+
+In the default PH/EN (phase/enable) mode, each motor needs two pins: **EN** (enable) turns it
+on and sets the speed with PWM (pulse-width modulation), and **PH** (phase) sets the direction. This is the same scheme as gpiozero's
 `PhaseEnableMotor`, except that gpiozero calls PH low "forward" (see below). The table is for motor A; motor B is identical using B_EN and B_PH.
 
 | nSLEEP | A_EN | A_PH | OUT1 | OUT2 | Motor | LED |
