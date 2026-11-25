@@ -1595,7 +1595,7 @@
 <h1 id="controlling-the-motors">Controlling the motors<a class="headerlink" href="#controlling-the-motors" title="Permanent link">&para;</a></h1>
 <p>In the default PH/EN mode, each motor needs two pins: <strong>EN</strong> turns it on and sets the
 speed with PWM, and <strong>PH</strong> sets the direction. This is the same scheme as gpiozero's
-<code>PhaseEnableMotor</code>. The table is for motor A; motor B is identical using B_EN and B_PH.</p>
+<code>PhaseEnableMotor</code>, except that gpiozero calls PH low "forward" (see below). The table is for motor A; motor B is identical using B_EN and B_PH.</p>
 <table>
 <thead>
 <tr>
@@ -1621,18 +1621,18 @@ speed with PWM, and <strong>PH</strong> sets the direction. This is the same sch
 <tr>
 <td>High</td>
 <td>High / PWM</td>
-<td>Low</td>
-<td>Low</td>
 <td>High</td>
+<td>High</td>
+<td>Low</td>
 <td>Forward</td>
 <td>Green</td>
 </tr>
 <tr>
 <td>High</td>
 <td>High / PWM</td>
-<td>High</td>
-<td>High</td>
 <td>Low</td>
+<td>Low</td>
+<td>High</td>
 <td>Reverse</td>
 <td>Red</td>
 </tr>
@@ -1658,8 +1658,9 @@ motors coast). Wake-up takes about 1 ms. nSLEEP is pulled high on the board, so 
 drivers are awake whenever VLOGIC is present.</p>
 <p><strong>Start-up behaviour:</strong> EN and PH have pull-down resistors, so while the host is booting
 (pins floating) both motors are held in brake.</p>
-<p>"Forward" and "reverse" here follow the gpiozero convention (PH low = forward). Which way
-the shaft actually turns depends on how the motor is wired.</p>
+<p>"Forward" and "reverse" here follow TI's convention for the DRV8874: PH high = forward, with
+OUT1 positive (green LED). Which way the shaft actually turns depends on how the motor is
+wired; swap its two leads, or use <code>invert=True</code> in the library, to change it.</p>
 <div class="admonition note">
 <p class="admonition-title">Coast and nSLEEP</p>
 <p>In PH/EN mode the only way to coast is to sleep the driver, and nSLEEP is shared by
@@ -1681,8 +1682,8 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
 <span class="n">FAULT</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">39</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">)</span>                       <span class="c1"># J3 pin 10 (pulled up on board)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">drive</span><span class="p">(</span><span class="n">en</span><span class="p">,</span> <span class="n">ph</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""speed -1.0..1.0; positive = forward (PH low)."""</span>
-    <span class="n">ph</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">speed</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""speed -1.0..1.0; positive = forward (PH high, OUT1 positive)."""</span>
+    <span class="n">ph</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">speed</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">en</span><span class="o">.</span><span class="n">duty_u16</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">speed</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">))</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">amps</span><span class="p">(</span><span class="n">adc</span><span class="p">):</span>
@@ -1709,8 +1710,10 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
 <span class="n">motor_b</span><span class="o">.</span><span class="n">enable_device</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">fault</span> <span class="o">=</span> <span class="n">DigitalInputDevice</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="n">pull_up</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">active_state</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># J3 pin 10</span>
 
-<span class="n">motor_a</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">motor_b</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c1"># gpiozero's forward() drives PH low, which is this board's reverse,</span>
+<span class="c1"># so backward() runs a motor forward here.</span>
+<span class="n">motor_a</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>   <span class="c1"># forward (OUT1 positive, green LED)</span>
+<span class="n">motor_b</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>   <span class="c1"># reverse (OUT2 positive, red LED)</span>
 <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Fault or current limit:"</span><span class="p">,</span> <span class="n">fault</span><span class="o">.</span><span class="n">is_active</span><span class="p">)</span>
 <span class="n">motor_a</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>   <span class="c1"># brake</span>

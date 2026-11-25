@@ -1653,17 +1653,17 @@ multimeter that they're open, then bridge pads 2 and 3 with solder.</p>
 <td>Coast</td>
 </tr>
 <tr>
-<td>Low</td>
 <td>High</td>
 <td>Low</td>
 <td>High</td>
+<td>Low</td>
 <td>Forward</td>
 </tr>
 <tr>
-<td>High</td>
 <td>Low</td>
 <td>High</td>
 <td>Low</td>
+<td>High</td>
 <td>Reverse</td>
 </tr>
 <tr>
@@ -1677,7 +1677,7 @@ multimeter that they're open, then bridge pads 2 and 3 with solder.</p>
 </table>
 <p>PWM mode suits libraries written for two-input drivers such as the L298N or DRV8833
 (gpiozero <code>Motor</code>, Arduino <code>analogWrite</code> on either pin). With gpiozero's <code>Motor</code> class,
-pass <code>forward=</code> J3 pin 4 (IN2) and <code>backward=</code> J3 pin 3 (IN1) so its directions match the
+pass <code>forward=</code> J3 pin 3 (IN1) and <code>backward=</code> J3 pin 4 (IN2) so its directions match the
 table above.</p>
 <p>In PWM mode each motor can coast on its own, without sleeping the board.</p>
 

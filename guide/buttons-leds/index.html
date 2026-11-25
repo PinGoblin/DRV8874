@@ -1605,11 +1605,11 @@ check the wiring before writing any code.</p>
 <tbody>
 <tr>
 <td>SW1 A FWD</td>
-<td>Motor A forward (EN high, PH low)</td>
+<td>Motor A forward (EN high, PH high: OUT1 positive)</td>
 </tr>
 <tr>
 <td>SW2 A REV</td>
-<td>Motor A reverse (EN high, PH high)</td>
+<td>Motor A reverse (EN high, PH low: OUT2 positive)</td>
 </tr>
 <tr>
 <td>SW3 B FWD</td>
@@ -1629,9 +1629,9 @@ check the wiring before writing any code.</p>
 <li>They work only in PH/EN mode (the default jumper setting).</li>
 </ul>
 <div class="admonition info">
-<p class="admonition-title">Pressing FWD and REV together gives reverse</p>
-<p>REV drives both EN and PH high, while FWD only drives EN, so REV wins. The result is
-the same as pressing REV alone and can't harm the board or the host. Release one
+<p class="admonition-title">Pressing FWD and REV together gives forward</p>
+<p>FWD drives both EN and PH high, while REV only drives EN, so FWD wins. The result is
+the same as pressing FWD alone and can't harm the board or the host. Release one
 button before pressing the other: flipping from forward to reverse at full speed
 causes a current surge (the fault LED flickers as the current limit catches it) and is
 hard on gearboxes.</p>
@@ -1659,12 +1659,12 @@ hard on gearboxes.</p>
 <tr>
 <td>Motor A / B direction</td>
 <td>Green</td>
-<td>Motor running forward (OUT2 positive). Brightness follows PWM duty</td>
+<td>Motor running forward (OUT1 positive). Brightness follows PWM duty</td>
 </tr>
 <tr>
 <td>Motor A / B direction</td>
 <td>Red</td>
-<td>Motor running reverse (OUT1 positive). Brightness follows PWM duty</td>
+<td>Motor running reverse (OUT2 positive). Brightness follows PWM duty</td>
 </tr>
 </tbody>
 </table>
