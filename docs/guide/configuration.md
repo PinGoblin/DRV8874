@@ -9,7 +9,7 @@ pads 1–2 bridged (PH/EN mode).
   directly. This matches two-input drivers such as the L298N and DRV8833, and lets each
   motor coast on its own, but needs PWM on both pins for full control.
 
-See [Terms](controlling-motors.md) for PWM and duty cycle.
+See the [Glossary](glossary.md) for PWM, duty cycle and other terms.
 
 !!! warning
     Never leave all three pads open: that selects a half-bridge mode this board isn't
