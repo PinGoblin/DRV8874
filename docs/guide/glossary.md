@@ -46,7 +46,7 @@ Abbreviations and terms used in this manual, in alphabetical order.
 | Slow decay / fast decay | — | What the motor does in the PWM off-time: slow decay brakes it (firm, linear speed control), fast decay lets it coast |
 | TI | Texas Instruments | Maker of the DRV8874 motor driver |
 | TVS | Transient-voltage suppressor | A diode (D2) that clamps voltage spikes on the motor supply |
-| UPS | Uninterruptible power supply | As in the PinGoblin UPS HAT+, whose QUAD battery pack can power this board |
+| UPS | Uninterruptible power supply | As in the PinGoblin UPS HAT+. Its QUAD and DUAL battery packs can also power this board |
 | USB | Universal serial bus | The connector on most microcontroller boards. A USB lead can supply the 5 V for VLOGIC when testing |
 | VIN | Voltage in | The motor supply input at J1 and J2, 6–18 V |
 | VLOGIC | Logic voltage | The host's 3.3 V or 5 V supply, fed in on J3 pin 2. Sets the logic level and the current limit |
