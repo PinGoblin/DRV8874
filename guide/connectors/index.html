@@ -16,7 +16,7 @@
         <link rel="prev" href="../safety/">
       
       
-        <link rel="next" href="../j3-pinout/">
+        <link rel="next" href="../power/">
       
       
         
@@ -393,6 +393,8 @@
       
         
       
+        
+      
     
     
     
@@ -539,6 +541,34 @@
 
       </a>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../power/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Powering the board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1466,7 +1496,7 @@
 
 
 <h1 id="connectors">Connectors<a class="headerlink" href="#connectors" title="Permanent link">&para;</a></h1>
-<p>The board has five connectors: two for power, two for motors and one logic header
+<p>The board has five connectors: two for power (see <a href="../power/">Powering the board</a>), two for motors and one logic header
 (J3, see <a href="../j3-pinout/">J3 pinout</a>).</p>
 <table>
 <thead>
@@ -1481,17 +1511,17 @@
 <tbody>
 <tr>
 <td>J1 VIN</td>
+<td>XT30, right-angle male</td>
+<td>GND (−)</td>
+<td>VIN+ (+, 6–18 V)</td>
+<td>Battery or XT30 supply in</td>
+</tr>
+<tr>
+<td>J2 VIN / THRU</td>
 <td>5.08 mm screw terminal</td>
 <td>VIN+ (6–18 V)</td>
 <td>GND</td>
-<td>Motor power in</td>
-</tr>
-<tr>
-<td>J2 VIN THRU</td>
-<td>5.08 mm screw terminal</td>
-<td>VIN+</td>
-<td>GND</td>
-<td>Wired in parallel with J1. Takes power on to the next board</td>
+<td>Wired supply in, or power out to the next board. In parallel with J1</td>
 </tr>
 <tr>
 <td>J4 MOTOR A</td>

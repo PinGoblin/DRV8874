@@ -393,6 +393,8 @@
       
         
       
+        
+      
     
     
     
@@ -521,6 +523,34 @@
     
   
     Connectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../power/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Powering the board
   
 
     
@@ -1558,8 +1588,9 @@
 <p>Several boards can share one motor supply and one host.</p>
 <h2 id="power">Power<a class="headerlink" href="#power" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Feed the supply into J1 of the first board and take it on from J2 (VIN THRU) to J1 of
-  the next.</li>
+<li>Connect one power source to the first board (J1 or J2), then wire J2 of each board to
+  J2 of the next. Only one power source for the whole chain: see
+  <a href="../power/">Powering the board</a>.</li>
 <li>J1 and J2 are wired in parallel, so every board's terminals carry the current of all the
   boards after it. <strong>Keep the total current through any board's terminals at or below
   6 A.</strong> For more boards, run a separate supply lead (a star) to each group.</li>
