@@ -395,6 +395,8 @@
       
         
       
+        
+      
     
     
     
@@ -450,6 +452,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../board-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Board overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -1551,6 +1581,14 @@ invert the direction in code (the library's <code>invert</code> option). Screw t
 to about 18 AWG. You can also solder wires straight into the pads.</p>
 <p>The connectors are supplied loose, so you can fit screw terminals, headers or solder wires
 directly.</p>
+<div class="admonition tip">
+<p class="admonition-title">Reduce motor noise</p>
+<p>Brushed motors spark at their brushes and are the main source of electrical noise in a
+motor project. Solder a <strong>100 nF ceramic capacitor directly across the motor's own
+terminals</strong> (at the motor, not at the board), and <strong>twist the two motor wires together</strong>
+along their length. This keeps the noise out of your host's ADC readings, wireless
+signals and nearby electronics.</p>
+</div>
 
 
 
