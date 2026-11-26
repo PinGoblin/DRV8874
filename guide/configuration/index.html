@@ -16,7 +16,7 @@
         <link rel="prev" href="../current-sensing/">
       
       
-        <link rel="next" href="../daisy-chain/">
+        <link rel="next" href="../four-motor-mode/">
       
       
         
@@ -369,6 +369,8 @@
       
         
           
+        
+      
         
       
         
@@ -845,6 +847,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1687,12 +1717,17 @@ pads 1–2 bridged (PH/EN mode).</p>
 <li><strong>PWM mode (IN1/IN2, input 1 / input 2):</strong> each pin drives one side of the motor
   directly. This matches two-input drivers such as the L298N and DRV8833, and lets each
   motor coast on its own, but needs PWM on both pins for full control.</li>
+<li><strong>Four-motor mode (all pads open):</strong> each pin drives one output on its own, so the
+  board runs four one-direction motors, each wired between a motor terminal and the VM
+  header J6. There is no current limit, and an undriven input turns its motor on, so it
+  needs extra setup. See <a href="../four-motor-mode/">Four-motor mode</a>.</li>
 </ul>
 <p>See the <a href="../glossary/">Glossary</a> for PWM, duty cycle and other terms.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Never leave all three pads open: that selects a half-bridge mode this board isn't
-designed for.</p>
+<p>Leaving all three pads open selects four-motor mode. Do this only on purpose: in that
+mode an input that isn't driven runs its motor at full speed. Read
+<a href="../four-motor-mode/">Four-motor mode</a> first.</p>
 </div>
 <table>
 <thead>
@@ -1722,10 +1757,20 @@ designed for.</p>
 <td>Not supported: FWD brakes the motor and REV runs it forward</td>
 <td><code>mode="pwm"</code></td>
 </tr>
+<tr>
+<td>All open</td>
+<td>Four-motor</td>
+<td>Motor A1 / B1: low = on</td>
+<td>Motor A2 / B2: low = on</td>
+<td>Turn motors off only: see <a href="../four-motor-mode/#test-buttons-and-leds-in-four-motor-mode">buttons in four-motor mode</a></td>
+<td><code>mode="independent"</code></td>
+</tr>
 </tbody>
 </table>
 <p>To change it, cut the thin trace between pads 1 and 2 with a craft knife, check with a
-multimeter that they're open, then bridge pads 2 and 3 with solder.</p>
+multimeter that they're open, then bridge pads 2 and 3 with solder (PWM mode) or leave
+all pads open (four-motor mode). The drivers read JP1 when they wake, so the new mode takes
+effect at the next power-up or wake from sleep.</p>
 <h2 id="pwm-mode-truth-table">PWM mode truth table<a class="headerlink" href="#pwm-mode-truth-table" title="Permanent link">&para;</a></h2>
 <p>Motor A; motor B is the same.</p>
 <table>
@@ -1775,7 +1820,7 @@ pass <code>forward=</code> J3 pin 3 (IN1) and <code>backward=</code> J3 pin 4 (I
 table above.</p>
 <p>In PWM mode each motor can coast on its own, without sleeping the board.</p>
 <h2 id="speed-control-in-each-mode">Speed control in each mode<a class="headerlink" href="#speed-control-in-each-mode" title="Permanent link">&para;</a></h2>
-<p>In both modes, speed comes from the <strong>PWM duty cycle</strong>: the fraction of each PWM period
+<p>In every mode, speed comes from the <strong>PWM duty cycle</strong>: the fraction of each PWM period
 for which the motor is connected to the supply. A motor driven at 60% duty sees, on
 average, about 60% of VM, so it runs at roughly 60% of its full speed at that load. What
 differs between the modes is which pin you switch, and what the motor does in the
@@ -1811,6 +1856,13 @@ off-time.</p>
 <td>IN2 PWM at duty <em>d</em>, IN1 low</td>
 <td>Coast</td>
 <td>Softer; speed falls away at low duty</td>
+</tr>
+<tr>
+<td>Four-motor</td>
+<td>Input PWM at duty 1 − <em>d</em> (one direction only)</td>
+<td>Not available</td>
+<td>Brake (through the high side)</td>
+<td>The same as PH/EN</td>
 </tr>
 </tbody>
 </table>

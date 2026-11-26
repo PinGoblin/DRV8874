@@ -399,6 +399,8 @@
       
         
       
+        
+      
     
     
     
@@ -853,6 +855,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1752,12 +1782,17 @@
 <tr>
 <td>J4</td>
 <td>Motor A</td>
-<td>Motor A terminals (OUT1, OUT2)</td>
+<td>Motor A terminals (OUT1 = A1, OUT2 = A2)</td>
 </tr>
 <tr>
 <td>J5</td>
 <td>Motor B</td>
-<td>Motor B terminals (OUT1, OUT2)</td>
+<td>Motor B terminals (OUT1 = B1, OUT2 = B2)</td>
+</tr>
+<tr>
+<td>J6</td>
+<td>VM header</td>
+<td>Four VM pins: the common motor lead in <a href="../four-motor-mode/">four-motor mode</a></td>
 </tr>
 </tbody>
 </table>
@@ -1784,7 +1819,7 @@
 <tr>
 <td>JP1</td>
 <td>PMODE jumper</td>
-<td>Selects PH/EN mode (default) or PWM mode. See <a href="../configuration/">Configuration</a></td>
+<td>Selects PH/EN mode (default), PWM mode or four-motor mode. See <a href="../configuration/">Configuration</a></td>
 </tr>
 </tbody>
 </table>
@@ -1852,9 +1887,9 @@
 <td>Surge suppressor on the motor supply</td>
 </tr>
 <tr>
-<td>C1</td>
-<td>220 µF</td>
-<td>Bulk capacitor shared by both drivers</td>
+<td>C13, C1</td>
+<td>220 µF (×2)</td>
+<td>Bulk capacitors, one beside each driver (U1, U2)</td>
 </tr>
 <tr>
 <td>H1–H4</td>

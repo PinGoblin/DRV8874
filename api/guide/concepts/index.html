@@ -397,6 +397,8 @@
       
         
       
+        
+      
     
     
     
@@ -746,6 +748,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1133,6 +1163,17 @@
     <span class="md-ellipsis">
       
         Stop, brake and coast
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#four-motor-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Four-motor mode
       
     </span>
   </a>
@@ -1699,6 +1740,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#four-motor-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Four-motor mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pwm-frequency" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1759,6 +1811,10 @@
 <td>One motor channel (<code>board.motor_a</code>, <code>board.motor_b</code>, or <code>board["a"]</code>)</td>
 </tr>
 <tr>
+<td><a class="autorefs autorefs-internal" title="            HalfBridgeMotor" href="../../reference/motor/#pingoblin_motor.motor.HalfBridgeMotor"><code>HalfBridgeMotor</code></a></td>
+<td>One unidirectional motor in four-motor mode (<code>board["a1"]</code> to <code>board["b2"]</code>)</td>
+</tr>
+<tr>
 <td><a class="autorefs autorefs-internal" title="            MotorChain" href="../../reference/chain/#pingoblin_motor.chain.MotorChain"><code>MotorChain</code></a></td>
 <td>Several daisy-chained boards managed as one system, with one fault monitor</td>
 </tr>
@@ -1799,7 +1855,8 @@
     <span class="n">b_en</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>             <span class="c1"># J3 pins 5, 6 (optional)</span>
     <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span>                <span class="c1"># J3 pin 9 (optional; needed for coast in PH/EN mode)</span>
     <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>                <span class="c1"># J3 pin 10 (optional; needed for stall detection without a sensor)</span>
-    <span class="n">mode</span><span class="o">=</span><span class="s2">"ph_en"</span><span class="p">,</span>                <span class="c1"># "ph_en" (JP1 pads 1-2, default) or "pwm" (JP1 pads 2-3)</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">"ph_en"</span><span class="p">,</span>                <span class="c1"># "ph_en" (JP1 pads 1-2, default), "pwm" (JP1 pads 2-3)</span>
+                                 <span class="c1"># or "independent" (JP1 open: four-motor mode)</span>
     <span class="n">logic_voltage</span><span class="o">=</span><span class="mf">3.3</span><span class="p">,</span>           <span class="c1"># VLOGIC: sets the current limit (about 2.0 A at 3.3 V, 3.0 A at 5 V)</span>
     <span class="n">motor_names</span><span class="o">=</span><span class="p">(</span><span class="s2">"left"</span><span class="p">,</span> <span class="s2">"right"</span><span class="p">),</span>
     <span class="n">motor_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">ramp_time</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>   <span class="c1"># options for both motors</span>
@@ -1883,6 +1940,30 @@ and release the pins on exit.</p>
 on a board (and by every board wired to the same GPIO). <code>coast()</code> therefore sleeps the line
 only if every other motor on it is idle. Otherwise it brakes and returns <code>False</code>. In PWM
 mode (<code>mode="pwm"</code>), each motor coasts independently.</p>
+<h2 id="four-motor-mode">Four-motor mode<a class="headerlink" href="#four-motor-mode" title="Permanent link">&para;</a></h2>
+<p>With JP1 open, <code>mode="independent"</code> gives four
+<a class="autorefs autorefs-internal" title="            HalfBridgeMotor" href="../../reference/motor/#pingoblin_motor.motor.HalfBridgeMotor"><code>HalfBridgeMotor</code></a>s instead of two motors. Each
+runs one way only and is driven by one input pin: A_EN → <code>a1</code>, A_PH → <code>a2</code>, B_EN → <code>b1</code>,
+B_PH → <code>b2</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
+                   <span class="n">mode</span><span class="o">=</span><span class="s2">"independent"</span><span class="p">,</span> <span class="n">motor_names</span><span class="o">=</span><span class="p">(</span><span class="s2">"pump"</span><span class="p">,</span> <span class="s2">"fan"</span><span class="p">,</span> <span class="s2">"valve"</span><span class="p">,</span> <span class="s2">"light"</span><span class="p">))</span>
+<span class="n">board</span><span class="p">[</span><span class="s2">"pump"</span><span class="p">]</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>           <span class="c1"># 60 % (the library inverts the pin duty for you)</span>
+<span class="n">board</span><span class="p">[</span><span class="s2">"valve"</span><span class="p">]</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">board</span><span class="o">.</span><span class="n">driver_current</span><span class="p">(</span><span class="s2">"a"</span><span class="p">)</span>           <span class="c1"># pump + fan together, if a sensor is configured</span>
+</code></pre></div>
+<ul>
+<li><code>sleep_pin</code> is required. The drivers stay asleep until the first run command, and
+  <a class="autorefs autorefs-internal" title="            close" href="../../reference/board/#pingoblin_motor.board.MotorBoard.close"><code>close()</code></a> puts them to sleep before releasing
+  the pins. Fit the 4.7 kΩ nSLEEP pull-down described in
+  <a href="../../../guide/four-motor-mode/">Four-motor mode</a>, so the motors stay off whenever your
+  program isn't running.</li>
+<li><code>reverse()</code>, negative speeds and <code>invert</code> raise errors. <code>board.motor_a</code> and
+  <code>board.motor_b</code> raise <a class="autorefs autorefs-internal" title="            ConfigError" href="../../reference/faults/#pingoblin_motor.faults.ConfigError"><code>ConfigError</code></a>: use the names.</li>
+<li><code>coast()</code> sleeps the drivers, so it only coasts when every other motor on the nSLEEP
+  line is idle.</li>
+<li>The fault monitor reports <code>DRIVER_FAULT</code> (nFAULT low) and, with sensors,
+  <code>BOARD_OVERLOAD</code>. There are no per-motor stall, open-load or overload checks.</li>
+</ul>
 <h2 id="pwm-frequency">PWM frequency<a class="headerlink" href="#pwm-frequency" title="Permanent link">&para;</a></h2>
 <p>On the Raspberry Pi, gpiozero uses software PWM. The default of 1 kHz works on any GPIO
 but makes motors whine. For silent 20 kHz, use the hardware PWM pins (GPIO12, 13, 18 or

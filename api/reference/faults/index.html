@@ -397,6 +397,8 @@
       
         
       
+        
+      
     
     
     
@@ -746,6 +748,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -2002,7 +2032,9 @@ until you call <a class="autorefs autorefs-internal" title="            clear_fa
 
         <p>Every fault the library can detect.</p>
 <p>Faults marked <em>needs sensor</em> are only detected when the motor has a current sensor
-(for example a PinGoblin ADS1115 board). The others work from the board's nFAULT line.</p>
+(for example a PinGoblin ADS1115 board). The others work from the board's nFAULT line.
+In four-motor mode only <code>DRIVER_FAULT</code>, <code>BOARD_OVERLOAD</code>, <code>CHAIN_OVERLOAD</code> and
+<code>SENSOR_ERROR</code> are detected.</p>
 <table>
 <thead>
 <tr>
@@ -2024,7 +2056,7 @@ until you call <a class="autorefs autorefs-internal" title="            clear_fa
 </tr>
 <tr>
 <td><code>DRIVER_FAULT</code></td>
-<td>nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown</td>
+<td>nFAULT low for 0.2 s with no motor driven (in four-motor mode, at any time): output short, overcurrent or over-temperature shutdown</td>
 <td>No</td>
 </tr>
 <tr>

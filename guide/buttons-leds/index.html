@@ -399,6 +399,8 @@
       
         
       
+        
+      
     
     
     
@@ -809,6 +811,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1656,7 +1686,10 @@ check the wiring before writing any code.</p>
   any source, such as a USB 5 V lead, and GND to J3 pin 1.</li>
 <li>They are safe to press while a host is connected, even if the host is driving the pins
   low: 1 kΩ resistors protect the host's GPIOs.</li>
-<li>They work only in PH/EN mode (the default jumper setting).</li>
+<li>They work as described here only in PH/EN mode (the default jumper setting). In PWM
+  mode FWD brakes the motor and REV runs it forward. In four-motor mode the buttons can
+  only turn motors off, and the direction LEDs don't show motor status: see
+  <a href="../four-motor-mode/#test-buttons-and-leds-in-four-motor-mode">buttons and LEDs in four-motor mode</a>.</li>
 </ul>
 <div class="admonition info">
 <p class="admonition-title">Pressing FWD and REV together gives forward</p>
@@ -1684,7 +1717,7 @@ hard on gearboxes.</p>
 <tr>
 <td>Fault</td>
 <td>Red</td>
-<td>A driver is limiting current or has detected a fault (same signal as nFAULT)</td>
+<td>A driver is limiting current or has detected a fault (same signal as nFAULT). In four-motor mode, a driver fault only</td>
 </tr>
 <tr>
 <td>Motor A / B direction</td>

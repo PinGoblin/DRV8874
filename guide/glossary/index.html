@@ -399,6 +399,8 @@
       
         
       
+        
+      
     
     
     
@@ -751,6 +753,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1642,6 +1672,11 @@
 <td>A family of Wi-Fi microcontrollers made by Espressif, often programmed in MicroPython</td>
 </tr>
 <tr>
+<td>Four-motor mode</td>
+<td>Independent half-bridge mode (TI's name)</td>
+<td>JP1 all pads open: each output drives its own one-direction motor, wired to VM on J6</td>
+</tr>
+<tr>
 <td>FWD / REV</td>
 <td>Forward / reverse</td>
 <td>Test button labels. Forward means OUT1 positive (green LED)</td>
@@ -1657,6 +1692,11 @@
 <td>A microcontroller pin that software can set high or low, or read. On the Pico these are named GP0, GP1 and so on</td>
 </tr>
 <tr>
+<td>Half-bridge</td>
+<td>—</td>
+<td>One pair of switches on one output: one to the supply (high side) and one to ground (low side). Each DRV8874 has two. In four-motor mode each half-bridge drives its own motor</td>
+</tr>
+<tr>
 <td>H-bridge</td>
 <td>—</td>
 <td>Four switches around the motor that can connect each terminal to the supply or to ground, so the motor can run in both directions. Each DRV8874 is one H-bridge</td>
@@ -1665,6 +1705,16 @@
 <td>HAT</td>
 <td>Hardware attached on top</td>
 <td>A Raspberry Pi add-on board that plugs onto the Pi's 40-pin header</td>
+</tr>
+<tr>
+<td>Hi-Z</td>
+<td>High impedance</td>
+<td>An output that is switched off completely (open), neither high nor low. Also how the DRV8874 describes an open PMODE pin</td>
+</tr>
+<tr>
+<td>High side / low side</td>
+<td>—</td>
+<td>The switch from an output to the supply (high side), or to ground (low side)</td>
 </tr>
 <tr>
 <td>I2C</td>
@@ -1724,7 +1774,7 @@
 <tr>
 <td>OUT1 / OUT2</td>
 <td>Output 1 / output 2</td>
-<td>The two motor terminals of each driver. Forward = OUT1 positive</td>
+<td>The two motor terminals of each driver, labelled A1 / A2 (J4) and B1 / B2 (J5). Forward = OUT1 positive</td>
 </tr>
 <tr>
 <td>PH</td>
@@ -1739,7 +1789,7 @@
 <tr>
 <td>PMODE</td>
 <td>Mode select (TI's pin name)</td>
-<td>The driver input, set by jumper JP1, that selects PH/EN or PWM mode</td>
+<td>The driver input, set by jumper JP1, that selects PH/EN, PWM or four-motor mode</td>
 </tr>
 <tr>
 <td>PWM</td>
@@ -1777,6 +1827,11 @@
 <td>A diode (D2) that clamps voltage spikes on the motor supply</td>
 </tr>
 <tr>
+<td>Unidirectional</td>
+<td>—</td>
+<td>Runs in one direction only, like a motor in four-motor mode</td>
+</tr>
+<tr>
 <td>UPS</td>
 <td>Uninterruptible power supply</td>
 <td>As in the PinGoblin UPS HAT+. Its QUAD and DUAL battery packs can also power this board</td>
@@ -1799,7 +1854,7 @@
 <tr>
 <td>VM</td>
 <td>Motor voltage</td>
-<td>The motor supply after the fuse and reverse-polarity protection</td>
+<td>The motor supply after the fuse and reverse-polarity protection. Available on J6</td>
 </tr>
 <tr>
 <td>XT30</td>

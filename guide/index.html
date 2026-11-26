@@ -399,6 +399,8 @@
       
         
       
+        
+      
     
     
     
@@ -751,6 +753,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1574,13 +1604,16 @@ current-sense output you can read with an ADC.</p>
 <li>Two independent motor channels, motor supply 6–18 V (12 V nominal)</li>
 <li>Direction + speed control (PH/EN, phase/enable mode), with a jumper for two-input
   PWM (pulse-width modulation) mode</li>
+<li><a href="four-motor-mode/">Four-motor mode</a>: up to four one-direction motors, such as pumps
+  and fans</li>
 <li>Analog current feedback per motor (0.675 V/A) for stall detection</li>
 <li>Built-in current limit, overcurrent and over-temperature protection</li>
 <li>Reverse-polarity protection, surge suppressor (TVS) and a 3 A resettable fuse on the motor supply</li>
 <li>Push buttons to test each motor without writing code</li>
 <li>Direction LEDs per motor, plus power and fault LEDs</li>
 <li>Power through-terminal for daisy-chaining several boards from one supply</li>
-<li>Safe start-up: motors stay off while the host boots</li>
+<li>Safe start-up: motors stay off while the host boots (in four-motor mode this needs a
+  4.7 kΩ resistor on nSLEEP)</li>
 </ul>
 <h2 id="where-to-start">Where to start<a class="headerlink" href="#where-to-start" title="Permanent link">&para;</a></h2>
 <ol>

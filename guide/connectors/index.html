@@ -399,6 +399,8 @@
       
         
       
+        
+      
     
     
     
@@ -761,6 +763,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1556,8 +1586,9 @@
 
 
 <h1 id="connectors">Connectors<a class="headerlink" href="#connectors" title="Permanent link">&para;</a></h1>
-<p>The board has five connectors: two for power (see <a href="../power/">Powering the board</a>), two for motors and one logic header
-(J3, see <a href="../j3-pinout/">J3 pinout</a>).</p>
+<p>The board has six connectors: two for power (see <a href="../power/">Powering the board</a>), two for
+motors, one logic header (J3, see <a href="../j3-pinout/">J3 pinout</a>) and the VM header J6 for
+<a href="../four-motor-mode/">four-motor mode</a>.</p>
 <table>
 <thead>
 <tr>
@@ -1586,16 +1617,23 @@
 <tr>
 <td>J4 MOTOR A</td>
 <td>3.5 mm screw terminal</td>
-<td>OUT1</td>
-<td>OUT2</td>
+<td>OUT1 (A1)</td>
+<td>OUT2 (A2)</td>
 <td>Motor A</td>
 </tr>
 <tr>
 <td>J5 MOTOR B</td>
 <td>3.5 mm screw terminal</td>
-<td>OUT1</td>
-<td>OUT2</td>
+<td>OUT1 (B1)</td>
+<td>OUT2 (B2)</td>
 <td>Motor B</td>
+</tr>
+<tr>
+<td>J6 VMx4</td>
+<td>2.54 mm 2×2 header</td>
+<td>VM</td>
+<td>VM</td>
+<td>All four pins are VM. Common supply lead for the motors in <a href="../four-motor-mode/">four-motor mode</a></td>
 </tr>
 <tr>
 <td>J3 LOGIC</td>
@@ -1606,9 +1644,16 @@
 </tr>
 </tbody>
 </table>
-<p>Motor polarity does not matter: if a motor turns the wrong way, swap its two wires or
-invert the direction in code (the library's <code>invert</code> option). Screw terminals take wire up
+<p>Motor polarity does not matter in PH/EN or PWM mode: if a motor turns the wrong way, swap
+its two wires or invert the direction in code (the library's <code>invert</code> option). In
+four-motor mode each motor runs one way only, so connect its + lead to J6 and its − lead
+to the terminal. Screw terminals take wire up
 to about 18 AWG. You can also solder wires straight into the pads.</p>
+<div class="admonition warning">
+<p class="admonition-title">J6 is the motor supply</p>
+<p>J6 carries VM, the full motor supply (up to 18 V). Use it only for motors in
+four-motor mode. Never connect it to J3 or to the host.</p>
+</div>
 <p>The connectors are supplied loose, so you can fit screw terminals, headers or solder wires
 directly.</p>
 <div class="admonition tip">

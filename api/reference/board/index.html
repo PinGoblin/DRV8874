@@ -397,6 +397,8 @@
       
         
       
+        
+      
     
     
     
@@ -746,6 +748,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1438,6 +1468,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pingoblin_motor.board.MotorBoard.is_four_motor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;is_four_motor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pingoblin_motor.board.MotorBoard.is_asleep" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1464,6 +1505,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;total_current
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pingoblin_motor.board.MotorBoard.driver_current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;driver_current
       
     </span>
   </a>
@@ -1838,6 +1890,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pingoblin_motor.board.MotorBoard.is_four_motor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;is_four_motor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pingoblin_motor.board.MotorBoard.is_asleep" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1864,6 +1927,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;total_current
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pingoblin_motor.board.MotorBoard.driver_current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;driver_current
       
     </span>
   </a>
@@ -1982,7 +2056,7 @@
 
     <div class="doc doc-contents first">
 
-        <p><a class="autorefs autorefs-internal" title="            MotorBoard" href="#pingoblin_motor.board.MotorBoard"><code>MotorBoard</code></a>: one Board A (two DRV8874 channels) and its shared lines.</p>
+        <p><a class="autorefs autorefs-internal" title="            MotorBoard" href="#pingoblin_motor.board.MotorBoard"><code>MotorBoard</code></a>: one Board A (two DRV8874 drivers) and its shared lines.</p>
 
 
 
@@ -2060,7 +2134,7 @@
 
 
 <a href="#pingoblin_motor.board.MotorBoard" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">MotorBoard</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">'board'</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">a_en</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">a_ph</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">b_en</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_ph</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fault_pin</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">'ph_en'</span><span class="p">,</span> <span class="n">logic_voltage</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">3.3</span><span class="p">,</span> <span class="n">adc</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            ADS1115 (pingoblin_motor.sensors.ADS1115)" href="../sensors/#pingoblin_motor.sensors.ADS1115">ADS1115</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sense_samples</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">a_sensor</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            CurrentSensor (pingoblin_motor.sensors.CurrentSensor)" href="../sensors/#pingoblin_motor.sensors.CurrentSensor">CurrentSensor</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_sensor</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            CurrentSensor (pingoblin_motor.sensors.CurrentSensor)" href="../sensors/#pingoblin_motor.sensors.CurrentSensor">CurrentSensor</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Backend (pingoblin_motor.backends.Backend)" href="../backends/#pingoblin_motor.backends.Backend">Backend</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pwm_frequency</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="n">motor_names</span><span class="o">=</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">),</span> <span class="n">motor_options</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">a_options</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_options</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fuse_rating</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">MotorBoard</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">'board'</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">a_en</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">a_ph</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">b_en</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_ph</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fault_pin</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">'ph_en'</span><span class="p">,</span> <span class="n">logic_voltage</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">3.3</span><span class="p">,</span> <span class="n">adc</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            ADS1115 (pingoblin_motor.sensors.ADS1115)" href="../sensors/#pingoblin_motor.sensors.ADS1115">ADS1115</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sense_samples</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">a_sensor</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            CurrentSensor (pingoblin_motor.sensors.CurrentSensor)" href="../sensors/#pingoblin_motor.sensors.CurrentSensor">CurrentSensor</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_sensor</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            CurrentSensor (pingoblin_motor.sensors.CurrentSensor)" href="../sensors/#pingoblin_motor.sensors.CurrentSensor">CurrentSensor</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Backend (pingoblin_motor.backends.Backend)" href="../backends/#pingoblin_motor.backends.Backend">Backend</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pwm_frequency</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="n">motor_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">motor_options</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">a_options</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b_options</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fuse_rating</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2071,6 +2145,37 @@
 <p>Pins are BCM GPIO numbers. Motor B is optional. Several boards can share <code>sleep_pin</code>
 (one e-stop line) and <code>fault_pin</code> (wired-OR fault line): pass the same GPIO to each
 board. Boards work as context managers and close on exit.</p>
+<p>The <code>mode</code> must match the PMODE jumper JP1:</p>
+<table>
+<thead>
+<tr>
+<th><code>mode</code></th>
+<th>JP1</th>
+<th>Motors</th>
+<th>Names (default)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"ph_en"</code></td>
+<td>Pads 1–2 (default)</td>
+<td>2 × <a class="autorefs autorefs-internal" title="            Motor" href="../motor/#pingoblin_motor.motor.Motor"><code>Motor</code></a></td>
+<td><code>a</code>, <code>b</code></td>
+</tr>
+<tr>
+<td><code>"pwm"</code></td>
+<td>Pads 2–3</td>
+<td>2 × <a class="autorefs autorefs-internal" title="            Motor" href="../motor/#pingoblin_motor.motor.Motor"><code>Motor</code></a></td>
+<td><code>a</code>, <code>b</code></td>
+</tr>
+<tr>
+<td><code>"independent"</code></td>
+<td>All pads open</td>
+<td>4 × <a class="autorefs autorefs-internal" title="            HalfBridgeMotor" href="../motor/#pingoblin_motor.motor.HalfBridgeMotor"><code>HalfBridgeMotor</code></a></td>
+<td><code>a1</code>, <code>a2</code>, <code>b1</code>, <code>b2</code></td>
+</tr>
+</tbody>
+</table>
 
 
 <details class="example" open>
@@ -2082,6 +2187,20 @@ board. Boards work as context managers and close on exit.</p>
     <span class="n">board</span><span class="o">.</span><span class="n">start_monitor</span><span class="p">(</span><span class="n">on_fault</span><span class="o">=</span><span class="nb">print</span><span class="p">)</span>
     <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
+</details>
+
+<details class="four-motor-mode" open>
+  <summary>Four-motor mode</summary>
+  <div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">"independent"</span><span class="p">)</span> <span class="k">as</span> <span class="n">board</span><span class="p">:</span>
+    <span class="n">board</span><span class="p">[</span><span class="s2">"a1"</span><span class="p">]</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">board</span><span class="p">[</span><span class="s2">"b2"</span><span class="p">]</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>In this mode an input that isn't driven turns its motor <strong>on</strong>. The board must have
+<code>sleep_pin</code> wired, with a 4.7 kΩ resistor from J3 pin 9 to GND, so the drivers
+sleep whenever your program isn't holding nSLEEP high. The library keeps the drivers
+asleep until the first run command, and puts them to sleep in
+<a class="autorefs autorefs-internal" title="            close" href="#pingoblin_motor.board.MotorBoard.close"><code>close()</code></a>.</p>
 </details>
 
 
@@ -2186,7 +2305,8 @@ board. Boards work as context managers and close on exit.</p>
             <td>
               <div class="doc-md-description">
                 <p>GPIO for nSLEEP (J3 pin 9), or <code>None</code>. Needed to coast in PH/EN mode and
-for <a class="autorefs autorefs-internal" title="            sleep" href="#pingoblin_motor.board.MotorBoard.sleep"><code>sleep()</code></a>.</p>
+for <a class="autorefs autorefs-internal" title="            sleep" href="#pingoblin_motor.board.MotorBoard.sleep"><code>sleep()</code></a>. Required in
+four-motor mode.</p>
               </div>
             </td>
             <td>
@@ -2219,7 +2339,8 @@ without a current sensor.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"ph_en"</code> (JP1 pads 1–2, default) or <code>"pwm"</code> (JP1 pads 2–3).</p>
+                <p><code>"ph_en"</code> (JP1 pads 1–2, default), <code>"pwm"</code> (JP1 pads 2–3) or
+<code>"independent"</code> (JP1 all pads open: four-motor mode).</p>
               </div>
             </td>
             <td>
@@ -2268,7 +2389,8 @@ without a current sensor.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>ADS1115 input wired to A_ISENSE.</p>
+                <p>ADS1115 input wired to A_ISENSE. In four-motor mode this reads
+motors <code>a1</code> and <code>a2</code> together.</p>
               </div>
             </td>
             <td>
@@ -2381,11 +2503,13 @@ instead of an ADS1115 channel.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Names for motors A and B, for example <code>("left", "right")</code>.</p>
+                <p>Names for motors A and B, for example <code>("left", "right")</code>. In
+four-motor mode, four names for A1, A2, B1 and B2. Default: <code>("a", "b")</code>, or
+<code>("a1", "a2", "b1", "b2")</code> in four-motor mode.</p>
               </div>
             </td>
             <td>
-                  <code>(&#39;a&#39;, &#39;b&#39;)</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2397,7 +2521,7 @@ instead of an ADS1115 channel.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Keyword arguments for both <a class="autorefs autorefs-internal" title="            Motor" href="../motor/#pingoblin_motor.motor.Motor"><code>Motor</code></a>s.</p>
+                <p>Keyword arguments for every motor.</p>
               </div>
             </td>
             <td>
@@ -2413,7 +2537,8 @@ instead of an ADS1115 channel.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Keyword arguments for motor A only (override <code>motor_options</code>).</p>
+                <p>Keyword arguments for motor A only (override <code>motor_options</code>). In
+four-motor mode they apply to A1 and A2.</p>
               </div>
             </td>
             <td>
@@ -2429,7 +2554,7 @@ instead of an ADS1115 channel.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Keyword arguments for motor B only.</p>
+                <p>Keyword arguments for motor B only (B1 and B2 in four-motor mode).</p>
               </div>
             </td>
             <td>
@@ -2471,7 +2596,8 @@ instead of an ADS1115 channel.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Invalid mode, voltage, names or pins.</p>
+                <p>Invalid mode, voltage, names or pins, or four-motor mode without
+<code>sleep_pin</code>.</p>
               </div>
             </td>
           </tr>
@@ -2541,6 +2667,29 @@ instead of an ADS1115 channel.</p>
 
         <p>The first <a class="autorefs autorefs-internal" title="            Motor" href="../motor/#pingoblin_motor.motor.Motor"><code>Motor</code></a> (J4).</p>
 
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ConfigError (pingoblin_motor.faults.ConfigError)" href="../faults/#pingoblin_motor.faults.ConfigError">ConfigError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>In four-motor mode. Use <code>board["a1"]</code>, <code>board["a2"]</code> and so on.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
     </div>
 
 </div>
@@ -2564,6 +2713,53 @@ instead of an ADS1115 channel.</p>
     <div class="doc doc-contents ">
 
         <p>The second <a class="autorefs autorefs-internal" title="            Motor" href="../motor/#pingoblin_motor.motor.Motor"><code>Motor</code></a> (J5), or <code>None</code> on a single-motor setup.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ConfigError (pingoblin_motor.faults.ConfigError)" href="../faults/#pingoblin_motor.faults.ConfigError">ConfigError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>In four-motor mode. Use <code>board["b1"]</code>, <code>board["b2"]</code> and so on.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="pingoblin_motor.board.MotorBoard.is_four_motor" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">is_four_motor</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pingoblin_motor.board.MotorBoard.is_four_motor" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">is_four_motor</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>True</code> in four-motor mode (<code>mode="independent"</code>).</p>
 
     </div>
 
@@ -2637,7 +2833,8 @@ instead of an ADS1115 channel.</p>
     <div class="doc doc-contents ">
 
         <p>Sum of the motors' last supply-side current readings (A).</p>
-<p><code>None</code> unless every motor has a sensor and has been read at least once.</p>
+<p><code>None</code> unless every motor (every driver, in four-motor mode) has a sensor and has
+been read at least once.</p>
 
     </div>
 
@@ -2645,6 +2842,116 @@ instead of an ADS1115 channel.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pingoblin_motor.board.MotorBoard.driver_current" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">driver_current</span>
+
+
+<a href="#pingoblin_motor.board.MotorBoard.driver_current" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">driver_current</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="float">float</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Read one driver's ISENSE now (four-motor mode).</p>
+<p>In four-motor mode ISENSE carries the combined current of both motors on that
+driver (A1 + A2, or B1 + B2), averaged over the PWM cycle: the current the pair draws
+from the supply.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>driver</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>"a"</code> (U1, J4) or <code>"b"</code> (U2, J5).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Current (A).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ConfigError (pingoblin_motor.faults.ConfigError)" href="../faults/#pingoblin_motor.faults.ConfigError">ConfigError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Not in four-motor mode, unknown driver, or no sensor for it.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            SensorError (pingoblin_motor.faults.SensorError)" href="../faults/#pingoblin_motor.faults.SensorError">SensorError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The reading failed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -2744,7 +3051,8 @@ instead of an ADS1115 channel.</p>
     <div class="doc doc-contents ">
 
         <p>Coast every motor on this board.</p>
-<p>In PH/EN mode this sleeps the board, so it needs <code>sleep_pin</code>. Without one the motors brake.</p>
+<p>In PH/EN and four-motor modes this sleeps the board, so it needs <code>sleep_pin</code>. Without
+one the motors brake.</p>
 
 
     </div>
@@ -2875,6 +3183,8 @@ monitor takes over.</p>
     <div class="doc doc-contents ">
 
         <p>Stop the monitor, brake every motor and release every pin.</p>
+<p>In four-motor mode the drivers are put to sleep first, so the motors don't start when
+the inputs are released.</p>
 
 
     </div>

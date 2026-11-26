@@ -397,6 +397,8 @@
       
         
       
+        
+      
     
     
     
@@ -746,6 +748,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1150,6 +1180,17 @@
     <span class="md-ellipsis">
       
         Stall homing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#four-motor-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Four-motor mode
       
     </span>
   </a>
@@ -1654,6 +1695,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#four-motor-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Four-motor mode
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1824,6 +1876,12 @@ the board can't tell which one stalled, so both are stopped.</p>
 <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>       <span class="c1"># returns when the stall brakes the motor</span>
 </code></pre></div>
 <p>See <code>python/examples/stall_homing.py</code> and <code>micropython/examples/pico_asyncio_stall_homing.py</code>.</p>
+<h2 id="four-motor-mode">Four-motor mode<a class="headerlink" href="#four-motor-mode" title="Permanent link">&para;</a></h2>
+<p>With <code>mode="independent"</code> the drivers don't limit current, so nFAULT low always means a
+driver shutdown and is reported as <code>DRIVER_FAULT</code>, even while motors run. <code>STALL</code>,
+<code>CURRENT_LIMIT</code>, <code>OPEN_LOAD</code> and <code>OVERLOAD</code> aren't detected, because ISENSE carries two
+motors at once. With a sensor on each driver, <code>BOARD_OVERLOAD</code> and <code>CHAIN_OVERLOAD</code> still
+work. See <a href="../../../guide/four-motor-mode/">Four-motor mode</a>.</p>
 
 
 

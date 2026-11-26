@@ -397,6 +397,8 @@
       
         
       
+        
+      
     
     
     
@@ -746,6 +748,34 @@
     
   
     Configuration: PMODE jumper (JP1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/four-motor-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Four-motor mode
   
 
     
@@ -1879,6 +1909,9 @@ line and, where fitted, each motor's current sensor. It detects every
 <p>Without a current sensor, a stall is inferred from nFAULT staying low (the driver
 current-limiting) for <code>stall_time</code>. If both motors on a board are running, the board
 can't tell which one stalled, so both are stopped.</p>
+<p>In four-motor mode the drivers don't limit current, so nFAULT low always means a driver
+shutdown (<code>DRIVER_FAULT</code>), even while motors run. Per-motor stall, open-load and overload
+checks are not available; <code>BOARD_OVERLOAD</code> and <code>CHAIN_OVERLOAD</code> use the two ISENSE readings.</p>
 
 
 
