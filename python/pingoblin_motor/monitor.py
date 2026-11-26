@@ -239,7 +239,7 @@ class FaultMonitor:
                 elif now - tr.open_since >= m.open_load_time:
                     self._emit(Fault(FaultType.OPEN_LOAD,
                                      f"no motor current ({amps * 1000:.0f} mA): motor disconnected, "
-                                     "broken wire, motor supply off or board fuse tripped",
+                                     "broken wire, motor supply off or board fuse blown",
                                      board.name, m.name, amps, now), m, found)
                     tr.open_since = None
                     continue
@@ -265,7 +265,7 @@ class FaultMonitor:
             if since is None:
                 self._board_over_since[key] = now
             elif now - since >= OVERLOAD_DEBOUNCE:
-                msg = f"board draws {total:.2f} A, above the {board.fuse_rating:.1f} A fuse rating"
+                msg = f"board draws {total:.2f} A, above the {board.fuse_rating:.1f} A board rating"
                 for m in board.motors.values():
                     if m.is_running:
                         self._emit(Fault(FaultType.BOARD_OVERLOAD, msg, board.name, m.name, total, now), m, found)

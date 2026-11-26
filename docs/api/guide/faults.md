@@ -8,9 +8,9 @@ Start the fault monitor with `board.start_monitor()` (Raspberry Pi), `board.enab
 | `STALL` | Current ≥ `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` without a sensor | No | Brake | Yes |
 | `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | No | None | No |
 | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | No | Sleep board (brake if no sleep pin) | Yes |
-| `OPEN_LOAD` | Under 30 mA for 1 s while driven at ≥ 20 %: motor disconnected, broken wire, motor supply off or fuse tripped | Yes | Brake | Yes |
+| `OPEN_LOAD` | Under 30 mA for 1 s while driven at ≥ 20 %: motor disconnected, broken wire, motor supply off or fuse blown | Yes | Brake | Yes |
 | `OVERLOAD` | Over `continuous_current` for `overload_time` | Yes | Brake | Yes |
-| `BOARD_OVERLOAD` | Board supply current over the 3 A fuse rating for 1 s | Yes | Brake | No |
+| `BOARD_OVERLOAD` | Board supply current over the 3 A continuous board rating for 1 s | Yes | Brake | No |
 | `CHAIN_OVERLOAD` | Daisy-chain supply current over 6 A for 1 s | Yes | Brake | No |
 | `SENSOR_ERROR` | Current-sensor read fails (reported once until it recovers) | Yes | None | No |
 

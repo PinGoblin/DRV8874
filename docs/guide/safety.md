@@ -18,5 +18,5 @@ Read these before connecting power.
 - **Only connect one power source at a time to J1 and J2.** J1 and J2 are connected
   together. For example, never connect a battery to J1 and a separate power supply to J2
   at the same time. See [Powering the board](power.md).
-- **Use a fused or current-limited supply.** The on-board fuse protects the board, not your
+- **Use a fused or current-limited supply.** The on-board fuse is not resettable and protects the board, not your
   wiring or batteries.

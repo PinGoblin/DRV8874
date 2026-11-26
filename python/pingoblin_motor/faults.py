@@ -25,9 +25,9 @@ class FaultType(enum.Enum):
     | `STALL` | Motor current at or above `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` when there is no sensor | No |
     | `CURRENT_LIMIT` | nFAULT low while a motor is driven. A warning, repeated at most every 5 s | No |
     | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | No |
-    | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % duty or more: motor disconnected, broken wire, motor supply off or board fuse tripped | Yes |
+    | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % duty or more: motor disconnected, broken wire, motor supply off or board fuse blown | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
-    | `BOARD_OVERLOAD` | Board supply current above the 3 A fuse rating for 1 s | Yes |
+    | `BOARD_OVERLOAD` | Board supply current above the 3 A continuous board rating for 1 s | Yes |
     | `CHAIN_OVERLOAD` | Daisy-chain supply current above the chain limit (6 A) for 1 s | Yes |
     | `SENSOR_ERROR` | The current sensor could not be read (reported once until it recovers) | Yes |
     """
@@ -41,13 +41,13 @@ class FaultType(enum.Enum):
     #: shutdown (shorted output) or over-temperature shutdown.
     DRIVER_FAULT = "driver_fault"
     #: Motor commanded to run but draws (almost) no current: motor disconnected,
-    #: broken wire, motor supply off or board fuse tripped. Needs a sensor.
+    #: broken wire, motor supply off or board fuse blown. Needs a sensor.
     OPEN_LOAD = "open_load"
     #: Motor current above its continuous rating for longer than
     #: ``overload_time``. Risk of overheating. Needs a sensor.
     OVERLOAD = "overload"
-    #: Total current on one board is above the board fuse rating (3 A).
-    #: The fuse is likely to trip. Needs sensors.
+    #: Total current on one board is above its 3 A continuous rating.
+    #: Sustained, this will blow the board's 4 A fuse. Needs sensors.
     BOARD_OVERLOAD = "board_overload"
     #: Total current through a daisy chain is above the chain limit (6 A).
     #: Needs sensors.

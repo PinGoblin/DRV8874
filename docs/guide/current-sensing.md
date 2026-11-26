@@ -27,9 +27,9 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
   [100% duty and the current limit](controlling-motors.md#practical-limits).
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
-- Both motors share the 3 A board fuse. If both run near their limit at 5 V logic for more
-  than a few seconds, the fuse will trip. Once power is removed it resets within about a
-  minute.
+- Both motors share a 3 A continuous board rating. Two motors held at the 3 A current
+  limit (for example, both stalled) draw about 6 A, which can blow the board's 4 A fuse,
+  and the fuse is not resettable. Detect stalls and stop the motors, as the library does.
 
 ## ISENSE and motor speed
 

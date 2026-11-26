@@ -55,7 +55,7 @@ but is noisier than the ADS1115. On the Pico, ISENSE is read against the 3.3 V s
 ## Board and chain totals
 
 `board.total_current` and `chain.total_current` add up the motor currents. They drive the
-`BOARD_OVERLOAD` (3 A fuse) and `CHAIN_OVERLOAD` (6 A terminals) checks.
+`BOARD_OVERLOAD` (3 A board rating) and `CHAIN_OVERLOAD` (6 A terminals) checks.
 
 !!! note
     ISENSE measures load, not speed. A free-running motor draws about the same current at

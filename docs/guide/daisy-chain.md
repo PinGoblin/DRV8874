@@ -10,7 +10,7 @@ Several boards can share one motor supply and one host.
 - J1 and J2 are wired in parallel, so every board's terminals carry the current of all the
   boards after it. **Keep the total current through any board's terminals at or below
   6 A.** For more boards, run a separate supply lead (a star) to each group.
-- Each board still has its own 3 A fuse.
+- Each board still has its own 4 A fuse.
 
 ## Logic
 

@@ -131,7 +131,7 @@ class FaultType:
     | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % or more | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
-    | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (3 A) for 1 s | Yes |
+    | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (3 A continuous board rating) for 1 s | Yes |
     | `CHAIN_OVERLOAD` | Chain supply current above the chain limit (6 A) for 1 s | Yes |
     | `SENSOR_ERROR` | The current sensor could not be read | Yes |
     """
@@ -1203,7 +1203,8 @@ class MotorBoard:
             motor_options: Keyword arguments for both `Motor`s.
             a_options: Keyword arguments for motor A only.
             b_options: Keyword arguments for motor B only.
-            fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
+            fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
+                The on-board 4 A slow-blow fuse allows 3 A continuously.
 
         Raises:
             ConfigError: Invalid mode, voltage, names or pins, or a `fault_pin` already used by
@@ -1843,7 +1844,7 @@ class FaultMonitor:
                 elif ticks_diff(now, tr.open) >= m.open_load_time * 1000:
                     self._emit(Fault(FaultType.OPEN_LOAD,
                                      "no motor current (%d mA): motor disconnected, broken wire, "
-                                     "motor supply off or board fuse tripped" % int(amps * 1000),
+                                     "motor supply off or board fuse blown" % int(amps * 1000),
                                      board.name, m.name, amps, now), m, found)
                     tr.open = None
                     continue
@@ -1866,7 +1867,7 @@ class FaultMonitor:
             if since is None:
                 self._bover[key] = now
             elif ticks_diff(now, since) >= OVERLOAD_DEBOUNCE_MS:
-                msg = "board draws %.2f A, above the %.1f A fuse rating" % (total, board.fuse_rating)
+                msg = "board draws %.2f A, above the %.1f A board rating" % (total, board.fuse_rating)
                 for m in board.motors.values():
                     if m.is_running:
                         self._emit(Fault(FaultType.BOARD_OVERLOAD, msg, board.name, m.name, total, now), m, found)

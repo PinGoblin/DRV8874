@@ -86,7 +86,8 @@ class MotorBoard:
             motor_options: Keyword arguments for both [`Motor`][pingoblin_motor.motor.Motor]s.
             a_options: Keyword arguments for motor A only (override `motor_options`).
             b_options: Keyword arguments for motor B only.
-            fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
+            fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
+                The on-board 4 A slow-blow fuse allows 3 A continuously.
 
         Raises:
             ConfigError: Invalid mode, voltage, names or pins, or a `fault_pin` already used
