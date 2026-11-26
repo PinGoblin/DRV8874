@@ -8,7 +8,7 @@
 | Default state | Drivers awake (nSLEEP pulled high); EN and PH pulled low, so motors are braked |
 | Motor channels | 2, bidirectional |
 | Continuous current per motor | About 1.5–2 A at 25 °C (to be confirmed by prototype thermal tests) |
-| Total board current | 3 A continuous (4 A slow-blow fuse, not resettable) |
+| Total board current | 3 A continuous (4 A fast-acting fuse, not resettable) |
 | Current limit per motor | About 3.0 A, fixed (independent of VLOGIC) |
 | Current-sense output | 0.675 V per amp |
 | PWM frequency | Up to 100 kHz (20 kHz recommended, which is above human hearing) |

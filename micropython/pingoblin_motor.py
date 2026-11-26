@@ -1204,7 +1204,7 @@ class MotorBoard:
             a_options: Keyword arguments for motor A only.
             b_options: Keyword arguments for motor B only.
             fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
-                The on-board 4 A slow-blow fuse allows 3 A continuously.
+                The on-board 4 A fast-acting (high I2t) fuse allows 3 A continuously.
 
         Raises:
             ConfigError: Invalid mode, voltage, names or pins, or a `fault_pin` already used by
