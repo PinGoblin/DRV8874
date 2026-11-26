@@ -397,8 +397,6 @@
       
         
       
-        
-      
     
     
     
@@ -748,34 +746,6 @@
     
   
     Configuration: PMODE jumper (JP1)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../guide/four-motor-mode/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Four-motor mode
   
 
     
@@ -1180,17 +1150,6 @@
     <span class="md-ellipsis">
       
         Stall homing
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#four-motor-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Four-motor mode
       
     </span>
   </a>
@@ -1695,17 +1654,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#four-motor-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Four-motor mode
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1851,7 +1799,7 @@ the board cannot tell which one stalled, so both are stopped.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaultAction</span><span class="p">,</span> <span class="n">FaultPolicy</span><span class="p">,</span> <span class="n">FaultType</span><span class="p">,</span> <span class="n">MotorBoard</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">on_fault</span><span class="p">(</span><span class="n">fault</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">fault</span><span class="p">)</span>              <span class="c1"># [stall] front.a: motor stalled: 1.82 A for 0.5 s</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fault</span><span class="p">)</span>              <span class="c1"># [stall] front.a: motor stalled: 2.61 A for 0.5 s</span>
 
 <span class="c1"># Per-motor policy: coast on stall, and don't latch</span>
 <span class="n">policy</span> <span class="o">=</span> <span class="n">FaultPolicy</span><span class="p">({</span><span class="n">FaultType</span><span class="o">.</span><span class="n">STALL</span><span class="p">:</span> <span class="n">FaultAction</span><span class="o">.</span><span class="n">COAST</span><span class="p">},</span> <span class="n">latch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1876,12 +1824,6 @@ the board cannot tell which one stalled, so both are stopped.</p>
 <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>       <span class="c1"># returns when the stall brakes the motor</span>
 </code></pre></div>
 <p>See <code>python/examples/stall_homing.py</code> and <code>micropython/examples/pico_asyncio_stall_homing.py</code>.</p>
-<h2 id="four-motor-mode">Four-motor mode<a class="headerlink" href="#four-motor-mode" title="Permanent link">&para;</a></h2>
-<p>With <code>mode="independent"</code> the drivers do not limit current, so nFAULT low always means a
-driver shutdown and is reported as <code>DRIVER_FAULT</code>, even while motors run. <code>STALL</code>,
-<code>CURRENT_LIMIT</code>, <code>OPEN_LOAD</code> and <code>OVERLOAD</code> are not detected, because ISENSE carries two
-motors at once. With a sensor on each driver, <code>BOARD_OVERLOAD</code> and <code>CHAIN_OVERLOAD</code> still
-work. See <a href="../../../guide/four-motor-mode/">Four-motor mode</a>.</p>
 
 
 

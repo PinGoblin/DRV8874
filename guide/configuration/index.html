@@ -16,7 +16,7 @@
         <link rel="prev" href="../current-sensing/">
       
       
-        <link rel="next" href="../four-motor-mode/">
+        <link rel="next" href="../daisy-chain/">
       
       
         
@@ -369,8 +369,6 @@
       
         
           
-        
-      
         
       
         
@@ -819,34 +817,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../four-motor-mode/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Four-motor mode
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1653,59 +1623,41 @@
 
 
 <h1 id="configuration-pmode-jumper-jp1">Configuration: PMODE jumper (JP1)<a class="headerlink" href="#configuration-pmode-jumper-jp1" title="Permanent link">&para;</a></h1>
-<p>JP1 is a 3-pad solder jumper that sets the control mode for both drivers. It is supplied
-with pads 1–2 bridged (PH/EN mode). The drivers read JP1 when they wake, so a change takes
-effect at the next power-up or wake from sleep.</p>
+<p>JP1 is a 2-pad solder jumper that sets the control mode for both drivers. It is supplied
+open (PH/EN mode). The drivers read JP1 when they wake, so a change takes effect at the
+next power-up or wake from sleep.</p>
 <table>
 <thead>
 <tr>
 <th>JP1 setting</th>
 <th>Mode</th>
-<th>Motors</th>
 <th>Library</th>
 <th>Details</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Pads 1–2 bridged (default)</td>
+<td>Open (default)</td>
 <td>PH/EN</td>
-<td>2, both directions</td>
 <td><code>mode="ph_en"</code></td>
 <td><a href="../controlling-motors/#phen-mode-default">PH/EN mode</a></td>
 </tr>
 <tr>
-<td>Pads 2–3 bridged</td>
+<td>Bridged</td>
 <td>PWM (IN1/IN2)</td>
-<td>2, both directions</td>
 <td><code>mode="pwm"</code></td>
 <td><a href="../controlling-motors/#pwm-mode-in1in2">PWM mode</a></td>
 </tr>
-<tr>
-<td>All pads open</td>
-<td>Four-motor</td>
-<td>4, one direction each</td>
-<td><code>mode="independent"</code></td>
-<td><a href="../four-motor-mode/">Four-motor mode</a></td>
-</tr>
 </tbody>
 </table>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Leaving all three pads open selects four-motor mode. Do this only on purpose: in that
-mode an input that is not driven runs its motor at full speed while the drivers are
-awake. Read <a href="../four-motor-mode/">Four-motor mode</a> first.</p>
-</div>
 <h2 id="changing-the-mode">Changing the mode<a class="headerlink" href="#changing-the-mode" title="Permanent link">&para;</a></h2>
 <ol>
 <li>Disconnect the motor supply and VLOGIC.</li>
-<li>Cut the thin trace between pads 1 and 2 with a craft knife.</li>
-<li>Check with a multimeter that pads 1 and 2 are no longer connected.</li>
-<li>For PWM mode, bridge pads 2 and 3 with solder. For four-motor mode, leave all pads open.</li>
-<li>Clean off any flux. In four-motor mode PMODE must float: the drivers recognise "open"
-   only between about 0.9 V and 1.2 V, so flux residue can select the wrong mode.</li>
+<li>For PWM mode, bridge the two JP1 pads with solder.</li>
+<li>To return to PH/EN mode, remove the solder with desoldering braid and check with a
+   multimeter that the pads are no longer connected.</li>
+<li>Tell the library which mode is set (<code>mode="pwm"</code> or <code>mode="ph_en"</code>).</li>
 </ol>
-<p>To return to PH/EN mode, remove any bridge between pads 2 and 3 and bridge pads 1 and 2.</p>
 
 
 

@@ -399,8 +399,6 @@
       
         
       
-        
-      
     
     
     
@@ -753,34 +751,6 @@
     
   
     Configuration: PMODE jumper (JP1)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../four-motor-mode/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Four-motor mode
   
 
     
@@ -1602,43 +1572,23 @@
 </tr>
 <tr>
 <td>Power LED on, motors do nothing, buttons do nothing</td>
-<td>VLOGIC missing, or nSLEEP not driven high (the board pulls it low)</td>
-<td>Feed 3.3–5 V to J3 pin 2 and connect GND (pin 1). Drive nSLEEP (pin 9) high from the host (pass <code>sleep_pin=</code> to the library), or link pin 9 to pin 2 for button tests</td>
+<td>VLOGIC missing, or nSLEEP held low</td>
+<td>Feed 3.3–5 V to J3 pin 2 and connect GND (pin 1). Disconnect nSLEEP (pin 9) or drive it high</td>
 </tr>
 <tr>
-<td>Buttons work (with pin 9 linked to pin 2), host code does nothing</td>
-<td>Wrong GPIO numbers, no common GND, nSLEEP not driven high, or EN never goes high</td>
-<td>Check the pin mapping and the GND link. Pass <code>sleep_pin=</code> to the library. Measure nSLEEP (pin 9) and EN (pin 3/5) while the code runs</td>
+<td>Buttons work, host code does nothing</td>
+<td>Wrong GPIO numbers, no common GND, or EN never goes high</td>
+<td>Check the pin mapping and the GND link. Measure EN (pin 3/5) while the code runs</td>
 </tr>
 <tr>
 <td>Buttons do nothing but host code works</td>
-<td>JP1 set to PWM or four-motor mode</td>
-<td>The buttons run motors only in PH/EN mode (JP1 pads 1–2). In PWM mode FWD brakes and REV runs forward; in four-motor mode the buttons only turn motors off</td>
-</tr>
-<tr>
-<td>Board works without a host, but not once the host is connected</td>
-<td>The nSLEEP GPIO is low, or is connected to VLOGIC as well</td>
-<td>Remove the link between pins 9 and 2 when the host is connected, and drive nSLEEP high from the host</td>
-</tr>
-<tr>
-<td>Motors run as soon as power is applied, or keep running after the program stops</td>
-<td>JP1 open (four-motor mode) with nSLEEP held high: connected to VLOGIC, or a GPIO left high</td>
-<td>Wire nSLEEP to a GPIO only, and drive it low when the program stops (the library does this in <code>close()</code>). See <a href="../four-motor-mode/">Four-motor mode</a>. If four-motor mode was not intended, bridge JP1 pads 1–2</td>
-</tr>
-<tr>
-<td>Direction LEDs glow or flicker while motors run in four-motor mode</td>
-<td>Normal: the LEDs show the difference between a pair of outputs</td>
-<td>Ignore the direction LEDs in four-motor mode</td>
+<td>JP1 bridged (PWM mode)</td>
+<td>The buttons run motors only in PH/EN mode (JP1 open). In PWM mode FWD brakes and REV runs forward</td>
 </tr>
 <tr>
 <td>A fault on one board stops motors on every board, or the library says the <code>fault_pin</code> is already used</td>
 <td>Boards share an nFAULT line</td>
 <td>Give each board its own nFAULT GPIO: see <a href="../daisy-chain/">Daisy-chaining boards</a></td>
-</tr>
-<tr>
-<td>Four-motor mode: a motor runs when it should be off, and the reverse</td>
-<td>Motor control inverted by hand-written code</td>
-<td>The motor runs while its input is low. Drive the input at 1 − speed, or use the library's <code>mode="independent"</code></td>
 </tr>
 <tr>
 <td>Motor runs only one direction</td>
@@ -1652,8 +1602,8 @@
 </tr>
 <tr>
 <td>Motor stutters, fault LED flickers</td>
-<td>Current limit active (load near 2 A at 3.3 V logic, 3 A at 5 V)</td>
-<td>Reduce the load or speed. A larger motor needs 5 V logic or a larger driver</td>
+<td>Current limit active (load near 3 A)</td>
+<td>Reduce the load or speed. A larger motor needs a larger driver</td>
 </tr>
 <tr>
 <td>Motor stops at 100% duty and the fault LED stays on</td>
@@ -1674,11 +1624,6 @@
 <td>ISENSE always reads 0</td>
 <td>Motor not driven when sampled, or PWM off-time sampled</td>
 <td>Read while the motor is driven. Average several samples</td>
-</tr>
-<tr>
-<td>ISENSE reads above VLOGIC in four-motor mode</td>
-<td>Two motors on one driver drawing more than about 4.9 A in total (for example, both stalled)</td>
-<td>Stop the motors. Use motors with a lower stall current, or read ISENSE through an ADS1115 board</td>
 </tr>
 <tr>
 <td>Host resets when motors start</td>

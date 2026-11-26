@@ -399,8 +399,6 @@
       
         
       
-        
-      
     
     
     
@@ -763,34 +761,6 @@
     
   
     Configuration: PMODE jumper (JP1)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../four-motor-mode/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Four-motor mode
   
 
     
@@ -1589,9 +1559,8 @@
 <p>J3 is a single row of 10 pins on the left edge of the board. Looking at the component
 side, pin 10 (nFAULT) is at the top and pin 1 (GND, square pad) is at the bottom, nearest
 the test buttons.</p>
-<p><img alt="J3 pinout. Pins 3 to 6 are A_EN, A_PH, B_EN and B_PH in PH/EN mode, IN1/IN2 for each
-motor in PWM mode, and one input per motor (A1, A2, B1, B2) in four-motor
-mode." src="../../images/j3-pinout.svg" /></p>
+<p><img alt="J3 pinout. Pins 3 to 6 are A_EN, A_PH, B_EN and B_PH in PH/EN mode, and IN1/IN2 for each
+motor in PWM mode." src="../../images/j3-pinout.svg" /></p>
 <table>
 <thead>
 <tr>
@@ -1600,7 +1569,6 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <th>Direction</th>
 <th>PH/EN mode (default)</th>
 <th>PWM mode</th>
-<th>Four-motor mode</th>
 </tr>
 </thead>
 <tbody>
@@ -1610,15 +1578,13 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Output</td>
 <td>Low = fault or current limiting. One GPIO per board</td>
 <td>Same</td>
-<td>Low = driver fault</td>
 </tr>
 <tr>
 <td>9</td>
 <td>nSLEEP</td>
 <td>Input</td>
-<td>Low or open = sleep, motors coast. Drive high to run</td>
+<td>Low = sleep, both motors coast. Pulled high on the board (optional)</td>
 <td>Same</td>
-<td>Same. Wire to a GPIO; do not also connect to VLOGIC</td>
 </tr>
 <tr>
 <td>8</td>
@@ -1626,7 +1592,6 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Output</td>
 <td>Motor B current, 0.675 V/A</td>
 <td>Same</td>
-<td>Motors B1 + B2 together</td>
 </tr>
 <tr>
 <td>7</td>
@@ -1634,7 +1599,6 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Output</td>
 <td>Motor A current, 0.675 V/A</td>
 <td>Same</td>
-<td>Motors A1 + A2 together</td>
 </tr>
 <tr>
 <td>6</td>
@@ -1642,7 +1606,6 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Input</td>
 <td>Motor B direction</td>
 <td>IN2, motor B</td>
-<td>Motor B2, low = on</td>
 </tr>
 <tr>
 <td>5</td>
@@ -1650,7 +1613,6 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Input</td>
 <td>Motor B on / speed (PWM)</td>
 <td>IN1, motor B</td>
-<td>Motor B1, low = on</td>
 </tr>
 <tr>
 <td>4</td>
@@ -1658,7 +1620,6 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Input</td>
 <td>Motor A direction</td>
 <td>IN2, motor A</td>
-<td>Motor A2, low = on</td>
 </tr>
 <tr>
 <td>3</td>
@@ -1666,14 +1627,12 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Input</td>
 <td>Motor A on / speed (PWM)</td>
 <td>IN1, motor A</td>
-<td>Motor A1, low = on</td>
 </tr>
 <tr>
 <td>2</td>
 <td>VLOGIC</td>
 <td>Power</td>
 <td>Logic supply in, 3.3–5 V</td>
-<td>Same</td>
 <td>Same</td>
 </tr>
 <tr>
@@ -1682,20 +1641,16 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>Power</td>
 <td>Ground, common with the host</td>
 <td>Same</td>
-<td>Same</td>
 </tr>
 </tbody>
 </table>
-<p>All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Every
-input, nSLEEP included, has a 10 kΩ pull-down on the board, so the drivers sleep until
-the host drives nSLEEP high, and unused EN/PH inputs can be left open in PH/EN and PWM
-modes. In four-motor mode an open input turns its motor <strong>on</strong> whenever the drivers are
-awake: see <a href="../four-motor-mode/">Four-motor mode</a>.</p>
+<p>All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. EN and
+PH have 10 kΩ pull-downs and nSLEEP has a 10 kΩ pull-up on the board, so unused inputs
+can be left open.</p>
 <p>nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give
 each board its own nFAULT GPIO: see <a href="../daisy-chain/">Daisy-chaining boards</a>.</p>
-<p>In PH/EN and PWM modes the current limit keeps ISENSE at or below about 0.4 × VLOGIC.
-In four-motor mode there is no current limit, and ISENSE can rise to about 4.5 V, above
-a 3.3 V host's supply. See <a href="../four-motor-mode/#current-sensing">Four-motor mode</a>.</p>
+<p>The 3 A current limit keeps ISENSE at or below about 2.1 V, within the range of any
+3.3 V or 5 V ADC.</p>
 <p>Signal names: <strong>EN</strong> = enable (on/off and PWM speed), <strong>PH</strong> = phase (direction),
 <strong>IN1 / IN2</strong> = input 1 / input 2 (PWM mode), <strong>ISENSE</strong> = current sense output. A leading
 <strong>n</strong> (nSLEEP, nFAULT) means the signal is active when low.</p>

@@ -399,8 +399,6 @@
       
         
       
-        
-      
     
     
     
@@ -883,34 +881,6 @@
     
   
     Configuration: PMODE jumper (JP1)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../four-motor-mode/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Four-motor mode
   
 
     
@@ -1814,14 +1784,12 @@
 </ul>
 <p>The <a href="../glossary/">Glossary</a> lists every abbreviation used in this manual.</p>
 </div>
-<p>The board has three control modes, selected with the <a href="../configuration/">PMODE jumper JP1</a>.
-This page covers the two modes that drive two motors in both directions: PH/EN mode (the
-default) and PWM mode. For up to four one-direction motors, see
-<a href="../four-motor-mode/">Four-motor mode</a>.</p>
+<p>The board has two control modes, selected with the <a href="../configuration/">PMODE jumper JP1</a>:
+PH/EN mode (the default) and PWM mode.</p>
 <p>The tables on this page are for motor A. Motor B is identical, using B_EN and B_PH (J3
 pins 5 and 6).</p>
 <h2 id="phen-mode-default">PH/EN mode (default)<a class="headerlink" href="#phen-mode-default" title="Permanent link">&para;</a></h2>
-<p>JP1 pads 1–2 bridged (as supplied). Each motor uses two pins: <strong>EN</strong> (enable) turns the
+<p>JP1 open (as supplied). Each motor uses two pins: <strong>EN</strong> (enable) turns the
 motor on and sets its speed with PWM, and <strong>PH</strong> (phase) sets the direction. One PWM
 channel per motor is enough. This is the same scheme as gpiozero's <code>PhaseEnableMotor</code>,
 except that gpiozero calls PH low "forward" (see <a href="#direction">Direction</a>).</p>
@@ -1839,16 +1807,7 @@ except that gpiozero calls PH low "forward" (see <a href="#direction">Direction<
 </thead>
 <tbody>
 <tr>
-<td>Low (default)</td>
-<td>Any</td>
-<td>Any</td>
-<td>Open</td>
-<td>Open</td>
-<td>Coast (sleep, near-zero current)</td>
-<td>Off</td>
-</tr>
-<tr>
-<td>High</td>
+<td>High (default)</td>
 <td>Low</td>
 <td>Any</td>
 <td>Low</td>
@@ -1874,6 +1833,15 @@ except that gpiozero calls PH low "forward" (see <a href="#direction">Direction<
 <td>Reverse</td>
 <td>Red</td>
 </tr>
+<tr>
+<td>Low</td>
+<td>Any</td>
+<td>Any</td>
+<td>Open</td>
+<td>Open</td>
+<td>Coast (sleep, near-zero current)</td>
+<td>Off</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Speed:</strong> drive EN with PWM. The duty cycle sets the speed. During the PWM off-time the
@@ -1885,7 +1853,7 @@ when the other motor is idle, and otherwise brakes.</p>
 <p><strong>Test buttons:</strong> FWD runs the motor forward and REV runs it in reverse, at full speed
 while held. See <a href="../buttons-leds/">Test buttons and LEDs</a>.</p>
 <h2 id="pwm-mode-in1in2">PWM mode (IN1/IN2)<a class="headerlink" href="#pwm-mode-in1in2" title="Permanent link">&para;</a></h2>
-<p>JP1 pads 2–3 bridged. Each pin drives one side of the motor directly, as on two-input
+<p>JP1 bridged. Each pin drives one side of the motor directly, as on two-input
 drivers such as the L298N and DRV8833. PWM mode lets each motor coast on its own, without
 sleeping the board, but needs PWM on both pins for full control.</p>
 <table>
@@ -1902,16 +1870,7 @@ sleeping the board, but needs PWM on both pins for full control.</p>
 </thead>
 <tbody>
 <tr>
-<td>Low (default)</td>
-<td>Any</td>
-<td>Any</td>
-<td>Open</td>
-<td>Open</td>
-<td>Coast (sleep, near-zero current)</td>
-<td>Off</td>
-</tr>
-<tr>
-<td>High</td>
+<td>High (default)</td>
 <td>Low</td>
 <td>Low</td>
 <td>Open</td>
@@ -1944,6 +1903,15 @@ sleeping the board, but needs PWM on both pins for full control.</p>
 <td>Low</td>
 <td>Low</td>
 <td>Brake</td>
+<td>Off</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>Any</td>
+<td>Any</td>
+<td>Open</td>
+<td>Open</td>
+<td>Coast (sleep, near-zero current)</td>
 <td>Off</td>
 </tr>
 </tbody>
@@ -1993,13 +1961,6 @@ modes differ in which pin is switched, and in what the motor does during the off
 <td>Coast</td>
 <td>Softer; speed falls away at low duty</td>
 </tr>
-<tr>
-<td><a href="../four-motor-mode/">Four-motor</a></td>
-<td>Input PWM at duty 1 − <em>d</em> (one direction only)</td>
-<td>Not available</td>
-<td>Brake (through the high side)</td>
-<td>The same as PH/EN</td>
-</tr>
 </tbody>
 </table>
 <p><strong>PH/EN mode.</strong> During the off-time both low-side switches are on (brake, also called slow
@@ -2046,13 +2007,12 @@ The library brakes for <code>reverse_delay</code> (0.1 s by default) before reve
 motor.</p>
 <h2 id="sleep-emergency-stop-and-start-up">Sleep, emergency stop and start-up<a class="headerlink" href="#sleep-emergency-stop-and-start-up" title="Permanent link">&para;</a></h2>
 <p><strong>Sleep / emergency stop:</strong> pull nSLEEP low to put both drivers to sleep (outputs open,
-motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-down on the board, so
-the drivers sleep until the host drives it high: your program must do this before the
-motors will run. The library does this automatically.</p>
-<p><strong>Start-up behaviour:</strong> nSLEEP, EN and PH all have 10 kΩ pull-downs, so while the host is
-booting, and after your program exits, the drivers sleep and the motors coast. If the
-motor's load can turn it backwards (a lift, an arm, a robot parked on a slope), have your
-program wake the board with EN low as soon as it starts: the motor is then braked.</p>
+motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-up to VLOGIC on the
+board, so the drivers are awake whenever VLOGIC is present and nSLEEP is not driven low.
+Connecting nSLEEP is optional.</p>
+<p><strong>Start-up behaviour:</strong> EN and PH have 10 kΩ pull-downs, so while the host is booting,
+and after your program exits, both motors are held in brake in PH/EN mode. In PWM mode
+the same pull-downs make the motors coast.</p>
 <h2 id="driving-the-pins-directly">Driving the pins directly<a class="headerlink" href="#driving-the-pins-directly" title="Permanent link">&para;</a></h2>
 <p>The <a href="../../api/">library</a> is the recommended way to use the board. The protocol can
 also be driven directly, as below (PH/EN mode). Speed runs from −1.0 (full reverse) to 1.0
@@ -2081,7 +2041,7 @@ also be driven directly, as below (PH/EN mode). Speed runs from −1.0 (full rev
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">amps</span><span class="p">(</span><span class="n">A_SENSE</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Motor A: </span><span class="si">%.2f</span><span class="s2"> A  fault/limit: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">FAULT</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mf">1.6</span><span class="p">:</span>              <span class="c1"># about 80% of the 2 A limit at 3.3 V logic</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mf">2.4</span><span class="p">:</span>              <span class="c1"># about 80% of the 3 A current limit</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Stall - stopping"</span><span class="p">)</span>
         <span class="k">break</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>

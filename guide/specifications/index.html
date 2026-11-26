@@ -399,8 +399,6 @@
       
         
       
-        
-      
     
     
     
@@ -763,34 +761,6 @@
     
   
     Configuration: PMODE jumper (JP1)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../four-motor-mode/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Four-motor mode
   
 
     
@@ -1608,11 +1578,11 @@
 </tr>
 <tr>
 <td>Default state</td>
-<td>Drivers asleep until nSLEEP (J3 pin 9) is driven high; all inputs have 10 kΩ pull-downs</td>
+<td>Drivers awake (nSLEEP pulled high); EN and PH pulled low, so motors are braked</td>
 </tr>
 <tr>
 <td>Motor channels</td>
-<td>2, bidirectional, or 4, one direction each (<a href="../four-motor-mode/">four-motor mode</a>)</td>
+<td>2, bidirectional</td>
 </tr>
 <tr>
 <td>Continuous current per motor</td>
@@ -1624,7 +1594,7 @@
 </tr>
 <tr>
 <td>Current limit per motor</td>
-<td>About 2.0 A with 3.3 V logic, about 3.0 A with 5 V logic (none in four-motor mode)</td>
+<td>About 3.0 A, fixed (independent of VLOGIC)</td>
 </tr>
 <tr>
 <td>Current-sense output</td>
@@ -1640,7 +1610,7 @@
 </tr>
 <tr>
 <td>Connectors</td>
-<td>XT30 right-angle male and 5.08 mm screw terminal (power), 3.5 mm screw terminals (motors), 2.54 mm 10-pin header (logic), 2.54 mm 2×2 header (VM, four-motor mode)</td>
+<td>XT30 right-angle male and 5.08 mm screw terminal (power), 3.5 mm screw terminals (motors), 2.54 mm 10-pin header (logic)</td>
 </tr>
 <tr>
 <td>Mounting</td>

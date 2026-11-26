@@ -399,8 +399,6 @@
       
         
       
-        
-      
     
     
     
@@ -811,34 +809,6 @@
     
   
     Configuration: PMODE jumper (JP1)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../four-motor-mode/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Four-motor mode
   
 
     
@@ -1672,21 +1642,14 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
 <table>
 <thead>
 <tr>
-<th>Host logic (VLOGIC)</th>
 <th>Current limit per motor</th>
 <th>ISENSE at the limit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>3.3 V</td>
-<td>About 2.0 A</td>
-<td>About 1.32 V</td>
-</tr>
-<tr>
-<td>5.0 V</td>
-<td>About 3.0 A</td>
-<td>About 2.0 V</td>
+<td>About 3.0 A (fixed, for any VLOGIC)</td>
+<td>About 2.07 V</td>
 </tr>
 </tbody>
 </table>
@@ -1697,9 +1660,6 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
   <a href="../controlling-motors/#practical-limits">100% duty and the current limit</a>.</li>
 <li>A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.</li>
-<li>In <a href="../four-motor-mode/">four-motor mode</a> there is no current limit, and each ISENSE
-  output carries the combined current of the two motors on that driver. It can rise above
-  3.3 V there.</li>
 <li>Both motors share the 3 A board fuse. If both run near their limit at 5 V logic for more
   than a few seconds, the fuse will trip. Once power is removed it resets within about a
   minute.</li>
@@ -1732,7 +1692,7 @@ shaft for under a second). Then:</p>
 \]</div>
 <p>Limits of this estimate:</p>
 <ul>
-<li>The current limit (2 A or 3 A) clamps the current, so the line ends there. Any heavier
+<li>The 3 A current limit clamps the current, so the line ends there. Any heavier
   load reads as the limit.</li>
 <li>Winding resistance rises about 0.4% per °C as the motor warms, which shifts the line.</li>
 <li>Gearbox friction and brush noise add error. Average several readings.</li>
