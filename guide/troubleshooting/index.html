@@ -1567,8 +1567,8 @@
 <tbody>
 <tr>
 <td>Power LED off</td>
-<td>No supply, supply reversed, or fuse tripped</td>
-<td>Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring. A tripped fuse resets about a minute after power is removed</td>
+<td>No supply, supply reversed, or fuse blown</td>
+<td>Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring (reverse polarity does not blow the fuse). A blown fuse (F1) is not resettable: it means a supply above 30 V or an internal fault, and F1 must be replaced</td>
 </tr>
 <tr>
 <td>Power LED on, motors do nothing, buttons do nothing</td>
@@ -1612,7 +1612,7 @@
 </tr>
 <tr>
 <td>Motor runs, then stops and restarts every few seconds</td>
-<td>Driver overheating, or the board fuse tripping</td>
+<td>Driver overheating</td>
 <td>Improve airflow and reduce continuous current. Keep the total under 3 A</td>
 </tr>
 <tr>

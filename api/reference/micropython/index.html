@@ -4620,7 +4620,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
 </tr>
 <tr>
 <td><code>BOARD_OVERLOAD</code></td>
-<td>Board supply current above <code>fuse_rating</code> (3 A) for 1 s</td>
+<td>Board supply current above <code>fuse_rating</code> (3 A continuous board rating) for 1 s</td>
 <td>Yes</td>
 </tr>
 <tr>
@@ -8834,7 +8834,8 @@ at about 3 A.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Board fuse hold current (A), for <code>BOARD_OVERLOAD</code>.</p>
+                <p>The board's continuous current rating (A), for <code>BOARD_OVERLOAD</code>.
+The on-board 4 A slow-blow fuse allows 3 A continuously.</p>
               </div>
             </td>
             <td>
