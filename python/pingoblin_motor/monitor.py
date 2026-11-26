@@ -172,8 +172,9 @@ class FaultMonitor:
                 self._board_since[key] = now
             elif now - since >= DRIVER_FAULT_DEBOUNCE:
                 f = Fault(FaultType.DRIVER_FAULT,
-                          "nFAULT low with no motor driven: driver shut down "
-                          "(output short, overcurrent or over-temperature)", board.name, None, None, now)
+                          "nFAULT low with no motor driven: driver shut down (output short, "
+                          "overcurrent or over-temperature) or motor supply below about 4.5 V "
+                          "(supply off, flat battery or fuse blown)", board.name, None, None, now)
                 self._record(f, found)
                 board._report_board_fault(f)
                 self._board_since[key] = None

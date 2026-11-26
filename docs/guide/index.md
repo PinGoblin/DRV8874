@@ -22,8 +22,9 @@ current-sense output that can be read with an ADC.
 
 1. Find your way around the board: [Board overview](board-overview.md).
 2. Read [Important safety information](safety.md).
-3. Wire the board using [Quick start](quick-start.md).
-4. Check each motor with the [test buttons](buttons-leds.md) (PH/EN mode).
-5. Install the library from the [API](../api/index.md) section and run the first example.
+3. Check that your motors suit the board: [Choosing a motor](choosing-a-motor.md).
+4. Wire the board using [Quick start](quick-start.md).
+5. Check each motor with the [test buttons](buttons-leds.md) (PH/EN mode).
+6. Install the library from the [API](../api/index.md) section and run the first example.
 
 If something does not work, see [Troubleshooting](troubleshooting.md).

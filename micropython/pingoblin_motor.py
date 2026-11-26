@@ -113,12 +113,12 @@ class ControlMode:
     """Control mode set by the PMODE jumper JP1 (string constants).
 
     Attributes:
-        PH_EN: `"ph_en"`: default (JP1 pads 1–2). EN = speed PWM, PH = direction.
-        PWM: `"pwm"`: JP1 pads 2–3. IN1 / IN2; allows per-motor coast.
+        PH_EN: `"ph_en"`: default (JP1 open). EN = speed PWM, PH = direction.
+        PWM: `"pwm"`: JP1 bridged. IN1 / IN2; allows per-motor coast.
     """
 
-    PH_EN = "ph_en"         # JP1 pads 1-2 (default): EN = speed PWM, PH = direction
-    PWM = "pwm"             # JP1 pads 2-3: IN1 / IN2
+    PH_EN = "ph_en"         # JP1 open (default): EN = speed PWM, PH = direction
+    PWM = "pwm"             # JP1 bridged: IN1 / IN2
 
 
 class FaultType:
@@ -128,7 +128,7 @@ class FaultType:
     |---|---|---|
     | `STALL` | Current at or above `stall_current` for `stall_time` while driven, or nFAULT low for `stall_time` without a sensor | No |
     | `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | No |
-    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature | No |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature, or motor supply below about 4.5 V | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % or more | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
     | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (3 A continuous board rating) for 1 s | Yes |
@@ -742,7 +742,8 @@ class Motor:
     def __init__(self, name, board, en_pin, ph_pin, mode, pins, sensor=None, invert=False,
                  pwm_freq=20000, min_speed_pc=0, ramp_time=0.0, reverse_delay=0.1,
                  stall_current=None, stall_time=0.5, start_grace=0.3, open_load_current=0.03,
-                 open_load_time=1.0, continuous_current=1.5, overload_time=5.0, policy=None):
+                 open_load_time=1.0, continuous_current=1.5, overload_time=5.0, policy=None,
+                 motor_voltage=None):
         """
         Args:
             name: Motor name within its board.
@@ -766,6 +767,10 @@ class Motor:
             continuous_current: Current (A) the motor may carry continuously.
             overload_time: Seconds above `continuous_current` before an overload fault.
             policy: `FaultPolicy` for this motor.
+            motor_voltage: The motor's rated voltage (V), or `None`. When it is below the
+                board's `supply_voltage`, 100 % speed is scaled to a PWM duty of
+                `motor_voltage / supply_voltage`, so the motor never receives more than its
+                rated average voltage. Requires `supply_voltage` on the board.
 
         Raises:
             ConfigError: An option is out of range.
@@ -774,6 +779,14 @@ class Motor:
             raise ConfigError("min_speed_pc must be 0-99")
         if ramp_time < 0 or reverse_delay < 0:
             raise ConfigError("ramp_time and reverse_delay must be >= 0")
+        supply = getattr(board, "supply_voltage", None)
+        if motor_voltage is not None:
+            if motor_voltage <= 0:
+                raise ConfigError("motor_voltage must be > 0")
+            if supply is None:
+                raise ConfigError("motor_voltage needs supply_voltage on the board")
+        self.motor_voltage = motor_voltage
+        self.max_duty = 1.0 if motor_voltage is None else min(1.0, motor_voltage / supply)
         self.name = name
         self.board = board
         self.mode = mode
@@ -1063,7 +1076,7 @@ class Motor:
     def _speed_to_duty(self, speed_pc):
         if speed_pc <= 0:
             return 0.0
-        return max(speed_pc, self.min_speed_pc) / 100
+        return max(speed_pc, self.min_speed_pc) / 100 * self.max_duty
 
     def _run(self, direction, speed_pc, duration, wait):
         speed_pc = _check_speed(speed_pc)
@@ -1176,7 +1189,7 @@ class MotorBoard:
                  adc=None, a_sense_channel=None, b_sense_channel=None,
                  a_sensor=None, b_sensor=None, sense_samples=None, pins=None,
                  pwm_freq=20000, motor_names=("a", "b"), motor_options=None,
-                 a_options=None, b_options=None, fuse_rating=3.0):
+                 a_options=None, b_options=None, fuse_rating=3.0, supply_voltage=None):
         """
         Args:
             name: Board name, used in `"board.motor"` addresses. Must not contain `.`.
@@ -1188,7 +1201,7 @@ class MotorBoard:
                 drivers are awake without it. Several boards may share it.
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection without a
                 sensor. Must be a different GPIO for each board.
-            mode: `"ph_en"` (JP1 pads 1–2, default) or `"pwm"` (JP1 pads 2–3).
+            mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
             logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is fixed
                 at about 3 A.
             adc: An `ADS1115` for current sensing.
@@ -1205,6 +1218,9 @@ class MotorBoard:
             b_options: Keyword arguments for motor B only.
             fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
                 The on-board 4 A fast-acting (high I2t) fuse allows 3 A continuously.
+            supply_voltage: Motor supply voltage (V), 6–30, or `None`. Required when a motor
+                is given `motor_voltage`: the library then limits that motor's PWM duty so the
+                average voltage across it does not exceed its rating.
 
         Raises:
             ConfigError: Invalid mode, voltage, names or pins, or a `fault_pin` already used by
@@ -1216,6 +1232,12 @@ class MotorBoard:
             raise ConfigError("mode must be 'ph_en' or 'pwm'")
         if logic_voltage < 3.0 or logic_voltage > 5.5:
             raise ConfigError("logic_voltage must be 3.0-5.5 V")
+        if supply_voltage is not None and (supply_voltage < 6.0 or supply_voltage > 30.0):
+            raise ConfigError("supply_voltage must be 6-30 V")
+        if supply_voltage is None:
+            for o in (motor_options, a_options, b_options):
+                if o and "motor_voltage" in o:
+                    raise ConfigError("motor_voltage needs supply_voltage on the board")
         if (b_en is None) != (b_ph is None):
             raise ConfigError("give both b_en and b_ph, or neither")
         used = [p for p in (a_en, a_ph, b_en, b_ph) if p is not None]
@@ -1233,6 +1255,7 @@ class MotorBoard:
         self.name = name
         self.mode = mode
         self.logic_voltage = logic_voltage
+        self.supply_voltage = supply_voltage
         self.fuse_rating = fuse_rating
         self.pins = pins
         self._sleep_pin = sleep_pin
@@ -1779,7 +1802,8 @@ class FaultMonitor:
                 self._drv[key] = now
             elif ticks_diff(now, since) >= DRIVER_FAULT_DEBOUNCE_MS:
                 f = Fault(FaultType.DRIVER_FAULT, "nFAULT low with no motor driven: driver shut down "
-                          "(output short, overcurrent or over-temperature)", board.name, None, None, now)
+                          "(output short, overcurrent or over-temperature) or motor supply below "
+                          "about 4.5 V (supply off, flat battery or fuse blown)", board.name, None, None, now)
                 self._record(f, found)
                 board._report_board_fault(f)
                 self._drv[key] = None

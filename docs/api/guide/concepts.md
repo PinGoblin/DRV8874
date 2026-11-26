@@ -58,6 +58,17 @@ Useful motor options (pass in `motor_options=`, `a_options=` or `b_options=`):
 | `min_speed_pc` | `0` | Raise any non-zero speed to at least this (motor deadband) |
 | `ramp_time` | `0` | Seconds to ramp 0→100 %. Soft start and soft speed changes |
 | `reverse_delay` | `0.1` | Brake time before reversing a running motor |
+| `motor_voltage` | `None` | The motor's rated voltage. Limits PWM duty to `motor_voltage / supply_voltage`, so 100 % speed never over-volts the motor. Needs `supply_voltage=` on the board |
+
+For example, a 6 V motor on a 12 V supply:
+
+```python
+board = MotorBoard(a_en=12, a_ph=5, supply_voltage=12.0,
+                   a_options=dict(motor_voltage=6.0))
+board.motor_a.forward(100)     # 50 % duty: 6 V average across the motor
+```
+
+See [Choosing a motor](../../guide/choosing-a-motor.md) for which motors suit the board.
 
 The fault-detection options are covered in [Faults](faults.md). The full list is in the
 [`Motor`][pingoblin_motor.motor.Motor] reference.

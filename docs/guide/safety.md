@@ -8,7 +8,9 @@ Read these before connecting power.
 
 - **Do not exceed 30 V on the motor supply, including supply tolerance.** A supply labelled 30 V can
   measure higher: check it with a meter, or use a lower voltage. The surge suppressor
-  starts conducting at about 33 V and is not meant to carry continuous current.
+  starts conducting at about 33 V and is not meant to carry continuous current. A higher
+  supply, such as a 36 V battery, destroys the surge suppressor (D2) and then blows the
+  fuse (F1). Both must then be replaced.
 - **Connect GND between the board and the host.** J3 pin 1 must go to a host GND pin.
 - **Wire with the power off.** Connect and disconnect motors only while the supply is off.
 - **The drivers get hot.** At high currents the chips and the board around them can exceed

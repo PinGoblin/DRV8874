@@ -52,12 +52,12 @@ class ControlMode(enum.Enum):
     """Control mode, set by the PMODE jumper JP1 on the board.
 
     Attributes:
-        PH_EN: Default (JP1 pads 1–2): EN = speed PWM, PH = direction.
-        PWM: JP1 pads 2–3: IN1 / IN2. Allows per-motor coast.
+        PH_EN: Default (JP1 open): EN = speed PWM, PH = direction.
+        PWM: JP1 bridged: IN1 / IN2. Allows per-motor coast.
     """
 
-    PH_EN = "ph_en"   #: default (JP1 pads 1-2): EN = speed PWM, PH = direction
-    PWM = "pwm"       #: JP1 pads 2-3: IN1/IN2
+    PH_EN = "ph_en"   #: default (JP1 open): EN = speed PWM, PH = direction
+    PWM = "pwm"       #: JP1 bridged: IN1/IN2
 
 
 class Motor:
@@ -88,7 +88,8 @@ class Motor:
                  stall_current: Optional[float] = None, stall_time: float = 0.5,
                  start_grace: float = 0.3, open_load_current: float = 0.03,
                  open_load_time: float = 1.0, continuous_current: float = 1.5,
-                 overload_time: float = 5.0, policy: Optional[FaultPolicy] = None):
+                 overload_time: float = 5.0, policy: Optional[FaultPolicy] = None,
+                 motor_voltage: Optional[float] = None):
         """
         Args:
             name: Motor name within its board, for example `"a"` or `"left"`.
@@ -115,6 +116,10 @@ class Motor:
             continuous_current: Current (A) the motor may carry continuously.
             overload_time: Seconds above `continuous_current` before an overload fault.
             policy: [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy] for this motor.
+            motor_voltage: The motor's rated voltage (V), or `None`. When it is below the
+                board's `supply_voltage`, 100 % speed is scaled to a PWM duty of
+                `motor_voltage / supply_voltage`, so the motor never receives more than its
+                rated average voltage. Requires `supply_voltage` on the board.
 
         Raises:
             ConfigError: An option is out of range.
@@ -123,6 +128,14 @@ class Motor:
             raise ConfigError("min_speed_pc must be 0-99")
         if ramp_time < 0 or reverse_delay < 0:
             raise ConfigError("ramp_time and reverse_delay must be >= 0")
+        supply = getattr(board, "supply_voltage", None)
+        if motor_voltage is not None:
+            if motor_voltage <= 0:
+                raise ConfigError("motor_voltage must be > 0")
+            if supply is None:
+                raise ConfigError("motor_voltage needs supply_voltage on the board")
+        self.motor_voltage = motor_voltage
+        self.max_duty = 1.0 if motor_voltage is None else min(1.0, motor_voltage / supply)
         self.name = name
         self.board = board
         self.mode = mode
@@ -433,7 +446,7 @@ class Motor:
         if speed_pc <= 0:
             return 0.0
         speed_pc = max(speed_pc, self.min_speed_pc)
-        return speed_pc / 100.0
+        return speed_pc / 100.0 * self.max_duty
 
     def _run(self, direction: Direction, speed_pc: float, duration, wait) -> None:
         speed_pc = self._check_speed(speed_pc)

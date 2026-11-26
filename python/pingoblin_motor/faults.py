@@ -24,7 +24,7 @@ class FaultType(enum.Enum):
     |---|---|---|
     | `STALL` | Motor current at or above `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` when there is no sensor | No |
     | `CURRENT_LIMIT` | nFAULT low while a motor is driven. A warning, repeated at most every 5 s | No |
-    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | No |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown, or motor supply below about 4.5 V | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % duty or more: motor disconnected, broken wire, motor supply off or board fuse blown | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
     | `BOARD_OVERLOAD` | Board supply current above the 3 A continuous board rating for 1 s | Yes |
@@ -38,7 +38,8 @@ class FaultType(enum.Enum):
     #: Driver is chopping at its current limit (short events). A warning only.
     CURRENT_LIMIT = "current_limit"
     #: nFAULT stays low while no motor on the board is driven: overcurrent
-    #: shutdown (shorted output) or over-temperature shutdown.
+    #: shutdown (shorted output), over-temperature shutdown, or a motor supply
+    #: below the driver's undervoltage threshold (about 4.5 V).
     DRIVER_FAULT = "driver_fault"
     #: Motor commanded to run but draws (almost) no current: motor disconnected,
     #: broken wire, motor supply off or board fuse blown. Needs a sensor.

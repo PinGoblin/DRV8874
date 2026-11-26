@@ -14,7 +14,11 @@ Each motor has a FWD and a REV button that runs it at full speed while held, in 
   from any source, such as a USB 5 V lead, and connect GND to J3 pin 1. They do nothing
   while nSLEEP (J3 pin 9) is held low.
 - They are safe to press while a host is connected, even if the host is driving the pins
-  low: 1 kΩ resistors protect the host's GPIOs.
+  low: 1 kΩ resistors protect the host's GPIOs. A pressed button drives its inputs high
+  whatever the host does, but cannot drive them low. For example, if the host holds PH
+  high, REV runs the motor forward.
+- They always drive the motor at 100 % duty, that is, at the full supply voltage. Do not
+  use them with a motor rated below the supply voltage.
 - They work as described here only in PH/EN mode (the default jumper setting). In PWM
   mode FWD brakes the motor and REV runs it forward.
 

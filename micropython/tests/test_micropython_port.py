@@ -363,3 +363,33 @@ def test_fault_pin_must_be_separate_per_board():
     assert 20 not in P(pins)
     a.close()
     MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, fault_pin=19, pins=pins).close()
+
+
+def test_motor_voltage_caps_duty():
+    b, pins, *_ = make_board(supply_voltage=12.0,
+                             a_options=dict(motor_voltage=6.0, reverse_delay=0),
+                             b_options=dict(motor_voltage=24.0, reverse_delay=0))
+    assert b.motor_a.max_duty == pytest.approx(0.5)
+    assert b.motor_b.max_duty == 1.0
+    b.motor_a.forward(100)
+    assert P(pins)[12].duty == pytest.approx(0.5)
+    b.motor_a.forward(50)
+    assert P(pins)[12].duty == pytest.approx(0.25)
+    b.motor_b.forward(100)
+    assert P(pins)[13].duty == pytest.approx(1.0)
+    b.close()
+
+
+def test_motor_voltage_needs_supply_voltage():
+    with pytest.raises(ConfigError):
+        make_board(a_options=dict(motor_voltage=6.0))
+    with pytest.raises(ConfigError):
+        make_board(name="b2", supply_voltage=40.0)
+
+
+def test_motor_voltage_error_leaves_pins_free():
+    pins = MockPins()
+    with pytest.raises(ConfigError):
+        make_board(pins=pins, a_options=dict(motor_voltage=6.0))
+    b, *_ = make_board(pins=pins)
+    b.close()

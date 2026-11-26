@@ -38,6 +38,7 @@ nav:
       - Powering the board: guide/power.md
       - J3 pinout: guide/j3-pinout.md
       - Quick start: guide/quick-start.md
+      - Choosing a motor: guide/choosing-a-motor.md
       - Controlling the motors: guide/controlling-motors.md
       - Test buttons and LEDs: guide/buttons-leds.md
       - Current sensing and current limit: guide/current-sensing.md

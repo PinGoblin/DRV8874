@@ -56,7 +56,7 @@ class MotorBoard:
                  backend: Optional[Backend] = None, pwm_frequency: float = 1000.0,
                  motor_names=("a", "b"), motor_options: Optional[dict] = None,
                  a_options: Optional[dict] = None, b_options: Optional[dict] = None,
-                 fuse_rating: float = 3.0):
+                 fuse_rating: float = 3.0, supply_voltage: Optional[float] = None):
         """
         Args:
             name: Board name, used in `"board.motor"` addresses. Must not contain `.`.
@@ -69,7 +69,7 @@ class MotorBoard:
                 [`sleep()`][pingoblin_motor.board.MotorBoard.sleep]. Several boards may share it.
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection
                 without a current sensor. Must be a different GPIO for each board.
-            mode: `"ph_en"` (JP1 pads 1–2, default) or `"pwm"` (JP1 pads 2–3).
+            mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
             logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is
                 fixed at about 3 A whatever the logic voltage.
             adc: An [`ADS1115`][pingoblin_motor.sensors.ADS1115] for current sensing.
@@ -88,6 +88,9 @@ class MotorBoard:
             b_options: Keyword arguments for motor B only.
             fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
                 The on-board 4 A fast-acting (high I2t) fuse allows 3 A continuously.
+            supply_voltage: Motor supply voltage (V), 6–30, or `None`. Required when a motor
+                is given `motor_voltage`: the library then limits that motor's PWM duty so the
+                average voltage across it does not exceed its rating.
 
         Raises:
             ConfigError: Invalid mode, voltage, names or pins, or a `fault_pin` already used
@@ -99,6 +102,11 @@ class MotorBoard:
             raise ConfigError("mode must be 'ph_en' or 'pwm'") from None
         if not 3.0 <= logic_voltage <= 5.5:
             raise ConfigError("logic_voltage must be 3.0-5.5 V")
+        if supply_voltage is not None and not 6.0 <= supply_voltage <= 30.0:
+            raise ConfigError("supply_voltage must be 6-30 V")
+        if supply_voltage is None and any("motor_voltage" in (o or {})
+                                          for o in (motor_options, a_options, b_options)):
+            raise ConfigError("motor_voltage needs supply_voltage on the board")
         if (b_en is None) != (b_ph is None):
             raise ConfigError("give both b_en and b_ph, or neither")
         pins = [p for p in (a_en, a_ph, b_en, b_ph) if p is not None]
@@ -118,6 +126,7 @@ class MotorBoard:
                                   "give each board its own nFAULT line")
         self.name = name
         self.logic_voltage = logic_voltage
+        self.supply_voltage = supply_voltage
         self.fuse_rating = fuse_rating
         self.backend = backend
         self._sleep_pin, self._fault_pin = sleep_pin, fault_pin
