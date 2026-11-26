@@ -1608,7 +1608,7 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>10</td>
 <td>nFAULT</td>
 <td>Output</td>
-<td>Low = fault or current limiting</td>
+<td>Low = fault or current limiting. One GPIO per board</td>
 <td>Same</td>
 <td>Low = driver fault</td>
 </tr>
@@ -1616,9 +1616,9 @@ mode." src="../../images/j3-pinout.svg" /></p>
 <td>9</td>
 <td>nSLEEP</td>
 <td>Input</td>
-<td>Low = sleep, both motors coast</td>
+<td>Low or open = sleep, motors coast. Drive high to run</td>
 <td>Same</td>
-<td>Must be driven high to run. Needs a GPIO and a 4.7 kΩ pull-down</td>
+<td>Same. Use a GPIO: never link to VLOGIC</td>
 </tr>
 <tr>
 <td>8</td>
@@ -1686,11 +1686,16 @@ mode." src="../../images/j3-pinout.svg" /></p>
 </tr>
 </tbody>
 </table>
-<p>All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Inputs
-have pull-downs (pull-up on nSLEEP), so unused inputs can be left open in PH/EN and PWM
-modes. In four-motor mode an open input turns its motor <strong>on</strong>: see
-<a href="../four-motor-mode/">Four-motor mode</a>. nFAULT is
-open-drain with a 10 kΩ pull-up to VLOGIC. The ISENSE outputs never exceed VLOGIC.</p>
+<p>All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Every
+input, nSLEEP included, has a 10 kΩ pull-down on the board, so the drivers sleep until
+the host drives nSLEEP high, and unused EN/PH inputs can be left open in PH/EN and PWM
+modes. In four-motor mode an open input turns its motor <strong>on</strong> whenever the drivers are
+awake: see <a href="../four-motor-mode/">Four-motor mode</a>.</p>
+<p>nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give
+each board its own nFAULT GPIO: see <a href="../daisy-chain/">Daisy-chaining boards</a>.</p>
+<p>In PH/EN and PWM modes the current limit keeps ISENSE at or below about 0.4 × VLOGIC.
+In four-motor mode there is no current limit, and ISENSE can rise to about 4.5 V, above
+a 3.3 V host's supply. See <a href="../four-motor-mode/#current-sensing">Four-motor mode</a>.</p>
 <p>Signal names: <strong>EN</strong> = enable (on/off and PWM speed), <strong>PH</strong> = phase (direction),
 <strong>IN1 / IN2</strong> = input 1 / input 2 (PWM mode), <strong>ISENSE</strong> = current sense output. A leading
 <strong>n</strong> (nSLEEP, nFAULT) means the signal is active when low.</p>

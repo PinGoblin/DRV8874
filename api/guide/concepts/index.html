@@ -1804,7 +1804,7 @@
 <tbody>
 <tr>
 <td><a class="autorefs autorefs-internal" title="            MotorBoard" href="../../reference/board/#pingoblin_motor.board.MotorBoard"><code>MotorBoard</code></a></td>
-<td>One Board A: two motors plus the shared nSLEEP and nFAULT lines</td>
+<td>One Board A: two motors (four in four-motor mode) plus its nSLEEP and nFAULT lines</td>
 </tr>
 <tr>
 <td><a class="autorefs autorefs-internal" title="            Motor" href="../../reference/motor/#pingoblin_motor.motor.Motor"><code>Motor</code></a></td>
@@ -1853,8 +1853,8 @@
     <span class="s2">"front"</span><span class="p">,</span>                     <span class="c1"># board name, used in "front.a"</span>
     <span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>             <span class="c1"># J3 pins 3, 4</span>
     <span class="n">b_en</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>             <span class="c1"># J3 pins 5, 6 (optional)</span>
-    <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span>                <span class="c1"># J3 pin 9 (optional; needed for coast in PH/EN mode)</span>
-    <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>                <span class="c1"># J3 pin 10 (optional; needed for stall detection without a sensor)</span>
+    <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span>                <span class="c1"># J3 pin 9: the board sleeps until this is driven high</span>
+    <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>                <span class="c1"># J3 pin 10 (optional; one GPIO per board)</span>
     <span class="n">mode</span><span class="o">=</span><span class="s2">"ph_en"</span><span class="p">,</span>                <span class="c1"># "ph_en" (JP1 pads 1-2, default), "pwm" (JP1 pads 2-3)</span>
                                  <span class="c1"># or "independent" (JP1 open: four-motor mode)</span>
     <span class="n">logic_voltage</span><span class="o">=</span><span class="mf">3.3</span><span class="p">,</span>           <span class="c1"># VLOGIC: sets the current limit (about 2.0 A at 3.3 V, 3.0 A at 5 V)</span>
@@ -1862,6 +1862,9 @@
     <span class="n">motor_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">ramp_time</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>   <span class="c1"># options for both motors</span>
 <span class="p">)</span>
 </code></pre></div>
+<p><code>sleep_pin</code> can only be left out if J3 pin 9 is linked to VLOGIC (pin 2), because the
+board pulls nSLEEP low. Several boards can share one <code>sleep_pin</code>, but each needs its own
+<code>fault_pin</code>.</p>
 <p>Boards work as context managers (<code>with MotorBoard(...) as board:</code>), which brake the motors
 and release the pins on exit.</p>
 <h2 id="speed-and-direction">Speed and direction<a class="headerlink" href="#speed-and-direction" title="Permanent link">&para;</a></h2>
@@ -1952,11 +1955,11 @@ B_PH → <code>b2</code>.</p>
 <span class="n">board</span><span class="o">.</span><span class="n">driver_current</span><span class="p">(</span><span class="s2">"a"</span><span class="p">)</span>           <span class="c1"># pump + fan together, if a sensor is configured</span>
 </code></pre></div>
 <ul>
-<li><code>sleep_pin</code> is required. The drivers stay asleep until the first run command, and
+<li><code>sleep_pin</code> is required, and J3 pin 9 must never be linked to VLOGIC in this mode. The
+  drivers stay asleep until the first run command, and
   <a class="autorefs autorefs-internal" title="            close" href="../../reference/board/#pingoblin_motor.board.MotorBoard.close"><code>close()</code></a> puts them to sleep before releasing
-  the pins. Fit the 4.7 kΩ nSLEEP pull-down described in
-  <a href="../../../guide/four-motor-mode/">Four-motor mode</a>, so the motors stay off whenever your
-  program isn't running.</li>
+  the pins. The board's pull-down on nSLEEP then keeps the motors off whenever your program
+  isn't running. See <a href="../../../guide/four-motor-mode/">Four-motor mode</a>.</li>
 <li><code>reverse()</code>, negative speeds and <code>invert</code> raise errors. <code>board.motor_a</code> and
   <code>board.motor_b</code> raise <a class="autorefs autorefs-internal" title="            ConfigError" href="../../reference/faults/#pingoblin_motor.faults.ConfigError"><code>ConfigError</code></a>: use the names.</li>
 <li><code>coast()</code> sleeps the drivers, so it only coasts when every other motor on the nSLEEP

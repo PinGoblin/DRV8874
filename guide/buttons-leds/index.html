@@ -1682,8 +1682,11 @@ check the wiring before writing any code.</p>
 </tbody>
 </table>
 <ul>
-<li>The buttons need VLOGIC (J3 pin 2). With no host connected, feed 3.3–5 V to VLOGIC from
-  any source, such as a USB 5 V lead, and GND to J3 pin 1.</li>
+<li>The buttons need VLOGIC (J3 pin 2) and the drivers awake (nSLEEP, J3 pin 9, high).
+  With a host connected, they work while your program holds nSLEEP high. With no host,
+  feed 3.3–5 V to VLOGIC from any source, such as a USB 5 V lead, connect GND to J3 pin 1,
+  and link J3 pin 9 to pin 2 while you test. Don't use this link in
+  <a href="../four-motor-mode/">four-motor mode</a>.</li>
 <li>They are safe to press while a host is connected, even if the host is driving the pins
   low: 1 kΩ resistors protect the host's GPIOs.</li>
 <li>They work as described here only in PH/EN mode (the default jumper setting). In PWM

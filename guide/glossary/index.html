@@ -1764,12 +1764,12 @@
 <tr>
 <td>nFAULT</td>
 <td>Not fault</td>
-<td>J3 output that goes low on a fault or while current limiting</td>
+<td>J3 output that goes low on a fault or while current limiting. Use one host GPIO per board</td>
 </tr>
 <tr>
 <td>nSLEEP</td>
 <td>Not sleep</td>
-<td>J3 input. Low puts both drivers to sleep (motors coast)</td>
+<td>J3 input. Low (the default, set by a pull-down on the board) puts both drivers to sleep and the motors coast. The host drives it high to run the motors</td>
 </tr>
 <tr>
 <td>OUT1 / OUT2</td>

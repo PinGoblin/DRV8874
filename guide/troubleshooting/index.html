@@ -1602,8 +1602,8 @@
 </tr>
 <tr>
 <td>Power LED on, motors do nothing, buttons do nothing</td>
-<td>VLOGIC missing, or nSLEEP held low</td>
-<td>Feed 3.3–5 V to J3 pin 2 and connect GND (pin 1). Disconnect or drive nSLEEP (pin 9) high</td>
+<td>VLOGIC missing, or nSLEEP not driven high (the board pulls it low)</td>
+<td>Feed 3.3–5 V to J3 pin 2 and connect GND (pin 1). Drive nSLEEP (pin 9) high from the host (pass <code>sleep_pin=</code> to the library), or link pin 9 to pin 2 for button tests</td>
 </tr>
 <tr>
 <td>Buttons work, host code does nothing</td>
@@ -1617,8 +1617,13 @@
 </tr>
 <tr>
 <td>Motors run as soon as power is applied, or keep running after the program stops</td>
-<td>JP1 open (four-motor mode) without the nSLEEP pull-down</td>
-<td>Fit 4.7 kΩ from J3 pin 9 to pin 1 and wire nSLEEP to a GPIO. See <a href="../four-motor-mode/">Four-motor mode</a>. If you didn't mean to use four-motor mode, bridge JP1 pads 1–2</td>
+<td>JP1 open (four-motor mode) with nSLEEP held high: linked to VLOGIC, or a GPIO left high</td>
+<td>Wire nSLEEP to a GPIO that your program drives low when it stops. See <a href="../four-motor-mode/">Four-motor mode</a>. If you didn't mean to use four-motor mode, bridge JP1 pads 1–2</td>
+</tr>
+<tr>
+<td>A fault on one board stops motors on every board, or the library says the <code>fault_pin</code> is already used</td>
+<td>Boards share an nFAULT line</td>
+<td>Give each board its own nFAULT GPIO: see <a href="../daisy-chain/">Daisy-chaining boards</a></td>
 </tr>
 <tr>
 <td>Four-motor mode: a motor runs when it should be off, and the reverse</td>

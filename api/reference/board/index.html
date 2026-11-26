@@ -2142,9 +2142,14 @@
 
 
         <p>One Board A dual DC motor driver.</p>
-<p>Pins are BCM GPIO numbers. Motor B is optional. Several boards can share <code>sleep_pin</code>
-(one e-stop line) and <code>fault_pin</code> (wired-OR fault line): pass the same GPIO to each
-board. Boards work as context managers and close on exit.</p>
+<p>Pins are BCM GPIO numbers. Motor B is optional. Boards work as context managers and
+close on exit.</p>
+<p>The board pulls nSLEEP low, so its drivers sleep (motors off) until <code>sleep_pin</code> is
+driven high. The library drives it high at start-up and wakes the board before every
+run command. Several boards can share one <code>sleep_pin</code> (one e-stop line). Each board
+needs its <strong>own</strong> <code>fault_pin</code>: a shared fault line overloads the nFAULT outputs and
+hides which board faulted, so a <code>fault_pin</code> already used by another open board is
+rejected.</p>
 <p>The <code>mode</code> must match the PMODE jumper JP1:</p>
 <table>
 <thead>
@@ -2196,10 +2201,10 @@ board. Boards work as context managers and close on exit.</p>
     <span class="n">board</span><span class="p">[</span><span class="s2">"a1"</span><span class="p">]</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
     <span class="n">board</span><span class="p">[</span><span class="s2">"b2"</span><span class="p">]</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-<p>In this mode an input that isn't driven turns its motor <strong>on</strong>. The board must have
-<code>sleep_pin</code> wired, with a 4.7 kΩ resistor from J3 pin 9 to GND, so the drivers
-sleep whenever your program isn't holding nSLEEP high. The library keeps the drivers
-asleep until the first run command, and puts them to sleep in
+<p>In this mode an input that isn't driven turns its motor <strong>on</strong>. <code>sleep_pin</code> is
+required: the board's pull-down on nSLEEP then keeps the drivers asleep whenever
+your program isn't holding it high. The library keeps the drivers asleep until the
+first run command, and puts them to sleep in
 <a class="autorefs autorefs-internal" title="            close" href="#pingoblin_motor.board.MotorBoard.close"><code>close()</code></a>.</p>
 </details>
 
@@ -2304,9 +2309,11 @@ asleep until the first run command, and puts them to sleep in
             </td>
             <td>
               <div class="doc-md-description">
-                <p>GPIO for nSLEEP (J3 pin 9), or <code>None</code>. Needed to coast in PH/EN mode and
-for <a class="autorefs autorefs-internal" title="            sleep" href="#pingoblin_motor.board.MotorBoard.sleep"><code>sleep()</code></a>. Required in
-four-motor mode.</p>
+                <p>GPIO for nSLEEP (J3 pin 9). The board pulls nSLEEP low, so the motors
+only run while this pin is driven high. Pass <code>None</code> only if J3 pin 9 is linked
+to VLOGIC (pin 2); the board then can't coast in PH/EN mode or
+<a class="autorefs autorefs-internal" title="            sleep" href="#pingoblin_motor.board.MotorBoard.sleep"><code>sleep()</code></a>. Required in four-motor
+mode. Several boards may share it.</p>
               </div>
             </td>
             <td>
@@ -2323,7 +2330,7 @@ four-motor mode.</p>
             <td>
               <div class="doc-md-description">
                 <p>GPIO for nFAULT (J3 pin 10), or <code>None</code>. Needed for stall detection
-without a current sensor.</p>
+without a current sensor. Must be a different GPIO for each board.</p>
               </div>
             </td>
             <td>
@@ -2596,8 +2603,8 @@ four-motor mode they apply to A1 and A2.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Invalid mode, voltage, names or pins, or four-motor mode without
-<code>sleep_pin</code>.</p>
+                <p>Invalid mode, voltage, names or pins, four-motor mode without
+<code>sleep_pin</code>, or a <code>fault_pin</code> already used by another open board.</p>
               </div>
             </td>
           </tr>

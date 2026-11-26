@@ -1612,8 +1612,8 @@ current-sense output you can read with an ADC.</p>
 <li>Push buttons to test each motor without writing code</li>
 <li>Direction LEDs per motor, plus power and fault LEDs</li>
 <li>Power through-terminal for daisy-chaining several boards from one supply</li>
-<li>Safe start-up: motors stay off while the host boots (in four-motor mode this needs a
-  4.7 kΩ resistor on nSLEEP)</li>
+<li>Safe start-up: the drivers sleep until the host enables them, so motors stay off while
+  the host boots, in every mode</li>
 </ul>
 <h2 id="where-to-start">Where to start<a class="headerlink" href="#where-to-start" title="Permanent link">&para;</a></h2>
 <ol>

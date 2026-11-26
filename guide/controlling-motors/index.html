@@ -1689,7 +1689,7 @@ on and sets the speed with PWM (pulse-width modulation), and <strong>PH</strong>
 </thead>
 <tbody>
 <tr>
-<td>High (default)</td>
+<td>High</td>
 <td>Low</td>
 <td>Any</td>
 <td>Low</td>
@@ -1716,7 +1716,7 @@ on and sets the speed with PWM (pulse-width modulation), and <strong>PH</strong>
 <td>Red</td>
 </tr>
 <tr>
-<td>Low</td>
+<td>Low (default)</td>
 <td>Any</td>
 <td>Any</td>
 <td>Open</td>
@@ -1735,10 +1735,13 @@ duty cycle maps to speed in each mode, and the limits at very low and 100% duty.
 briefly before reversing a heavily loaded motor. The library does this for you: it brakes
 for <code>reverse_delay</code> (0.1 s by default) before reversing a running motor.</p>
 <p><strong>Sleep / emergency stop:</strong> pull nSLEEP low to put both drivers to sleep (outputs open,
-motors coast). Wake-up takes about 1 ms. nSLEEP is pulled high on the board, so the
-drivers are awake whenever VLOGIC is present.</p>
-<p><strong>Start-up behaviour:</strong> EN and PH have pull-down resistors, so while the host is booting
-(pins floating) both motors are held in brake.</p>
+motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-down on the board, so
+the drivers sleep until the host drives it high: your program must do this before the
+motors will run. The library does it for you.</p>
+<p><strong>Start-up behaviour:</strong> nSLEEP, EN and PH all have 10 kΩ pull-downs, so while the host is
+booting, and after your program exits, the drivers sleep and the motors coast. If the
+motor's load can turn it backwards (a lift, an arm, a robot parked on a slope), have your
+program wake the board with EN low as soon as it starts: the motor is then braked.</p>
 <p>"Forward" and "reverse" here follow TI's convention for the DRV8874: PH high = forward, with
 OUT1 positive (green LED). Which way the shaft actually turns depends on how the motor is
 wired; swap its two leads, or use <code>invert=True</code> in the library, to change it.</p>
@@ -1757,6 +1760,7 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">PWM</span><span class="p">,</span> <span class="n">ADC</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
+<span class="n">SLEEP</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>             <span class="c1"># J3 pin 9: high = drivers awake</span>
 <span class="n">A_EN</span> <span class="o">=</span> <span class="n">PWM</span><span class="p">(</span><span class="n">Pin</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">duty_u16</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># J3 pin 3</span>
 <span class="n">A_PH</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>              <span class="c1"># J3 pin 4</span>
 <span class="n">A_SENSE</span> <span class="o">=</span> <span class="n">ADC</span><span class="p">(</span><span class="n">Pin</span><span class="p">(</span><span class="mi">34</span><span class="p">));</span> <span class="n">A_SENSE</span><span class="o">.</span><span class="n">atten</span><span class="p">(</span><span class="n">ADC</span><span class="o">.</span><span class="n">ATTN_11DB</span><span class="p">)</span>  <span class="c1"># J3 pin 7</span>
@@ -1782,9 +1786,10 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">gpiozero</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhaseEnableMotor</span><span class="p">,</span> <span class="n">DigitalInputDevice</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">gpiozero</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhaseEnableMotor</span><span class="p">,</span> <span class="n">DigitalInputDevice</span><span class="p">,</span> <span class="n">DigitalOutputDevice</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
 
+<span class="n">wake</span> <span class="o">=</span> <span class="n">DigitalOutputDevice</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>   <span class="c1"># J3 pin 9: high = drivers awake</span>
 <span class="n">motor_a</span> <span class="o">=</span> <span class="n">PhaseEnableMotor</span><span class="p">(</span><span class="n">phase</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">enable</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>   <span class="c1"># J3 pins 4, 3</span>
 <span class="n">motor_b</span> <span class="o">=</span> <span class="n">PhaseEnableMotor</span><span class="p">(</span><span class="n">phase</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">enable</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>   <span class="c1"># J3 pins 6, 5</span>
 <span class="n">motor_a</span><span class="o">.</span><span class="n">enable_device</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mi">1000</span>           <span class="c1"># software PWM</span>

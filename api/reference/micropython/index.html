@@ -5695,7 +5695,7 @@ types use <code>DEFAULT_ACTIONS</code>.</p>
 
 
 
-        <p>Creates pins and shares them by GPIO number, so boards can share nSLEEP and nFAULT.</p>
+        <p>Creates pins and shares them by GPIO number, so boards can share one nSLEEP line.</p>
 <p>A shared pin is closed when the last user releases it. Subclasses implement
 <code>_make_output()</code>, <code>_make_pwm()</code> and <code>_make_input()</code>.</p>
 
@@ -9233,10 +9233,14 @@ so on). Direction, sensor and current options have no effect.</p>
 </tr>
 </tbody>
 </table>
-<p>In four-motor mode an input that isn't driven turns its motor <strong>on</strong>. Wire <code>sleep_pin</code>
-and fit a 4.7 kΩ resistor from J3 pin 9 to GND, so the drivers sleep unless your
-program holds nSLEEP high. The library keeps the drivers asleep until the first run
-command and puts them to sleep in <code>close()</code>.</p>
+<p>The board pulls nSLEEP low, so its drivers sleep (motors off) until <code>sleep_pin</code> is
+driven high. The library drives it high at start-up and wakes the board before every
+run command. Several boards can share one <code>sleep_pin</code> (one e-stop line). Each board
+needs its <strong>own</strong> <code>fault_pin</code>: a <code>fault_pin</code> already used by another open board is
+rejected.</p>
+<p>In four-motor mode an input that isn't driven turns its motor <strong>on</strong>, so <code>sleep_pin</code>
+is required. The library keeps the drivers asleep until the first run command and puts
+them to sleep in <code>close()</code>.</p>
 
 
 <details class="example" open>
@@ -9345,7 +9349,9 @@ command and puts them to sleep in <code>close()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>GPIO for nSLEEP (J3 pin 9), or <code>None</code>. Required in four-motor mode.</p>
+                <p>GPIO for nSLEEP (J3 pin 9). The board pulls nSLEEP low, so the motors only
+run while this pin is driven high. <code>None</code> only if J3 pin 9 is linked to VLOGIC.
+Required in four-motor mode. Several boards may share it.</p>
               </div>
             </td>
             <td>
@@ -9360,7 +9366,8 @@ command and puts them to sleep in <code>close()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>GPIO for nFAULT (J3 pin 10), or <code>None</code>. Needed for stall detection without a sensor.</p>
+                <p>GPIO for nFAULT (J3 pin 10), or <code>None</code>. Needed for stall detection without a
+sensor. Must be a different GPIO for each board.</p>
               </div>
             </td>
             <td>
@@ -9613,8 +9620,8 @@ four-motor mode. Default <code>("a", "b")</code> or <code>("a1", "a2", "b1", "b2
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Invalid mode, voltage, names or pins, or four-motor mode without
-<code>sleep_pin</code>.</p>
+                <p>Invalid mode, voltage, names or pins, four-motor mode without
+<code>sleep_pin</code>, or a <code>fault_pin</code> already used by another open board.</p>
               </div>
             </td>
           </tr>
