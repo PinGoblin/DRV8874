@@ -721,6 +721,78 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#phen-mode-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PH/EN mode (default)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pwm-mode-in1in2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PWM mode (IN1/IN2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#speed-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speed control
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Speed control">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#practical-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sleep-emergency-stop-and-start-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sleep, emergency stop and start-up
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#driving-the-pins-directly" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1622,6 +1694,78 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#phen-mode-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PH/EN mode (default)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pwm-mode-in1in2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PWM mode (IN1/IN2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#speed-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speed control
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Speed control">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#practical-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sleep-emergency-stop-and-start-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sleep, emergency stop and start-up
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#driving-the-pins-directly" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1670,17 +1814,23 @@
 </ul>
 <p>The <a href="../glossary/">Glossary</a> lists every abbreviation used in this manual.</p>
 </div>
-<p>This page covers the two-motor modes. For up to four one-direction motors, see
+<p>The board has three control modes, selected with the <a href="../configuration/">PMODE jumper JP1</a>.
+This page covers the two modes that drive two motors in both directions: PH/EN mode (the
+default) and PWM mode. For up to four one-direction motors, see
 <a href="../four-motor-mode/">Four-motor mode</a>.</p>
-<p>In the default PH/EN (phase/enable) mode, each motor needs two pins: <strong>EN</strong> (enable) turns it
-on and sets the speed with PWM (pulse-width modulation), and <strong>PH</strong> (phase) sets the direction. This is the same scheme as gpiozero's
-<code>PhaseEnableMotor</code>, except that gpiozero calls PH low "forward" (see below). The table is for motor A; motor B is identical using B_EN and B_PH.</p>
+<p>The tables on this page are for motor A. Motor B is identical, using B_EN and B_PH (J3
+pins 5 and 6).</p>
+<h2 id="phen-mode-default">PH/EN mode (default)<a class="headerlink" href="#phen-mode-default" title="Permanent link">&para;</a></h2>
+<p>JP1 pads 1–2 bridged (as supplied). Each motor uses two pins: <strong>EN</strong> (enable) turns the
+motor on and sets its speed with PWM, and <strong>PH</strong> (phase) sets the direction. One PWM
+channel per motor is enough. This is the same scheme as gpiozero's <code>PhaseEnableMotor</code>,
+except that gpiozero calls PH low "forward" (see <a href="#direction">Direction</a>).</p>
 <table>
 <thead>
 <tr>
 <th>nSLEEP</th>
-<th>A_EN</th>
-<th>A_PH</th>
+<th>A_EN (pin 3)</th>
+<th>A_PH (pin 4)</th>
 <th>OUT1</th>
 <th>OUT2</th>
 <th>Motor</th>
@@ -1688,6 +1838,15 @@ on and sets the speed with PWM (pulse-width modulation), and <strong>PH</strong>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>Low (default)</td>
+<td>Any</td>
+<td>Any</td>
+<td>Open</td>
+<td>Open</td>
+<td>Coast (sleep, near-zero current)</td>
+<td>Off</td>
+</tr>
 <tr>
 <td>High</td>
 <td>Low</td>
@@ -1715,6 +1874,33 @@ on and sets the speed with PWM (pulse-width modulation), and <strong>PH</strong>
 <td>Reverse</td>
 <td>Red</td>
 </tr>
+</tbody>
+</table>
+<p><strong>Speed:</strong> drive EN with PWM. The duty cycle sets the speed. During the PWM off-time the
+motor brakes, which gives a firm, close-to-linear response. The library's <code>speed_pc</code>
+(0–100) is the EN duty cycle.</p>
+<p><strong>Coast:</strong> in PH/EN mode a motor can only coast by putting the drivers to sleep, and
+nSLEEP is shared by both motors. The library's <code>coast()</code> therefore sleeps the board only
+when the other motor is idle, and otherwise brakes.</p>
+<p><strong>Test buttons:</strong> FWD runs the motor forward and REV runs it in reverse, at full speed
+while held. See <a href="../buttons-leds/">Test buttons and LEDs</a>.</p>
+<h2 id="pwm-mode-in1in2">PWM mode (IN1/IN2)<a class="headerlink" href="#pwm-mode-in1in2" title="Permanent link">&para;</a></h2>
+<p>JP1 pads 2–3 bridged. Each pin drives one side of the motor directly, as on two-input
+drivers such as the L298N and DRV8833. PWM mode lets each motor coast on its own, without
+sleeping the board, but needs PWM on both pins for full control.</p>
+<table>
+<thead>
+<tr>
+<th>nSLEEP</th>
+<th>A_EN = IN1 (pin 3)</th>
+<th>A_PH = IN2 (pin 4)</th>
+<th>OUT1</th>
+<th>OUT2</th>
+<th>Motor</th>
+<th>LED</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>Low (default)</td>
 <td>Any</td>
@@ -1724,36 +1910,153 @@ on and sets the speed with PWM (pulse-width modulation), and <strong>PH</strong>
 <td>Coast (sleep, near-zero current)</td>
 <td>Off</td>
 </tr>
+<tr>
+<td>High</td>
+<td>Low</td>
+<td>Low</td>
+<td>Open</td>
+<td>Open</td>
+<td>Coast</td>
+<td>Off</td>
+</tr>
+<tr>
+<td>High</td>
+<td>High</td>
+<td>Low</td>
+<td>High</td>
+<td>Low</td>
+<td>Forward</td>
+<td>Green</td>
+</tr>
+<tr>
+<td>High</td>
+<td>Low</td>
+<td>High</td>
+<td>Low</td>
+<td>High</td>
+<td>Reverse</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>High</td>
+<td>High</td>
+<td>High</td>
+<td>Low</td>
+<td>Low</td>
+<td>Brake</td>
+<td>Off</td>
+</tr>
 </tbody>
 </table>
-<p><strong>Speed:</strong> drive EN with PWM. The duty cycle sets the speed, and in the PWM off-time the
-motor brakes, which gives a firm, linear response. Use 20 kHz to keep the motor quiet.
-1–5 kHz also works but makes the motor whine.
-See <a href="../configuration/#speed-control-in-each-mode">Speed control in each mode</a> for how
-duty cycle maps to speed in each mode, and the limits at very low and 100% duty.</p>
-<p><strong>Changing direction:</strong> change PH at any time. To protect gearboxes, slow down or stop
-briefly before reversing a heavily loaded motor. The library does this for you: it brakes
-for <code>reverse_delay</code> (0.1 s by default) before reversing a running motor.</p>
+<p><strong>Speed:</strong> hold one input high and switch the other (slow decay), or hold one input low
+and switch the other (fast decay). See <a href="#speed-control">Speed control</a> below. In
+<code>mode="pwm"</code> the library uses slow decay, so the response matches PH/EN mode.</p>
+<p><strong>Other libraries:</strong> PWM mode suits code written for two-input drivers (gpiozero <code>Motor</code>,
+Arduino <code>analogWrite()</code> on either pin). With gpiozero's <code>Motor</code> class, pass <code>forward=</code>
+J3 pin 3 (IN1) and <code>backward=</code> J3 pin 4 (IN2), so its directions match the table above.</p>
+<p><strong>Test buttons:</strong> not supported in PWM mode. FWD drives IN1 and IN2 high, which brakes
+the motor, and REV drives IN1 only, which runs it forward.</p>
+<h2 id="speed-control">Speed control<a class="headerlink" href="#speed-control" title="Permanent link">&para;</a></h2>
+<p>In every mode, speed comes from the <strong>PWM duty cycle</strong>: the fraction of each PWM period
+for which the motor is connected to the supply. A motor driven at 60% duty sees, on
+average, about 60% of VM, so it runs at roughly 60% of its full speed at that load. The
+modes differ in which pin is switched, and in what the motor does during the off-time.</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Forward at speed <em>d</em></th>
+<th>Reverse at speed <em>d</em></th>
+<th>Off-time</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PH/EN (default)</td>
+<td>PH high, EN PWM at duty <em>d</em></td>
+<td>PH low, EN PWM at duty <em>d</em></td>
+<td>Brake</td>
+<td>Firm, close to linear</td>
+</tr>
+<tr>
+<td>PWM, slow decay (used by the library)</td>
+<td>IN1 high, IN2 PWM at duty 1 − <em>d</em></td>
+<td>IN2 high, IN1 PWM at duty 1 − <em>d</em></td>
+<td>Brake</td>
+<td>The same as PH/EN</td>
+</tr>
+<tr>
+<td>PWM, fast decay</td>
+<td>IN1 PWM at duty <em>d</em>, IN2 low</td>
+<td>IN2 PWM at duty <em>d</em>, IN1 low</td>
+<td>Coast</td>
+<td>Softer; speed falls away at low duty</td>
+</tr>
+<tr>
+<td><a href="../four-motor-mode/">Four-motor</a></td>
+<td>Input PWM at duty 1 − <em>d</em> (one direction only)</td>
+<td>Not available</td>
+<td>Brake (through the high side)</td>
+<td>The same as PH/EN</td>
+</tr>
+</tbody>
+</table>
+<p><strong>PH/EN mode.</strong> During the off-time both low-side switches are on (brake, also called slow
+decay), so the motor's current keeps circulating and the speed follows the duty cycle
+closely, even at light load. PH/EN mode is the simplest to use and gives the best
+low-speed control.</p>
+<p><strong>PWM mode, slow decay.</strong> One input is held high and the other is switched. The motor is
+driven while the switched input is <em>low</em>, so the duty is inverted: for 30% speed forward,
+hold IN1 high and run IN2 at 70%. The off-time is a brake, so the response matches PH/EN
+mode.</p>
+<p><strong>PWM mode, fast decay.</strong> One input is held low and the other is switched at the speed
+duty. This is how most two-input motor libraries work, including gpiozero's <code>Motor</code> class
+and Arduino code that calls <code>analogWrite()</code> on one pin. During the off-time both outputs
+turn off and the motor coasts, while its current flows back into the supply. Torque is
+lower and the response is less linear at low duty: a lightly loaded motor may slow very
+little until the duty is well below 50%. Slow decay gives finer control.</p>
+<h3 id="practical-limits">Practical limits<a class="headerlink" href="#practical-limits" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Minimum speed.</strong> Most small motors do not start turning until the duty cycle reaches
+  about 10–30%, because of friction and gearbox losses. Below that they hum without
+  turning. The library's <code>min_speed_pc</code> raises any non-zero speed to this value.</li>
+<li><strong>PWM frequency.</strong> Use 20 kHz where the host supports it: it is above human hearing and
+  gives smooth current. Lower frequencies (1–5 kHz, such as the Raspberry Pi's software
+  PWM) work the same way but make the motor whine.</li>
+<li><strong>Full speed.</strong> 100% duty applies the full supply to the motor. The test buttons drive
+  EN high, so they always run at 100%.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">100% duty and the current limit</p>
+<p>The drivers limit current on every PWM cycle and restart on the next PWM edge. At
+exactly 100% duty there are no edges, so if a motor stalls and reaches the current
+limit, the driver holds it in brake (and lights the fault LED) until the input
+changes. To recover, change the speed, stop and restart, or release and press the test
+button again. If a stall is likely at full speed, run at 99% instead: the motor runs
+at effectively full speed, and the current limit then recovers automatically.</p>
+</div>
+<h2 id="direction">Direction<a class="headerlink" href="#direction" title="Permanent link">&para;</a></h2>
+<p>"Forward" and "reverse" follow TI's convention for the DRV8874: forward is OUT1 positive
+(green LED). In PH/EN mode that is PH high; in PWM mode, IN1 high and IN2 low. Which way
+the shaft turns depends on how the motor is wired: swap its two leads, or use
+<code>invert=True</code> in the library, to change it.</p>
+<p>To protect gearboxes, slow down or stop briefly before reversing a heavily loaded motor.
+The library brakes for <code>reverse_delay</code> (0.1 s by default) before reversing a running
+motor.</p>
+<h2 id="sleep-emergency-stop-and-start-up">Sleep, emergency stop and start-up<a class="headerlink" href="#sleep-emergency-stop-and-start-up" title="Permanent link">&para;</a></h2>
 <p><strong>Sleep / emergency stop:</strong> pull nSLEEP low to put both drivers to sleep (outputs open,
 motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-down on the board, so
 the drivers sleep until the host drives it high: your program must do this before the
-motors will run. The library does it for you.</p>
+motors will run. The library does this automatically.</p>
 <p><strong>Start-up behaviour:</strong> nSLEEP, EN and PH all have 10 kΩ pull-downs, so while the host is
 booting, and after your program exits, the drivers sleep and the motors coast. If the
 motor's load can turn it backwards (a lift, an arm, a robot parked on a slope), have your
 program wake the board with EN low as soon as it starts: the motor is then braked.</p>
-<p>"Forward" and "reverse" here follow TI's convention for the DRV8874: PH high = forward, with
-OUT1 positive (green LED). Which way the shaft actually turns depends on how the motor is
-wired; swap its two leads, or use <code>invert=True</code> in the library, to change it.</p>
-<div class="admonition note">
-<p class="admonition-title">Coast and nSLEEP</p>
-<p>In PH/EN mode the only way to coast is to sleep the driver, and nSLEEP is shared by
-both motors. The library's <code>coast()</code> therefore sleeps the board only when the other
-motor is idle, and otherwise brakes. In PWM mode each motor coasts on its own.</p>
-</div>
 <h2 id="driving-the-pins-directly">Driving the pins directly<a class="headerlink" href="#driving-the-pins-directly" title="Permanent link">&para;</a></h2>
-<p>The <a href="../../api/">library</a> is the easiest way to use the board, but the protocol is
-simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (full forward).</p>
+<p>The <a href="../../api/">library</a> is the recommended way to use the board. The protocol can
+also be driven directly, as below (PH/EN mode). Speed runs from −1.0 (full reverse) to 1.0
+(full forward).</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">ESP32, MicroPython</label><label for="__tabbed_1_2">Raspberry Pi, gpiozero</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">

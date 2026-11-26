@@ -1653,8 +1653,8 @@
 
 
 <h1 id="test-buttons-and-leds">Test buttons and LEDs<a class="headerlink" href="#test-buttons-and-leds" title="Permanent link">&para;</a></h1>
-<p>Each motor has a FWD and a REV button that runs it at full speed while held. Use them to
-check the wiring before writing any code.</p>
+<p>Each motor has a FWD and a REV button that runs it at full speed while held, in PH/EN mode
+(the default). Use them to check the wiring before writing any code.</p>
 <table>
 <thead>
 <tr>
@@ -1685,23 +1685,15 @@ check the wiring before writing any code.</p>
 <li>The buttons need VLOGIC (J3 pin 2) and the drivers awake (nSLEEP, J3 pin 9, high).
   With a host connected, they work while your program holds nSLEEP high. With no host,
   feed 3.3–5 V to VLOGIC from any source, such as a USB 5 V lead, connect GND to J3 pin 1,
-  and link J3 pin 9 to pin 2 while you test. Don't use this link in
+  and link J3 pin 9 to pin 2 while you test. Do not use this link in
   <a href="../four-motor-mode/">four-motor mode</a>.</li>
 <li>They are safe to press while a host is connected, even if the host is driving the pins
   low: 1 kΩ resistors protect the host's GPIOs.</li>
 <li>They work as described here only in PH/EN mode (the default jumper setting). In PWM
   mode FWD brakes the motor and REV runs it forward. In four-motor mode the buttons can
-  only turn motors off, and the direction LEDs don't show motor status: see
+  only turn motors off, and the direction LEDs do not show motor status: see
   <a href="../four-motor-mode/#test-buttons-and-leds-in-four-motor-mode">buttons and LEDs in four-motor mode</a>.</li>
 </ul>
-<div class="admonition info">
-<p class="admonition-title">Pressing FWD and REV together gives forward</p>
-<p>FWD drives both EN and PH high, while REV only drives EN, so FWD wins. The result is
-the same as pressing FWD alone and can't harm the board or the host. Release one
-button before pressing the other: flipping from forward to reverse at full speed
-causes a current surge (the fault LED flickers as the current limit catches it) and is
-hard on gearboxes.</p>
-</div>
 <h2 id="leds">LEDs<a class="headerlink" href="#leds" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1734,8 +1726,10 @@ hard on gearboxes.</p>
 </tr>
 </tbody>
 </table>
-<p>A direction LED may glow faintly if you spin an unpowered motor by hand. This is normal:
-the motor is acting as a generator.</p>
+<p>The direction LEDs do not show motor status in four-motor mode: see
+<a href="../four-motor-mode/#test-buttons-and-leds-in-four-motor-mode">buttons and LEDs in four-motor mode</a>.</p>
+<p>A direction LED may glow faintly when an unpowered motor is turned by hand. This is
+normal: the motor is acting as a generator.</p>
 
 
 

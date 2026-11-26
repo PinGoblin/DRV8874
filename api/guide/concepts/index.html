@@ -1955,11 +1955,11 @@ B_PH → <code>b2</code>.</p>
 <span class="n">board</span><span class="o">.</span><span class="n">driver_current</span><span class="p">(</span><span class="s2">"a"</span><span class="p">)</span>           <span class="c1"># pump + fan together, if a sensor is configured</span>
 </code></pre></div>
 <ul>
-<li><code>sleep_pin</code> is required, and J3 pin 9 must never be linked to VLOGIC in this mode. The
+<li><code>sleep_pin</code> is required, and J3 pin 9 must not also be connected to VLOGIC. The
   drivers stay asleep until the first run command, and
   <a class="autorefs autorefs-internal" title="            close" href="../../reference/board/#pingoblin_motor.board.MotorBoard.close"><code>close()</code></a> puts them to sleep before releasing
   the pins. The board's pull-down on nSLEEP then keeps the motors off whenever your program
-  isn't running. See <a href="../../../guide/four-motor-mode/">Four-motor mode</a>.</li>
+  is not running. See <a href="../../../guide/four-motor-mode/">Four-motor mode</a>.</li>
 <li><code>reverse()</code>, negative speeds and <code>invert</code> raise errors. <code>board.motor_a</code> and
   <code>board.motor_b</code> raise <a class="autorefs autorefs-internal" title="            ConfigError" href="../../reference/faults/#pingoblin_motor.faults.ConfigError"><code>ConfigError</code></a>: use the names.</li>
 <li><code>coast()</code> sleeps the drivers, so it only coasts when every other motor on the nSLEEP

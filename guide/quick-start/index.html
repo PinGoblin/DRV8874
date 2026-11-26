@@ -1733,30 +1733,30 @@
 <tr>
 <td>5</td>
 <td>B_EN</td>
-<td>GPIO13 (PWM1)</td>
-<td>GPIO27</td>
-<td>GP4</td>
+<td>GPIO13 (PWM1) (optional)</td>
+<td>GPIO27 (optional)</td>
+<td>GP4 (optional)</td>
 </tr>
 <tr>
 <td>6</td>
 <td>B_PH</td>
-<td>GPIO6</td>
-<td>GPIO33</td>
-<td>GP5</td>
+<td>GPIO6 (optional)</td>
+<td>GPIO33 (optional)</td>
+<td>GP5 (optional)</td>
 </tr>
 <tr>
 <td>7</td>
 <td>A_ISENSE</td>
-<td>PinGoblin ADS1115 board (the Pi has no ADC)</td>
-<td>GPIO34 (ADC1)</td>
-<td>GP26 (ADC0)</td>
+<td>PinGoblin ADS1115 board (optional; the Pi has no ADC)</td>
+<td>GPIO34, ADC1 (optional)</td>
+<td>GP26, ADC0 (optional)</td>
 </tr>
 <tr>
 <td>8</td>
 <td>B_ISENSE</td>
-<td>PinGoblin ADS1115 board</td>
-<td>GPIO35 (ADC1)</td>
-<td>GP27 (ADC1)</td>
+<td>PinGoblin ADS1115 board (optional)</td>
+<td>GPIO35, ADC1 (optional)</td>
+<td>GP27, ADC1 (optional)</td>
 </tr>
 <tr>
 <td>9</td>
@@ -1775,11 +1775,12 @@
 </tbody>
 </table>
 <p>nSLEEP is pulled low on the board, so the drivers sleep until the host drives it high.
-The library does this for you. If you don't need sleep or coast control, you can link
-J3 pin 9 to pin 2 (VLOGIC) instead of using a GPIO, except in
-<a href="../four-motor-mode/">four-motor mode</a>.</p>
+The library does this automatically. If you do not need sleep or coast control, you can
+link J3 pin 9 to pin 2 (VLOGIC) instead of using a GPIO, except in
+<a href="../four-motor-mode/">four-motor mode</a>. Pins 5 and 6 are needed only for motor B, and pins
+7 and 8 only for current sensing.</p>
 <p>Every input on J3 has a 10 kΩ pull-down, so the motors stay off while the host boots,
-whichever GPIOs you use. On a Raspberry Pi, don't use GPIO2 and GPIO3: they carry I2C for
+whichever GPIOs you use. On a Raspberry Pi, do not use GPIO2 and GPIO3: they carry I2C for
 the ADS1115 board. On an ESP32, avoid the boot-strapping pins (GPIO0, 2, 12, 15): the
 board's pull-downs can stop the ESP32 booting normally. Also avoid GPIO14, which toggles
 during boot. Use ADC1 pins for current sense, because ADC2 cannot be read while Wi-Fi is
@@ -1824,10 +1825,11 @@ on. If you use more than one board, give each its own nFAULT GPIO (see
 </div>
 </div>
 </div>
-<p>On a Raspberry Pi the library uses 1 kHz software PWM by default, which makes motors
-whine. For silent 20 kHz drive, use hardware PWM on GPIO12 and GPIO13: see
-<a href="../../api/guide/concepts/#pwm-frequency">PWM frequency</a>. MicroPython boards use 20 kHz
-hardware PWM by default.</p>
+<p>The MicroPython library uses 20 kHz hardware PWM by default. On a Raspberry Pi the library
+defaults to 1 kHz, because the Pi's standard GPIO PWM is generated in software and is
+unreliable at higher frequencies; at 1 kHz the motors whine audibly. For silent 20 kHz
+drive on a Pi, enable hardware PWM on GPIO12 and GPIO13: see
+<a href="../../api/guide/concepts/#pwm-frequency">PWM frequency</a>.</p>
 
 
 

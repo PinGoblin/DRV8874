@@ -1588,24 +1588,26 @@
 <h1 id="important-safety-information">Important safety information<a class="headerlink" href="#important-safety-information" title="Permanent link">&para;</a></h1>
 <p>Read these before connecting power.</p>
 <div class="admonition danger">
-<p class="admonition-title">Never connect VIN (6–18 V) to J3</p>
-<p>J3 is logic only. VIN on any J3 pin will destroy the host and the drivers.</p>
+<p class="admonition-title">Never connect the motor supply voltage (6–18 V) to the J3 header</p>
+<p>J3 is for logic signals only. The motor supply on any J3 pin will destroy the host and
+the drivers.</p>
 </div>
 <ul>
-<li><strong>Do not exceed 18 V on VIN, including supply tolerance.</strong> A supply labelled 18 V can
+<li><strong>Do not exceed 18 V on the motor supply, including supply tolerance.</strong> A supply labelled 18 V can
   measure higher: check it with a meter, or use a lower voltage. The surge suppressor
   starts conducting at about 20 V and is not meant to carry continuous current.</li>
 <li><strong>Connect GND between the board and the host.</strong> J3 pin 1 must go to a host GND pin.</li>
 <li><strong>Wire with the power off.</strong> Connect and disconnect motors only while the supply is off.</li>
 <li><strong>The drivers get hot.</strong> At high currents the chips and the board around them can exceed
   60 °C. Allow airflow and do not touch them while running.</li>
-<li><strong>Daisy-chaining:</strong> the VIN through-terminal (J2) shares one supply between boards. Keep
+<li><strong>Daisy-chaining:</strong> the power through-terminal (J2) shares one supply between boards. Keep
   the total current through a board's terminals at or below 6 A.</li>
-<li><strong>One power source per chain.</strong> J1 and J2 are connected together. Never connect a battery
-  and a supply at the same time: see <a href="../power/">Powering the board</a>.</li>
-<li><strong>Four-motor mode has no current limit,</strong> and an input that isn't driven turns its
-  motor on. Wire nSLEEP to a GPIO and never link it to VLOGIC in this mode: see
-  <a href="../four-motor-mode/">Four-motor mode</a>.</li>
+<li><strong>Only connect one power source at a time to J1 and J2.</strong> J1 and J2 are connected
+  together. For example, never connect a battery to J1 and a separate power supply to J2
+  at the same time. See <a href="../power/">Powering the board</a>.</li>
+<li><strong>Four-motor mode has no current limit,</strong> and an input that is not driven turns its
+  motor on. Wire nSLEEP (J3 pin 9) to a GPIO, and do not also connect it to VLOGIC while
+  in four-motor mode: see <a href="../four-motor-mode/">Four-motor mode</a>.</li>
 <li><strong>Use a fused or current-limited supply.</strong> The on-board fuse protects the board, not your
   wiring or batteries.</li>
 </ul>

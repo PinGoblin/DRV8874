@@ -805,41 +805,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pwm-mode-truth-table" class="md-nav__link">
+  <a href="#changing-the-mode" class="md-nav__link">
     <span class="md-ellipsis">
       
-        PWM mode truth table
+        Changing the mode
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#speed-control-in-each-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Speed control in each mode
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Speed control in each mode">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#practical-limits" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Practical limits
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1650,41 +1622,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pwm-mode-truth-table" class="md-nav__link">
+  <a href="#changing-the-mode" class="md-nav__link">
     <span class="md-ellipsis">
       
-        PWM mode truth table
+        Changing the mode
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#speed-control-in-each-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Speed control in each mode
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Speed control in each mode">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#practical-limits" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Practical limits
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1709,200 +1653,59 @@
 
 
 <h1 id="configuration-pmode-jumper-jp1">Configuration: PMODE jumper (JP1)<a class="headerlink" href="#configuration-pmode-jumper-jp1" title="Permanent link">&para;</a></h1>
-<p>JP1 is a 3-pad solder jumper that sets the control mode for both drivers. It ships with
-pads 1–2 bridged (PH/EN mode).</p>
-<ul>
-<li><strong>PH/EN mode (phase/enable, default):</strong> one pin per motor sets the direction (PH) and the
-  other turns the motor on and sets its speed (EN). One PWM channel per motor is enough.</li>
-<li><strong>PWM mode (IN1/IN2, input 1 / input 2):</strong> each pin drives one side of the motor
-  directly. This matches two-input drivers such as the L298N and DRV8833, and lets each
-  motor coast on its own, but needs PWM on both pins for full control.</li>
-<li><strong>Four-motor mode (all pads open):</strong> each pin drives one output on its own, so the
-  board runs four one-direction motors, each wired between a motor terminal and the VM
-  header J6. There is no current limit, and an undriven input turns its motor on, so it
-  needs extra setup. See <a href="../four-motor-mode/">Four-motor mode</a>.</li>
-</ul>
-<p>See the <a href="../glossary/">Glossary</a> for PWM, duty cycle and other terms.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Leaving all three pads open selects four-motor mode. Do this only on purpose: in that
-mode an input that isn't driven runs its motor at full speed. Read
-<a href="../four-motor-mode/">Four-motor mode</a> first.</p>
-</div>
+<p>JP1 is a 3-pad solder jumper that sets the control mode for both drivers. It is supplied
+with pads 1–2 bridged (PH/EN mode). The drivers read JP1 when they wake, so a change takes
+effect at the next power-up or wake from sleep.</p>
 <table>
 <thead>
 <tr>
 <th>JP1 setting</th>
 <th>Mode</th>
-<th>J3 pin 3 / 5</th>
-<th>J3 pin 4 / 6</th>
-<th>Test buttons</th>
+<th>Motors</th>
 <th>Library</th>
+<th>Details</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1–2 bridged (default)</td>
+<td>Pads 1–2 bridged (default)</td>
 <td>PH/EN</td>
-<td>EN: on/off + PWM speed</td>
-<td>PH: direction</td>
-<td>Forward / reverse control</td>
+<td>2, both directions</td>
 <td><code>mode="ph_en"</code></td>
+<td><a href="../controlling-motors/#phen-mode-default">PH/EN mode</a></td>
 </tr>
 <tr>
-<td>2–3 bridged</td>
+<td>Pads 2–3 bridged</td>
 <td>PWM (IN1/IN2)</td>
-<td>IN1</td>
-<td>IN2</td>
-<td>Not supported: FWD brakes the motor and REV runs it forward</td>
+<td>2, both directions</td>
 <td><code>mode="pwm"</code></td>
+<td><a href="../controlling-motors/#pwm-mode-in1in2">PWM mode</a></td>
 </tr>
 <tr>
-<td>All open</td>
+<td>All pads open</td>
 <td>Four-motor</td>
-<td>Motor A1 / B1: low = on</td>
-<td>Motor A2 / B2: low = on</td>
-<td>Turn motors off only: see <a href="../four-motor-mode/#test-buttons-and-leds-in-four-motor-mode">buttons in four-motor mode</a></td>
+<td>4, one direction each</td>
 <td><code>mode="independent"</code></td>
+<td><a href="../four-motor-mode/">Four-motor mode</a></td>
 </tr>
 </tbody>
 </table>
-<p>To change it, cut the thin trace between pads 1 and 2 with a craft knife, check with a
-multimeter that they're open, then bridge pads 2 and 3 with solder (PWM mode) or leave
-all pads open (four-motor mode). The drivers read JP1 when they wake, so the new mode takes
-effect at the next power-up or wake from sleep. Clean off the flux after cutting the trace:
-in four-motor mode PMODE must float, and the drivers only see "open" between about 0.9 V
-and 1.2 V, so flux residue can be enough to select the wrong mode.</p>
-<h2 id="pwm-mode-truth-table">PWM mode truth table<a class="headerlink" href="#pwm-mode-truth-table" title="Permanent link">&para;</a></h2>
-<p>Motor A; motor B is the same.</p>
-<table>
-<thead>
-<tr>
-<th>IN1 (pin 3)</th>
-<th>IN2 (pin 4)</th>
-<th>OUT1</th>
-<th>OUT2</th>
-<th>Motor</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Low</td>
-<td>Low</td>
-<td>Open</td>
-<td>Open</td>
-<td>Coast</td>
-</tr>
-<tr>
-<td>High</td>
-<td>Low</td>
-<td>High</td>
-<td>Low</td>
-<td>Forward</td>
-</tr>
-<tr>
-<td>Low</td>
-<td>High</td>
-<td>Low</td>
-<td>High</td>
-<td>Reverse</td>
-</tr>
-<tr>
-<td>High</td>
-<td>High</td>
-<td>Low</td>
-<td>Low</td>
-<td>Brake</td>
-</tr>
-</tbody>
-</table>
-<p>PWM mode suits libraries written for two-input drivers such as the L298N or DRV8833
-(gpiozero <code>Motor</code>, Arduino <code>analogWrite</code> on either pin). With gpiozero's <code>Motor</code> class,
-pass <code>forward=</code> J3 pin 3 (IN1) and <code>backward=</code> J3 pin 4 (IN2) so its directions match the
-table above.</p>
-<p>In PWM mode each motor can coast on its own, without sleeping the board.</p>
-<h2 id="speed-control-in-each-mode">Speed control in each mode<a class="headerlink" href="#speed-control-in-each-mode" title="Permanent link">&para;</a></h2>
-<p>In every mode, speed comes from the <strong>PWM duty cycle</strong>: the fraction of each PWM period
-for which the motor is connected to the supply. A motor driven at 60% duty sees, on
-average, about 60% of VM, so it runs at roughly 60% of its full speed at that load. What
-differs between the modes is which pin you switch, and what the motor does in the
-off-time.</p>
-<table>
-<thead>
-<tr>
-<th>Mode</th>
-<th>Forward at speed <em>d</em></th>
-<th>Reverse at speed <em>d</em></th>
-<th>Off-time</th>
-<th>Response</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>PH/EN (default)</td>
-<td>PH high, EN PWM at duty <em>d</em></td>
-<td>PH low, EN PWM at duty <em>d</em></td>
-<td>Brake</td>
-<td>Firm, close to linear</td>
-</tr>
-<tr>
-<td>PWM, slow decay (what the library uses)</td>
-<td>IN1 high, IN2 PWM at duty 1 − <em>d</em></td>
-<td>IN2 high, IN1 PWM at duty 1 − <em>d</em></td>
-<td>Brake</td>
-<td>The same as PH/EN</td>
-</tr>
-<tr>
-<td>PWM, fast decay</td>
-<td>IN1 PWM at duty <em>d</em>, IN2 low</td>
-<td>IN2 PWM at duty <em>d</em>, IN1 low</td>
-<td>Coast</td>
-<td>Softer; speed falls away at low duty</td>
-</tr>
-<tr>
-<td>Four-motor</td>
-<td>Input PWM at duty 1 − <em>d</em> (one direction only)</td>
-<td>Not available</td>
-<td>Brake (through the high side)</td>
-<td>The same as PH/EN</td>
-</tr>
-</tbody>
-</table>
-<p><strong>PH/EN mode.</strong> EN carries the speed and PH the direction, so a single PWM channel per
-motor is enough. During the off-time both low-side switches are on (brake, also called
-slow decay), so the motor's current keeps circulating and the speed follows the duty cycle
-closely, even at light load. This is the easiest mode to use and gives the best low-speed
-control. The library's <code>speed_pc</code> (0–100) is the EN duty cycle.</p>
-<p><strong>PWM mode, slow decay.</strong> One input is held high and the other is switched. The motor is
-driven while the switched input is <em>low</em>, so its duty is inverted: for 30% speed forward,
-hold IN1 high and run IN2 at 70%. The off-time is a brake, so the response matches PH/EN
-mode. The library does this inversion for you in <code>mode="pwm"</code>.</p>
-<p><strong>PWM mode, fast decay.</strong> One input is held low and the other is switched at the speed
-duty, which is how most two-input motor libraries work, including gpiozero's <code>Motor</code> class
-and Arduino code that calls <code>analogWrite()</code> on one pin. In the off-time both outputs turn
-off and the motor coasts, while its current flows back into the supply. Expect less torque
-and a less linear response at low duty: a lightly loaded motor may barely slow until the
-duty is well below 50%. It works, but slow decay gives finer control.</p>
-<h3 id="practical-limits">Practical limits<a class="headerlink" href="#practical-limits" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Minimum speed.</strong> Most small motors don't start turning until the duty cycle reaches
-  about 10–30%, because of friction and gearbox losses. Below that they hum without
-  turning. The library's <code>min_speed_pc</code> raises any non-zero speed to this value.</li>
-<li><strong>PWM frequency.</strong> Use 20 kHz where the host supports it: it's above human hearing and
-  gives smooth current. Lower frequencies (1–5 kHz, such as the Pi's software PWM) work the
-  same way but make the motor whine.</li>
-<li><strong>Full speed.</strong> 100% duty applies the full supply to the motor. The test buttons drive
-  EN high, so they always run at 100%.</li>
-</ul>
 <div class="admonition warning">
-<p class="admonition-title">100% duty and the current limit</p>
-<p>The drivers limit current on every PWM cycle and restart on the next PWM edge. At
-exactly 100% duty there are no edges, so if a motor stalls and reaches the current
-limit, the driver holds it in brake (and lights the fault LED) until the input
-changes. To recover, change the speed, stop and restart, or release and press the test
-button again. If a stall is likely at full speed, run at 99% instead: the motor is
-effectively at full speed, and the current limit then recovers on its own.</p>
+<p class="admonition-title">Warning</p>
+<p>Leaving all three pads open selects four-motor mode. Do this only on purpose: in that
+mode an input that is not driven runs its motor at full speed while the drivers are
+awake. Read <a href="../four-motor-mode/">Four-motor mode</a> first.</p>
 </div>
+<h2 id="changing-the-mode">Changing the mode<a class="headerlink" href="#changing-the-mode" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Disconnect the motor supply and VLOGIC.</li>
+<li>Cut the thin trace between pads 1 and 2 with a craft knife.</li>
+<li>Check with a multimeter that pads 1 and 2 are no longer connected.</li>
+<li>For PWM mode, bridge pads 2 and 3 with solder. For four-motor mode, leave all pads open.</li>
+<li>Clean off any flux. In four-motor mode PMODE must float: the drivers recognise "open"
+   only between about 0.9 V and 1.2 V, so flux residue can select the wrong mode.</li>
+</ol>
+<p>To return to PH/EN mode, remove any bridge between pads 2 and 3 and bridge pads 1 and 2.</p>
 
 
 
