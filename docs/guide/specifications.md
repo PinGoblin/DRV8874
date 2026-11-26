@@ -14,7 +14,8 @@
 | PWM frequency | Up to 100 kHz (20 kHz recommended, which is above human hearing) |
 | Driver IC | TI DRV8874 (×2) |
 | Connectors | XT30 right-angle male and 5.08 mm screw terminal (power), 3.5 mm screw terminals (motors), 2.54 mm 10-pin header (logic) |
-| Mounting | M2.5 holes |
+| Board size | 52.0 × 64.5 mm, 1.6 mm thick, 4-layer, 3 mm corner radius |
+| Mounting | 4 × 2.7 mm holes for M2.5 screws, on a 45.0 × 57.5 mm rectangle, centres 3.5 mm from each edge |
 
 !!! note "20 kHz and pets"
     20 kHz is above human hearing, but dogs, cats and some other animals can hear it.
