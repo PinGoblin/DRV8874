@@ -18,6 +18,8 @@ current-sense output that can be read with an ADC.
 - Power through-terminal for daisy-chaining several boards from one supply
 - Safe start-up: motors are held in brake while the host boots
 
+See [Features](features.md) for the full list.
+
 ## Where to start
 
 1. Find your way around the board: [Board overview](board-overview.md).
