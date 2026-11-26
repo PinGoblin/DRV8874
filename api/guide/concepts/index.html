@@ -397,6 +397,8 @@
       
         
       
+        
+      
     
     
     
@@ -634,6 +636,34 @@
     
   
     Quick start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/choosing-a-motor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing a motor
   
 
     
@@ -1849,8 +1879,19 @@ and release the pins on exit.</p>
 <td><code>0.1</code></td>
 <td>Brake time before reversing a running motor</td>
 </tr>
+<tr>
+<td><code>motor_voltage</code></td>
+<td><code>None</code></td>
+<td>The motor's rated voltage. Limits PWM duty to <code>motor_voltage / supply_voltage</code>, so 100 % speed never over-volts the motor. Needs <code>supply_voltage=</code> on the board</td>
+</tr>
 </tbody>
 </table>
+<p>For example, a 6 V motor on a 12 V supply:</p>
+<div class="highlight"><pre><span></span><code><span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">supply_voltage</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
+                   <span class="n">a_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">motor_voltage</span><span class="o">=</span><span class="mf">6.0</span><span class="p">))</span>
+<span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>     <span class="c1"># 50 % duty: 6 V average across the motor</span>
+</code></pre></div>
+<p>See <a href="../../../guide/choosing-a-motor/">Choosing a motor</a> for which motors suit the board.</p>
 <p>The fault-detection options are covered in <a href="../faults/">Faults</a>. The full list is in the
 <a class="autorefs autorefs-internal" title="            Motor" href="../../reference/motor/#pingoblin_motor.motor.Motor"><code>Motor</code></a> reference.</p>
 <h2 id="stop-brake-and-coast">Stop, brake and coast<a class="headerlink" href="#stop-brake-and-coast" title="Permanent link">&para;</a></h2>

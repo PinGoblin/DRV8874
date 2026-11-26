@@ -399,6 +399,8 @@
       
         
       
+        
+      
     
     
     
@@ -649,6 +651,34 @@
     
   
     Quick start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../choosing-a-motor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing a motor
   
 
     
@@ -1565,7 +1595,9 @@ the drivers.</p>
 <ul>
 <li><strong>Do not exceed 30 V on the motor supply, including supply tolerance.</strong> A supply labelled 30 V can
   measure higher: check it with a meter, or use a lower voltage. The surge suppressor
-  starts conducting at about 33 V and is not meant to carry continuous current.</li>
+  starts conducting at about 33 V and is not meant to carry continuous current. A higher
+  supply, such as a 36 V battery, destroys the surge suppressor (D2) and then blows the
+  fuse (F1). Both must then be replaced.</li>
 <li><strong>Connect GND between the board and the host.</strong> J3 pin 1 must go to a host GND pin.</li>
 <li><strong>Wire with the power off.</strong> Connect and disconnect motors only while the supply is off.</li>
 <li><strong>The drivers get hot.</strong> At high currents the chips and the board around them can exceed

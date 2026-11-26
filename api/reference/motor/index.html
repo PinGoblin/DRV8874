@@ -397,6 +397,8 @@
       
         
       
+        
+      
     
     
     
@@ -634,6 +636,34 @@
     
   
     Quick start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/choosing-a-motor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing a motor
   
 
     
@@ -2445,7 +2475,7 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Default (JP1 pads 1–2): EN = speed PWM, PH = direction.</p>
+                <p>Default (JP1 open): EN = speed PWM, PH = direction.</p>
               </div>
             </td>
           </tr>
@@ -2455,7 +2485,7 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>JP1 pads 2–3: IN1 / IN2. Allows per-motor coast.</p>
+                <p>JP1 bridged: IN1 / IN2. Allows per-motor coast.</p>
               </div>
             </td>
           </tr>
@@ -2505,7 +2535,7 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
 
   
       dataclass
-   (pingoblin_motor.faults.FaultPolicy)" href="../faults/#pingoblin_motor.faults.FaultPolicy">FaultPolicy</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+   (pingoblin_motor.faults.FaultPolicy)" href="../faults/#pingoblin_motor.faults.FaultPolicy">FaultPolicy</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">motor_voltage</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2870,6 +2900,25 @@ checks are skipped (start-up surge).</p>
   
       dataclass
   " href="../faults/#pingoblin_motor.faults.FaultPolicy"><code>FaultPolicy</code></a> for this motor.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>motor_voltage</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The motor's rated voltage (V), or <code>None</code>. When it is below the
+board's <code>supply_voltage</code>, 100 % speed is scaled to a PWM duty of
+<code>motor_voltage / supply_voltage</code>, so the motor never receives more than its
+rated average voltage. Requires <code>supply_voltage</code> on the board.</p>
               </div>
             </td>
             <td>

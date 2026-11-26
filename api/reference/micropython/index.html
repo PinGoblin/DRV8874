@@ -395,6 +395,8 @@
       
         
       
+        
+      
     
     
     
@@ -632,6 +634,34 @@
     
   
     Quick start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/choosing-a-motor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing a motor
   
 
     
@@ -4522,7 +4552,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"ph_en"</code>: default (JP1 pads 1–2). EN = speed PWM, PH = direction.</p>
+                <p><code>"ph_en"</code>: default (JP1 open). EN = speed PWM, PH = direction.</p>
               </div>
             </td>
           </tr>
@@ -4532,7 +4562,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"pwm"</code>: JP1 pads 2–3. IN1 / IN2; allows per-motor coast.</p>
+                <p><code>"pwm"</code>: JP1 bridged. IN1 / IN2; allows per-motor coast.</p>
               </div>
             </td>
           </tr>
@@ -4605,7 +4635,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
 </tr>
 <tr>
 <td><code>DRIVER_FAULT</code></td>
-<td>nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature</td>
+<td>nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature, or motor supply below about 4.5 V</td>
 <td>No</td>
 </tr>
 <tr>
@@ -7037,7 +7067,7 @@ On the ESP32 the input range is set to about 0–3.1 V (11 dB attenuation).</p>
 
 
 <a href="#pingoblin_motor_mp.Motor" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">Motor</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">board</span><span class="p">,</span> <span class="n">en_pin</span><span class="p">,</span> <span class="n">ph_pin</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">pins</span><span class="p">,</span> <span class="n">sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pwm_freq</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">min_speed_pc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ramp_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">reverse_delay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stall_current</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stall_time</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">start_grace</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">open_load_current</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">open_load_time</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">continuous_current</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">overload_time</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">Motor</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">board</span><span class="p">,</span> <span class="n">en_pin</span><span class="p">,</span> <span class="n">ph_pin</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">pins</span><span class="p">,</span> <span class="n">sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pwm_freq</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">min_speed_pc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ramp_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">reverse_delay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stall_current</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stall_time</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">start_grace</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">open_load_current</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">open_load_time</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">continuous_current</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">overload_time</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">motor_voltage</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -7356,6 +7386,24 @@ checks are skipped.</p>
             <td>
               <div class="doc-md-description">
                 <p><code>FaultPolicy</code> for this motor.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>motor_voltage</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The motor's rated voltage (V), or <code>None</code>. When it is below the
+board's <code>supply_voltage</code>, 100 % speed is scaled to a PWM duty of
+<code>motor_voltage / supply_voltage</code>, so the motor never receives more than its
+rated average voltage. Requires <code>supply_voltage</code> on the board.</p>
               </div>
             </td>
             <td>
@@ -8473,7 +8521,7 @@ only when every other motor on that line is idle; otherwise the motor brakes.</p
 
 
 <a href="#pingoblin_motor_mp.MotorBoard" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">MotorBoard</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'board'</span><span class="p">,</span> <span class="n">a_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'ph_en'</span><span class="p">,</span> <span class="n">logic_voltage</span><span class="o">=</span><span class="mf">3.3</span><span class="p">,</span> <span class="n">adc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sense_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pwm_freq</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">motor_names</span><span class="o">=</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">),</span> <span class="n">motor_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fuse_rating</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">MotorBoard</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'board'</span><span class="p">,</span> <span class="n">a_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'ph_en'</span><span class="p">,</span> <span class="n">logic_voltage</span><span class="o">=</span><span class="mf">3.3</span><span class="p">,</span> <span class="n">adc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sense_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pwm_freq</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">motor_names</span><span class="o">=</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">),</span> <span class="n">motor_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fuse_rating</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">supply_voltage</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -8623,7 +8671,7 @@ sensor. Must be a different GPIO for each board.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"ph_en"</code> (JP1 pads 1–2, default) or <code>"pwm"</code> (JP1 pads 2–3).</p>
+                <p><code>"ph_en"</code> (JP1 open, default) or <code>"pwm"</code> (JP1 bridged).</p>
               </div>
             </td>
             <td>
@@ -8840,6 +8888,23 @@ The on-board 4 A fast-acting (high I2t) fuse allows 3 A continuously.</p>
             </td>
             <td>
                   <code>3.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>supply_voltage</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Motor supply voltage (V), 6–30, or <code>None</code>. Required when a motor
+is given <code>motor_voltage</code>: the library then limits that motor's PWM duty so the
+average voltage across it does not exceed its rating.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
