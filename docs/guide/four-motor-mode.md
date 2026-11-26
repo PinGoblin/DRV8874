@@ -18,21 +18,21 @@ the four VM pins on J6.
 !!! danger "An input that isn't driven turns its motor on"
     In four-motor mode a motor runs while its input is **low**. The board's pull-down
     resistors, which keep the motors stopped in the other modes, hold every input low.
-    So whenever the drivers are awake and the host isn't actively driving the inputs high
-    (while the host boots, after your program exits or crashes, or with J3 unplugged but
-    VLOGIC present), **all four motors run at full speed with no current limit**.
+    So whenever the drivers are awake and the host isn't driving the inputs high, **all
+    four motors run at full speed with no current limit**.
 
-    Before using this mode:
+    The board guards against this with a 10 kΩ pull-down on nSLEEP: the drivers sleep
+    (outputs open, motors off) unless the host holds nSLEEP high. That only works if you:
 
-    1. Wire **nSLEEP (J3 pin 9) to a GPIO** on the host.
-    2. Fit a **4.7 kΩ resistor from J3 pin 9 to J3 pin 1 (GND)**. If several boards share one
-       nSLEEP line, use a single 2.2 kΩ resistor on that line instead (up to four boards).
+    1. Wire **nSLEEP (J3 pin 9) to a GPIO** on the host, and drive it high only while your
+       program is controlling the inputs. The library does this: it keeps the drivers
+       asleep until the first run command, and puts them to sleep again when the board is
+       closed.
+    2. **Never link J3 pin 9 to VLOGIC** in this mode, as you might for button tests in the
+       other modes.
 
-    The resistor overrides the board's 100 kΩ pull-up on nSLEEP, so the drivers sleep
-    (outputs open, motors off) unless your program holds nSLEEP high. The library keeps the
-    drivers asleep until the first run command, and puts them to sleep again when the board
-    is closed. Check it: with your program stopped and VLOGIC present, nSLEEP should measure
-    below 0.5 V and no motor should turn.
+    Check it: with your program stopped and VLOGIC present, nSLEEP should measure below
+    0.5 V and no motor should turn.
 
 ## Setting up
 
@@ -40,7 +40,7 @@ the four VM pins on J6.
    knife. Leave pads 2 and 3 unbridged. Check with a multimeter that pad 2 is open to both
    pad 1 and pad 3. The drivers read JP1 each time they wake, so the change takes effect
    at the next wake-up or power-up.
-2. **Fit the nSLEEP resistor** and wire nSLEEP to a GPIO, as described above.
+2. **Wire nSLEEP to a GPIO**, as described above.
 3. **Wire the motors.** Connect each motor between its terminal and any of the four pins on
    J6. J6 carries VM: the motor supply after the fuse and reverse-polarity protection.
 4. **Check the direction.** Current flows from VM, through the motor, into the terminal.
@@ -105,7 +105,14 @@ stalling or the total load is too high.
 ### Current sensing
 
 ISENSE now measures the low-side current of both outputs of a driver together. A_ISENSE
-reads A1 + A2, and B_ISENSE reads B1 + B2, at the usual 0.675 V per amp. Averaged over
+reads A1 + A2, and B_ISENSE reads B1 + B2, at the usual 0.675 V per amp.
+
+!!! warning "ISENSE can exceed 3.3 V in this mode"
+    With no current limit, ISENSE passes 3.3 V once a pair draws about 4.9 A (for example,
+    two stalled motors) and can rise to about 4.5 V. The 1 kΩ series resistor limits the
+    current into the host's pin to about 1 mA, but that is still outside a 3.3 V ADC's
+    rating. Use a PinGoblin ADS1115 board, or choose motors that can't draw that much
+    between them. Averaged over
 several samples, it gives the supply current the pair draws. The library reads it with
 `board.driver_current("a")`. Per-motor stall detection isn't possible in this mode,
 because the board can't tell the two motors apart.

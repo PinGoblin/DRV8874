@@ -10,8 +10,8 @@ mode.](../images/j3-pinout.svg)
 
 | Pin | Signal | Direction | PH/EN mode (default) | PWM mode | Four-motor mode |
 | --- | --- | --- | --- | --- | --- |
-| 10 | nFAULT | Output | Low = fault or current limiting | Same | Low = driver fault |
-| 9 | nSLEEP | Input | Low = sleep, both motors coast | Same | Must be driven high to run. Needs a GPIO and a 4.7 kΩ pull-down |
+| 10 | nFAULT | Output | Low = fault or current limiting. One GPIO per board | Same | Low = driver fault |
+| 9 | nSLEEP | Input | Low or open = sleep, motors coast. Drive high to run | Same | Same. Use a GPIO: never link to VLOGIC |
 | 8 | B_ISENSE | Output | Motor B current, 0.675 V/A | Same | Motors B1 + B2 together |
 | 7 | A_ISENSE | Output | Motor A current, 0.675 V/A | Same | Motors A1 + A2 together |
 | 6 | B_PH | Input | Motor B direction | IN2, motor B | Motor B2, low = on |
@@ -21,11 +21,18 @@ mode.](../images/j3-pinout.svg)
 | 2 | VLOGIC | Power | Logic supply in, 3.3–5 V | Same | Same |
 | 1 | GND | Power | Ground, common with the host | Same | Same |
 
-All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Inputs
-have pull-downs (pull-up on nSLEEP), so unused inputs can be left open in PH/EN and PWM
-modes. In four-motor mode an open input turns its motor **on**: see
-[Four-motor mode](four-motor-mode.md). nFAULT is
-open-drain with a 10 kΩ pull-up to VLOGIC. The ISENSE outputs never exceed VLOGIC.
+All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Every
+input, nSLEEP included, has a 10 kΩ pull-down on the board, so the drivers sleep until
+the host drives nSLEEP high, and unused EN/PH inputs can be left open in PH/EN and PWM
+modes. In four-motor mode an open input turns its motor **on** whenever the drivers are
+awake: see [Four-motor mode](four-motor-mode.md).
+
+nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give
+each board its own nFAULT GPIO: see [Daisy-chaining boards](daisy-chain.md).
+
+In PH/EN and PWM modes the current limit keeps ISENSE at or below about 0.4 × VLOGIC.
+In four-motor mode there is no current limit, and ISENSE can rise to about 4.5 V, above
+a 3.3 V host's supply. See [Four-motor mode](four-motor-mode.md#current-sensing).
 
 Signal names: **EN** = enable (on/off and PWM speed), **PH** = phase (direction),
 **IN1 / IN2** = input 1 / input 2 (PWM mode), **ISENSE** = current sense output. A leading

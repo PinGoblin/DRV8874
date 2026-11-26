@@ -38,7 +38,7 @@ def on_fault(fault):
 
 # Per-motor policy: coast on stall, and don't latch
 policy = FaultPolicy({FaultType.STALL: FaultAction.COAST}, latch=False)
-board = MotorBoard(a_en=12, a_ph=5, fault_pin=19, a_options=dict(policy=policy))
+board = MotorBoard(a_en=12, a_ph=5, sleep_pin=26, fault_pin=19, a_options=dict(policy=policy))
 board.start_monitor(on_fault=on_fault)
 
 board.motor_a.add_fault_handler(lambda f: print("motor A:", f.message))
@@ -59,7 +59,7 @@ Driving into an end stop and stopping on the stall is a cheap way to home an axi
 from pingoblin_motor import FaultAction, FaultPolicy, FaultType, MotorBoard
 
 policy = FaultPolicy({FaultType.STALL: FaultAction.BRAKE}, latch=False)
-board = MotorBoard(a_en=12, a_ph=5, fault_pin=19,
+board = MotorBoard(a_en=12, a_ph=5, sleep_pin=26, fault_pin=19,
                    a_options=dict(policy=policy, stall_time=0.2))
 board.start_monitor()
 board.motor_a.reverse(40)

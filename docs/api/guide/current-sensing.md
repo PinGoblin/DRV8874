@@ -16,7 +16,7 @@ ADS1115 boards share the I2C bus (addresses 0x48–0x4B).
     from pingoblin_motor import ADS1115, MotorBoard
 
     adc = ADS1115(bus=1, address=0x48)
-    board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, fault_pin=19,
+    board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
                        adc=adc, a_sense_channel=0, b_sense_channel=1)
     board.motor_a.forward(70)
     print(f"{board.motor_a.current:.2f} A")
@@ -30,7 +30,7 @@ ADS1115 boards share the I2C bus (addresses 0x48–0x4B).
 
     i2c = I2C(0, sda=Pin(21), scl=Pin(22), freq=400000)   # Pico: I2C(0, sda=Pin(0), scl=Pin(1))
     adc = ADS1115(i2c, address=0x48)
-    board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, fault_pin=39,
+    board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, sleep_pin=32, fault_pin=39,
                        adc=adc, a_sense_channel=0, b_sense_channel=1)
     ```
 
@@ -43,7 +43,7 @@ duty the estimate is unreliable, so the raw reading is returned.
 ```python
 from pingoblin_motor import ADCChannel, MotorBoard
 
-board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, fault_pin=39,
+board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, sleep_pin=32, fault_pin=39,
                    a_sensor=ADCChannel(34), b_sensor=ADCChannel(35))
 ```
 

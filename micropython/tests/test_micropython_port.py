@@ -271,7 +271,7 @@ def test_board_update_runs_monitor_at_interval():
 
 
 # ------------------------------------------------------------- chain
-def test_chain_aliases_shared_pins_estop_and_overload():
+def test_chain_aliases_shared_sleep_estop_and_overload():
     pins = MockPins()
     sensors = []
     boards = []
@@ -279,7 +279,7 @@ def test_chain_aliases_shared_pins_estop_and_overload():
         sa, sb = MockSensor(), MockSensor()
         sensors += [sa, sb]
         boards.append(MotorBoard("b%d" % i, a_en=base, a_ph=base + 1, b_en=base + 2, b_ph=base + 3,
-                                 sleep_pin=26, fault_pin=19, pins=pins, a_sensor=sa, b_sensor=sb,
+                                 sleep_pin=26, fault_pin=20 + i, pins=pins, a_sensor=sa, b_sensor=sb,
                                  sense_samples=1,
                                  motor_options=dict(stall_current=5, continuous_current=5, reverse_delay=0)))
     assert pins._refs[26] == 3
@@ -433,3 +433,13 @@ def test_four_motor_nfault_and_overload():
     assert FaultType.DRIVER_FAULT in types and FaultType.STALL not in types
     assert FaultType.CURRENT_LIMIT not in types
     b.close()
+
+
+def test_fault_pin_must_be_separate_per_board():
+    pins = MockPins()
+    a, *_ = make_board("front", pins=pins)            # fault_pin=19
+    with pytest.raises(ConfigError):
+        MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, fault_pin=19, pins=pins)
+    assert 20 not in P(pins)
+    a.close()
+    MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, fault_pin=19, pins=pins).close()

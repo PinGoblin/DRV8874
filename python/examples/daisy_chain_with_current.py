@@ -1,6 +1,7 @@
 """Two daisy-chained boards, one PinGoblin ADS1115 board for current sensing.
 
-Shared lines: nSLEEP (GPIO26) and nFAULT (GPIO19) are wired to both boards.
+nSLEEP (GPIO26) is shared by both boards (one e-stop line). Each board has its own
+nFAULT line: front = GPIO19, rear = GPIO24.
 ADS1115 (address 0x48): AIN0 = front A_ISENSE, AIN1 = front B_ISENSE,
 AIN2 = rear A_ISENSE, AIN3 = rear B_ISENSE.
 
@@ -26,7 +27,7 @@ ADC = None if mock else ADS1115(bus=1, address=0x48)
 
 front = MotorBoard("front", a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
                    backend=backend, **sensing(0, 1))
-rear = MotorBoard("rear", a_en=16, a_ph=20, b_en=21, b_ph=7, sleep_pin=26, fault_pin=19,
+rear = MotorBoard("rear", a_en=16, a_ph=20, b_en=21, b_ph=7, sleep_pin=26, fault_pin=24,
                   backend=backend, **sensing(2, 3))
 
 

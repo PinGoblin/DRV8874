@@ -5,6 +5,7 @@
 | Motor supply (VIN) | 6–18 V DC (18 V maximum, including supply tolerance), 12 V nominal |
 | Logic supply (VLOGIC) | 3.3–5 V, from the host |
 | Logic input high | 1.5 V min (3.3 V and 5 V logic both work) |
+| Default state | Drivers asleep until nSLEEP (J3 pin 9) is driven high; all inputs have 10 kΩ pull-downs |
 | Motor channels | 2, bidirectional, or 4, one direction each ([four-motor mode](four-motor-mode.md)) |
 | Continuous current per motor | About 1.5–2 A at 25 °C (to be confirmed by prototype thermal tests) |
 | Total board current | 3 A continuous (resettable fuse: 3 A hold, 6 A trip) |

@@ -4,7 +4,7 @@ The main classes are importable from the package:
 
 | Class | Purpose |
 |---|---|
-| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One board: two motors plus shared nSLEEP / nFAULT |
+| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One board: two motors (four in four-motor mode) plus its nSLEEP / nFAULT lines |
 | [`Motor`][pingoblin_motor.motor.Motor] | One motor channel |
 | [`HalfBridgeMotor`][pingoblin_motor.motor.HalfBridgeMotor] | One unidirectional motor in four-motor mode |
 | [`MotorChain`][pingoblin_motor.chain.MotorChain] | Several daisy-chained boards |

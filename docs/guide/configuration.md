@@ -29,7 +29,9 @@ See the [Glossary](glossary.md) for PWM, duty cycle and other terms.
 To change it, cut the thin trace between pads 1 and 2 with a craft knife, check with a
 multimeter that they're open, then bridge pads 2 and 3 with solder (PWM mode) or leave
 all pads open (four-motor mode). The drivers read JP1 when they wake, so the new mode takes
-effect at the next power-up or wake from sleep.
+effect at the next power-up or wake from sleep. Clean off the flux after cutting the trace:
+in four-motor mode PMODE must float, and the drivers only see "open" between about 0.9 V
+and 1.2 V, so flux residue can be enough to select the wrong mode.
 
 ## PWM mode truth table
 

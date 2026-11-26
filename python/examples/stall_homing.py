@@ -17,7 +17,7 @@ backend = MockBackend() if mock else None
 
 # Brake on stall but don't latch: a stall at the end stop is expected here.
 policy = FaultPolicy({FaultType.STALL: FaultAction.BRAKE}, latch=False)
-board = MotorBoard(a_en=12, a_ph=5, fault_pin=19, backend=backend,
+board = MotorBoard(a_en=12, a_ph=5, sleep_pin=26, fault_pin=19, backend=backend,
                    a_options=dict(policy=policy, stall_time=0.3))
 stalled = threading.Event()
 board.motor_a.add_fault_handler(lambda f: f.type is FaultType.STALL and stalled.set())

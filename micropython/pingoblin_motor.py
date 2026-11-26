@@ -304,7 +304,7 @@ class FaultPolicy:
 
 
 class PinFactory:
-    """Creates pins and shares them by GPIO number, so boards can share nSLEEP and nFAULT.
+    """Creates pins and shares them by GPIO number, so boards can share one nSLEEP line.
 
     A shared pin is closed when the last user releases it. Subclasses implement
     `_make_output()`, `_make_pwm()` and `_make_input()`.
@@ -1282,6 +1282,7 @@ class HalfBridgeMotor(Motor):
 # ---------------------------------------------------------------- board
 
 _sleep_groups = {}
+_fault_users = {}
 
 
 class MotorBoard:
@@ -1295,10 +1296,15 @@ class MotorBoard:
     | `"pwm"` | Pads 2–3 | 2 × `Motor` | `a`, `b` |
     | `"independent"` | All pads open | 4 × `HalfBridgeMotor` | `a1`, `a2`, `b1`, `b2` |
 
-    In four-motor mode an input that isn't driven turns its motor **on**. Wire `sleep_pin`
-    and fit a 4.7 kΩ resistor from J3 pin 9 to GND, so the drivers sleep unless your
-    program holds nSLEEP high. The library keeps the drivers asleep until the first run
-    command and puts them to sleep in `close()`.
+    The board pulls nSLEEP low, so its drivers sleep (motors off) until `sleep_pin` is
+    driven high. The library drives it high at start-up and wakes the board before every
+    run command. Several boards can share one `sleep_pin` (one e-stop line). Each board
+    needs its **own** `fault_pin`: a `fault_pin` already used by another open board is
+    rejected.
+
+    In four-motor mode an input that isn't driven turns its motor **on**, so `sleep_pin`
+    is required. The library keeps the drivers asleep until the first run command and puts
+    them to sleep in `close()`.
 
     Example:
         ```python
@@ -1324,8 +1330,11 @@ class MotorBoard:
             a_ph: GPIO for A_PH (J3 pin 4).
             b_en: GPIO for B_EN (J3 pin 5), or `None` for a single motor.
             b_ph: GPIO for B_PH (J3 pin 6), or `None`.
-            sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`. Required in four-motor mode.
-            fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection without a sensor.
+            sleep_pin: GPIO for nSLEEP (J3 pin 9). The board pulls nSLEEP low, so the motors only
+                run while this pin is driven high. `None` only if J3 pin 9 is linked to VLOGIC.
+                Required in four-motor mode. Several boards may share it.
+            fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection without a
+                sensor. Must be a different GPIO for each board.
             mode: `"ph_en"` (JP1 pads 1–2, default), `"pwm"` (JP1 pads 2–3) or
                 `"independent"` (JP1 all pads open: four-motor mode).
             logic_voltage: VLOGIC (V). Sets the current limit: 2.0 A at 3.3 V, 3.0 A at 5 V.
@@ -1345,8 +1354,8 @@ class MotorBoard:
             fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
 
         Raises:
-            ConfigError: Invalid mode, voltage, names or pins, or four-motor mode without
-                `sleep_pin`.
+            ConfigError: Invalid mode, voltage, names or pins, four-motor mode without
+                `sleep_pin`, or a `fault_pin` already used by another open board.
         """
         if a_en is None or a_ph is None:
             raise ConfigError("a_en and a_ph are required")
@@ -1370,11 +1379,15 @@ class MotorBoard:
         if "." in name or len(motor_names) != n or len(set(motor_names)) != n \
                 or any("." in m for m in motor_names):
             raise ConfigError("names must be unique and must not contain '.' (%d motor names)" % n)
+        pins = pins or MachinePins()
+        if fault_pin is not None and (id(pins), fault_pin) in _fault_users:
+            raise ConfigError("fault_pin %s is already used by board '%s': give each board its own "
+                              "nFAULT line" % (fault_pin, _fault_users[(id(pins), fault_pin)].name))
         self.name = name
         self.mode = mode
         self.logic_voltage = logic_voltage
         self.fuse_rating = fuse_rating
-        self.pins = pins or MachinePins()
+        self.pins = pins
         self._sleep_pin = sleep_pin
         self._fault_pin = fault_pin
         # Four-motor mode: stay asleep until the first run, so the inputs are set first.
@@ -1382,6 +1395,8 @@ class MotorBoard:
         self._fault = self.pins.input(fault_pin) if fault_pin is not None else None
         if sleep_pin is not None:
             _sleep_groups.setdefault((id(self.pins), sleep_pin), []).append(self)
+        if fault_pin is not None:
+            _fault_users[(id(self.pins), fault_pin)] = self
         self._chain = None
         self.monitor = None
         self.motors = {}
@@ -1614,6 +1629,8 @@ class MotorBoard:
             grp = _sleep_groups.get((id(self.pins), self._sleep_pin), [])
             if self in grp:
                 grp.remove(self)
+        if _fault_users.get((id(self.pins), self._fault_pin)) is self:
+            del _fault_users[(id(self.pins), self._fault_pin)]
         self.pins.release(self._sleep_pin)
         self.pins.release(self._fault_pin)
 

@@ -18,8 +18,8 @@ current-sense output you can read with an ADC.
 - Push buttons to test each motor without writing code
 - Direction LEDs per motor, plus power and fault LEDs
 - Power through-terminal for daisy-chaining several boards from one supply
-- Safe start-up: motors stay off while the host boots (in four-motor mode this needs a
-  4.7 kΩ resistor on nSLEEP)
+- Safe start-up: the drivers sleep until the host enables them, so motors stay off while
+  the host boots, in every mode
 
 ## Where to start
 

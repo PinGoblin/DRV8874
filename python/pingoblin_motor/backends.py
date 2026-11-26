@@ -2,7 +2,8 @@
 
 A backend creates three kinds of pin: digital outputs, PWM outputs and digital inputs.
 Pins are cached by GPIO number, so several boards in a daisy chain can share one
-nSLEEP or nFAULT line: ask for the same pin twice and you get the same object back.
+nSLEEP line: ask for the same pin twice and you get the same object back. (nFAULT must
+not be shared: each board needs its own.)
 A shared pin is released when the last user closes it.
 
 | Backend | Use |

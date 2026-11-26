@@ -4,7 +4,7 @@
 
 | Class | What it is |
 | --- | --- |
-| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One Board A: two motors plus the shared nSLEEP and nFAULT lines |
+| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One Board A: two motors (four in four-motor mode) plus its nSLEEP and nFAULT lines |
 | [`Motor`][pingoblin_motor.motor.Motor] | One motor channel (`board.motor_a`, `board.motor_b`, or `board["a"]`) |
 | [`HalfBridgeMotor`][pingoblin_motor.motor.HalfBridgeMotor] | One unidirectional motor in four-motor mode (`board["a1"]` to `board["b2"]`) |
 | [`MotorChain`][pingoblin_motor.chain.MotorChain] | Several daisy-chained boards managed as one system, with one fault monitor |
@@ -22,8 +22,8 @@ board = MotorBoard(
     "front",                     # board name, used in "front.a"
     a_en=12, a_ph=5,             # J3 pins 3, 4
     b_en=13, b_ph=6,             # J3 pins 5, 6 (optional)
-    sleep_pin=26,                # J3 pin 9 (optional; needed for coast in PH/EN mode)
-    fault_pin=19,                # J3 pin 10 (optional; needed for stall detection without a sensor)
+    sleep_pin=26,                # J3 pin 9: the board sleeps until this is driven high
+    fault_pin=19,                # J3 pin 10 (optional; one GPIO per board)
     mode="ph_en",                # "ph_en" (JP1 pads 1-2, default), "pwm" (JP1 pads 2-3)
                                  # or "independent" (JP1 open: four-motor mode)
     logic_voltage=3.3,           # VLOGIC: sets the current limit (about 2.0 A at 3.3 V, 3.0 A at 5 V)
@@ -31,6 +31,10 @@ board = MotorBoard(
     motor_options=dict(ramp_time=0.5),   # options for both motors
 )
 ```
+
+`sleep_pin` can only be left out if J3 pin 9 is linked to VLOGIC (pin 2), because the
+board pulls nSLEEP low. Several boards can share one `sleep_pin`, but each needs its own
+`fault_pin`.
 
 Boards work as context managers (`with MotorBoard(...) as board:`), which brake the motors
 and release the pins on exit.
@@ -90,11 +94,11 @@ board["valve"].forward(100, duration=0.5)
 board.driver_current("a")           # pump + fan together, if a sensor is configured
 ```
 
-- `sleep_pin` is required. The drivers stay asleep until the first run command, and
+- `sleep_pin` is required, and J3 pin 9 must never be linked to VLOGIC in this mode. The
+  drivers stay asleep until the first run command, and
   [`close()`][pingoblin_motor.board.MotorBoard.close] puts them to sleep before releasing
-  the pins. Fit the 4.7 kΩ nSLEEP pull-down described in
-  [Four-motor mode](../../guide/four-motor-mode.md), so the motors stay off whenever your
-  program isn't running.
+  the pins. The board's pull-down on nSLEEP then keeps the motors off whenever your program
+  isn't running. See [Four-motor mode](../../guide/four-motor-mode.md).
 - `reverse()`, negative speeds and `invert` raise errors. `board.motor_a` and
   `board.motor_b` raise [`ConfigError`][pingoblin_motor.faults.ConfigError]: use the names.
 - `coast()` sleeps the drivers, so it only coasts when every other motor on the nSLEEP

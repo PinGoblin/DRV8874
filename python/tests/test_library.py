@@ -312,10 +312,10 @@ def test_policy_override_and_handler():
 
 
 # ---------------------------------------------------------------- daisy chain
-def test_chain_shared_pins_alias_and_estop():
+def test_chain_shared_sleep_alias_and_estop():
     be = MockBackend()
     front, *_ = make_board("front", backend=be)
-    rear = MotorBoard("rear", a_en=20, a_ph=21, b_en=22, b_ph=23, sleep_pin=26, fault_pin=19,
+    rear = MotorBoard("rear", a_en=20, a_ph=21, b_en=22, b_ph=23, sleep_pin=26, fault_pin=24,
                       backend=be, motor_options=dict(reverse_delay=0))
     assert be._refs[26] == 2            # shared nSLEEP
     chain = MotorChain([front, rear], monitor=False)
@@ -533,3 +533,14 @@ def test_four_motor_nfault_is_driver_fault_while_running():
     assert FaultType.STALL not in types and FaultType.CURRENT_LIMIT not in types
     assert board["a1"].state is MotorState.FAULT
     board.close()
+
+
+def test_fault_pin_must_be_separate_per_board():
+    be = MockBackend()
+    front, *_ = make_board("front", backend=be)           # fault_pin=19
+    with pytest.raises(ConfigError, match="own nFAULT"):
+        MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, fault_pin=19, backend=be)
+    assert 20 not in be.pins                               # nothing created on failure
+    front.close()
+    rear = MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, fault_pin=19, backend=be)
+    rear.close()                                           # free again once front closed

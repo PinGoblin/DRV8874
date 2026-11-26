@@ -37,8 +37,8 @@ Abbreviations and terms used in this manual, in alphabetical order.
 | MIT | Massachusetts Institute of Technology licence | The open-source licence the software is released under |
 | MOSFET | Metal-oxide-semiconductor field-effect transistor | An electronic switch. Q1 is a MOSFET that blocks a reversed supply |
 | n (prefix) | Not | A leading n means the signal is active when low. nSLEEP low = sleep, nFAULT low = fault |
-| nFAULT | Not fault | J3 output that goes low on a fault or while current limiting |
-| nSLEEP | Not sleep | J3 input. Low puts both drivers to sleep (motors coast) |
+| nFAULT | Not fault | J3 output that goes low on a fault or while current limiting. Use one host GPIO per board |
+| nSLEEP | Not sleep | J3 input. Low (the default, set by a pull-down on the board) puts both drivers to sleep and the motors coast. The host drives it high to run the motors |
 | OUT1 / OUT2 | Output 1 / output 2 | The two motor terminals of each driver, labelled A1 / A2 (J4) and B1 / B2 (J5). Forward = OUT1 positive |
 | PH | Phase | PH/EN mode input that sets direction. High = forward, low = reverse |
 | PH/EN | Phase / enable | The default control mode: PH sets the direction, EN sets on/off and speed |

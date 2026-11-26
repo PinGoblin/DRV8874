@@ -22,9 +22,15 @@ WAKE_TIME_S = 0.0015           # DRV8874 wake-up time from sleep is about 1 ms
 class MotorBoard:
     """One Board A dual DC motor driver.
 
-    Pins are BCM GPIO numbers. Motor B is optional. Several boards can share `sleep_pin`
-    (one e-stop line) and `fault_pin` (wired-OR fault line): pass the same GPIO to each
-    board. Boards work as context managers and close on exit.
+    Pins are BCM GPIO numbers. Motor B is optional. Boards work as context managers and
+    close on exit.
+
+    The board pulls nSLEEP low, so its drivers sleep (motors off) until `sleep_pin` is
+    driven high. The library drives it high at start-up and wakes the board before every
+    run command. Several boards can share one `sleep_pin` (one e-stop line). Each board
+    needs its **own** `fault_pin`: a shared fault line overloads the nFAULT outputs and
+    hides which board faulted, so a `fault_pin` already used by another open board is
+    rejected.
 
     The `mode` must match the PMODE jumper JP1:
 
@@ -52,14 +58,15 @@ class MotorBoard:
             board["b2"].forward(80, duration=2, wait=True)
         ```
 
-        In this mode an input that isn't driven turns its motor **on**. The board must have
-        `sleep_pin` wired, with a 4.7 kΩ resistor from J3 pin 9 to GND, so the drivers
-        sleep whenever your program isn't holding nSLEEP high. The library keeps the drivers
-        asleep until the first run command, and puts them to sleep in
+        In this mode an input that isn't driven turns its motor **on**. `sleep_pin` is
+        required: the board's pull-down on nSLEEP then keeps the drivers asleep whenever
+        your program isn't holding it high. The library keeps the drivers asleep until the
+        first run command, and puts them to sleep in
         [`close()`][pingoblin_motor.board.MotorBoard.close].
     """
 
     _sleep_groups: Dict[tuple, list] = {}
+    _fault_users: Dict[tuple, "MotorBoard"] = {}
     _group_lock = threading.Lock()
 
     def __init__(self, name: str = "board", *, a_en: int, a_ph: int,
@@ -80,11 +87,13 @@ class MotorBoard:
             a_ph: GPIO for A_PH (J3 pin 4).
             b_en: GPIO for B_EN (J3 pin 5), or `None` for a single motor.
             b_ph: GPIO for B_PH (J3 pin 6), or `None`.
-            sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`. Needed to coast in PH/EN mode and
-                for [`sleep()`][pingoblin_motor.board.MotorBoard.sleep]. Required in
-                four-motor mode.
+            sleep_pin: GPIO for nSLEEP (J3 pin 9). The board pulls nSLEEP low, so the motors
+                only run while this pin is driven high. Pass `None` only if J3 pin 9 is linked
+                to VLOGIC (pin 2); the board then can't coast in PH/EN mode or
+                [`sleep()`][pingoblin_motor.board.MotorBoard.sleep]. Required in four-motor
+                mode. Several boards may share it.
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection
-                without a current sensor.
+                without a current sensor. Must be a different GPIO for each board.
             mode: `"ph_en"` (JP1 pads 1–2, default), `"pwm"` (JP1 pads 2–3) or
                 `"independent"` (JP1 all pads open: four-motor mode).
             logic_voltage: VLOGIC (V). Sets the current limit: about 2.0 A at 3.3 V and
@@ -110,8 +119,8 @@ class MotorBoard:
             fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
 
         Raises:
-            ConfigError: Invalid mode, voltage, names or pins, or four-motor mode without
-                `sleep_pin`.
+            ConfigError: Invalid mode, voltage, names or pins, four-motor mode without
+                `sleep_pin`, or a `fault_pin` already used by another open board.
         """
         try:
             self.mode = ControlMode(mode)
@@ -133,18 +142,27 @@ class MotorBoard:
 
         if "." in name:
             raise ConfigError("board name must not contain '.'")
+        backend = backend or default_backend()
+        if fault_pin is not None:
+            with MotorBoard._group_lock:
+                other = MotorBoard._fault_users.get((id(backend), fault_pin))
+            if other is not None:
+                raise ConfigError(f"fault_pin {fault_pin} is already used by board '{other.name}': "
+                                  "give each board its own nFAULT line")
         self.name = name
         self.logic_voltage = logic_voltage
         self.fuse_rating = fuse_rating
-        self.backend = backend or default_backend()
+        self.backend = backend
         self._sleep_pin, self._fault_pin = sleep_pin, fault_pin
-        # Drive nSLEEP high (awake) at start; the board's pull-up also keeps it high. In
-        # four-motor mode stay asleep until the first run, so the inputs are set first.
+        # The board pulls nSLEEP low. Drive it high (awake) at start, except in four-motor
+        # mode: stay asleep until the first run, so the inputs are set first.
         self._sleep = self.backend.output(sleep_pin, not four) if sleep_pin is not None else None
         self._fault = self.backend.input(fault_pin) if fault_pin is not None else None
-        if sleep_pin is not None:
-            with MotorBoard._group_lock:
+        with MotorBoard._group_lock:
+            if sleep_pin is not None:
                 MotorBoard._sleep_groups.setdefault((id(self.backend), sleep_pin), []).append(self)
+            if fault_pin is not None:
+                MotorBoard._fault_users[(id(self.backend), fault_pin)] = self
 
         common = dict(motor_options or {})
         self.motors: Dict[str, Motor] = {}
@@ -372,11 +390,14 @@ class MotorBoard:
             self._sleep.set(False)
         for m in self.motors.values():
             m.close()
-        if self._sleep_pin is not None:
-            with MotorBoard._group_lock:
+        with MotorBoard._group_lock:
+            if self._sleep_pin is not None:
                 grp = MotorBoard._sleep_groups.get((id(self.backend), self._sleep_pin), [])
                 if self in grp:
                     grp.remove(self)
+            key = (id(self.backend), self._fault_pin)
+            if MotorBoard._fault_users.get(key) is self:
+                del MotorBoard._fault_users[key]
         self.backend.release(self._sleep_pin)
         self.backend.release(self._fault_pin)
 

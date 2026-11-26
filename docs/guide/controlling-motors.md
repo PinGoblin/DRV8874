@@ -24,10 +24,10 @@ on and sets the speed with PWM (pulse-width modulation), and **PH** (phase) sets
 
 | nSLEEP | A_EN | A_PH | OUT1 | OUT2 | Motor | LED |
 | --- | --- | --- | --- | --- | --- | --- |
-| High (default) | Low | Any | Low | Low | Brake (stops quickly) | Off |
+| High | Low | Any | Low | Low | Brake (stops quickly) | Off |
 | High | High / PWM | High | High | Low | Forward | Green |
 | High | High / PWM | Low | Low | High | Reverse | Red |
-| Low | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
+| Low (default) | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
 
 **Speed:** drive EN with PWM. The duty cycle sets the speed, and in the PWM off-time the
 motor brakes, which gives a firm, linear response. Use 20 kHz to keep the motor quiet.
@@ -40,11 +40,14 @@ briefly before reversing a heavily loaded motor. The library does this for you: 
 for `reverse_delay` (0.1 s by default) before reversing a running motor.
 
 **Sleep / emergency stop:** pull nSLEEP low to put both drivers to sleep (outputs open,
-motors coast). Wake-up takes about 1 ms. nSLEEP is pulled high on the board, so the
-drivers are awake whenever VLOGIC is present.
+motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-down on the board, so
+the drivers sleep until the host drives it high: your program must do this before the
+motors will run. The library does it for you.
 
-**Start-up behaviour:** EN and PH have pull-down resistors, so while the host is booting
-(pins floating) both motors are held in brake.
+**Start-up behaviour:** nSLEEP, EN and PH all have 10 kΩ pull-downs, so while the host is
+booting, and after your program exits, the drivers sleep and the motors coast. If the
+motor's load can turn it backwards (a lift, an arm, a robot parked on a slope), have your
+program wake the board with EN low as soon as it starts: the motor is then braked.
 
 "Forward" and "reverse" here follow TI's convention for the DRV8874: PH high = forward, with
 OUT1 positive (green LED). Which way the shaft actually turns depends on how the motor is
@@ -66,6 +69,7 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
     from machine import Pin, PWM, ADC
     import time
 
+    SLEEP = Pin(32, Pin.OUT, value=1)             # J3 pin 9: high = drivers awake
     A_EN = PWM(Pin(25), freq=20000, duty_u16=0)   # J3 pin 3
     A_PH = Pin(26, Pin.OUT, value=0)              # J3 pin 4
     A_SENSE = ADC(Pin(34)); A_SENSE.atten(ADC.ATTN_11DB)  # J3 pin 7
@@ -93,9 +97,10 @@ simple enough to drive by hand. Speed runs from −1.0 (full reverse) to 1.0 (fu
 === "Raspberry Pi, gpiozero"
 
     ```python
-    from gpiozero import PhaseEnableMotor, DigitalInputDevice
+    from gpiozero import PhaseEnableMotor, DigitalInputDevice, DigitalOutputDevice
     from time import sleep
 
+    wake = DigitalOutputDevice(26, initial_value=True)   # J3 pin 9: high = drivers awake
     motor_a = PhaseEnableMotor(phase=5, enable=12)   # J3 pins 4, 3
     motor_b = PhaseEnableMotor(phase=6, enable=13)   # J3 pins 6, 5
     motor_a.enable_device.frequency = 1000           # software PWM

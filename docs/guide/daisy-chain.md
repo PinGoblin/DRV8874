@@ -14,12 +14,20 @@ Several boards can share one motor supply and one host.
 
 ## Logic
 
-- Each board needs its own EN and PH pins (J3 pins 3–6).
-- nSLEEP (pin 9) and nFAULT (pin 10) can be shared: wire them together across boards and
-  connect them to one GPIO each. That gives one emergency-stop line and one fault line.
-  nFAULT is open-drain, so any board can pull the shared line low.
+- Each board needs its own EN and PH pins (J3 pins 3–6), and its **own nFAULT pin**
+  (pin 10, see below).
+- nSLEEP (pin 9) can be shared: wire it to every board and connect it to one GPIO. That
+  gives one emergency-stop line that stops every board at once. One 3.3 V GPIO can drive
+  nSLEEP for up to four boards (about 0.35 mA per board).
 - Connect GND (pin 1) and VLOGIC (pin 2) on every board.
 - One PinGoblin ADS1115 board reads the ISENSE outputs of two boards. Up to four ADS1115
   boards share one I2C bus.
+
+!!! warning "Give every board its own nFAULT line"
+    Never wire the nFAULT pins of two boards together. Each board's fault LED and pull-up
+    load its nFAULT line with up to about 3.5 mA, and the driver that pulls the line low is
+    rated for 5 mA. A shared line would also hide which board has the fault, so the library
+    would have to stop every motor on every board. The library raises an error if two boards
+    are given the same `fault_pin`.
 
 In software, manage the boards as one [`MotorChain`](../api/guide/daisy-chain.md).
