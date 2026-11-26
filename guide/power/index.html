@@ -1745,7 +1745,7 @@
 
 
 <h1 id="powering-the-board">Powering the board<a class="headerlink" href="#powering-the-board" title="Permanent link">&para;</a></h1>
-<p>The board runs from <strong>6–18 V DC</strong>. It has two power connectors, wired in parallel:</p>
+<p>The board runs from <strong>6–30 V DC</strong>, which covers 12 V and 24 V systems. It has two power connectors, wired in parallel:</p>
 <table>
 <thead>
 <tr>
@@ -1860,7 +1860,7 @@ cell, where the UPS HAT+ software stops:</p>
 example 100 kΩ over 22 kΩ, which gives 3.0 V at 16.8 V).</p>
 <h2 id="other-batteries">Other batteries<a class="headerlink" href="#other-batteries" title="Permanent link">&para;</a></h2>
 <p>Any battery with its own protection circuit (BMS), an XT30 plug and a full-charge voltage
-of 18 V or less:</p>
+of 30 V or less:</p>
 <table>
 <thead>
 <tr>
@@ -1896,16 +1896,42 @@ of 18 V or less:</p>
 <td>Yes</td>
 </tr>
 <tr>
-<td>5S Li-ion / LiPo or more</td>
-<td>21 V or more</td>
+<td>5S Li-ion / LiPo</td>
+<td>21.0 V</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>6S Li-ion / LiPo</td>
+<td>25.2 V</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>7S Li-ion / LiPo</td>
+<td>29.4 V</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>8S LiFePO4 (24 V)</td>
+<td>29.2 V</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>24 V lead-acid / AGM</td>
+<td>27.6–29.4 V while charging</td>
+<td>Yes, if the charger stays at or below 30 V</td>
+</tr>
+<tr>
+<td>8S Li-ion / LiPo or more</td>
+<td>33.6 V or more</td>
 <td><strong>No</strong></td>
 </tr>
 </tbody>
 </table>
 <h2 id="wired-supplies">Wired supplies<a class="headerlink" href="#wired-supplies" title="Permanent link">&para;</a></h2>
 <p>Connect plug-packs and bench supplies to J2: positive to pin 1 (VIN+), negative to pin 2
-(GND). Keep the supply at or below 18 V, including its tolerance: a supply labelled 18 V can
-measure higher. A 12 V supply suits most hobby motors.</p>
+(GND). Keep the supply at or below 30 V, including its tolerance: a supply labelled 30 V can
+measure higher. A 12 V supply suits most hobby motors, and a 24 V supply suits industrial
+pumps, valves and actuators.</p>
 
 
 
