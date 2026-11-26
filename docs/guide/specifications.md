@@ -2,7 +2,7 @@
 
 | Parameter | Value |
 | --- | --- |
-| Motor supply (VIN) | 6–18 V DC (18 V maximum, including supply tolerance), 12 V nominal |
+| Motor supply (VIN) | 6–30 V DC (30 V maximum, including supply tolerance), suits 12 V and 24 V systems |
 | Logic supply (VLOGIC) | 3.3–5 V, from the host |
 | Logic input high | 1.5 V min (3.3 V and 5 V logic both work) |
 | Default state | Drivers awake (nSLEEP pulled high); EN and PH pulled low, so motors are braked |

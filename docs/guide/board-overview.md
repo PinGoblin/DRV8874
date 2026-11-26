@@ -6,7 +6,7 @@
 
 | Ref | Name | What it does |
 | --- | --- | --- |
-| J1 | Power in (XT30) | Battery or supply with an XT30 plug, 6–18 V. See [Powering the board](power.md) |
+| J1 | Power in (XT30) | Battery or supply with an XT30 plug, 6–30 V. See [Powering the board](power.md) |
 | J2 | Power in / through | Screw terminal in parallel with J1: a wired supply in, or power out to the next board |
 | J3 | Logic header | Connects to the host: power, direction and speed inputs, current sense, sleep and fault. See [J3 pinout](j3-pinout.md) |
 
@@ -43,6 +43,6 @@ See [Test buttons and LEDs](buttons-leds.md) for how the buttons behave with a h
 | U1, U2 | TI DRV8874 | H-bridge drivers for motors A and B |
 | F1 | 3 A resettable fuse | Protects the board's supply |
 | Q1 | P-channel MOSFET | Reverse-polarity protection |
-| D2 | SMBJ18A | Surge suppressor on the motor supply |
+| D2 | SMBJ30A | Surge suppressor on the motor supply |
 | C13, C1 | 220 µF (×2) | Bulk capacitors, one beside each driver (U1, U2) |
 | H1–H4 | M2.5 holes | Mounting |

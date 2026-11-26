@@ -7,7 +7,7 @@ microcontroller, such as a Raspberry Pi, ESP32, Raspberry Pi Pico or Arduino. Ea
 has its own TI DRV8874 H-bridge, with speed set by PWM, direction set by one pin, and a
 current-sense output that can be read with an ADC.
 
-- Two independent motor channels, motor supply 6–18 V (12 V nominal)
+- Two independent motor channels, motor supply 6–30 V (12 V and 24 V systems)
 - Direction + speed control (PH/EN, phase/enable mode), with a jumper for two-input
   PWM (pulse-width modulation) mode
 - Analog current feedback per motor (0.675 V/A) for stall detection

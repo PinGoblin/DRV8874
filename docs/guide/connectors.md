@@ -5,8 +5,8 @@ motors and one logic header (J3, see [J3 pinout](j3-pinout.md)).
 
 | Connector | Type | Pin 1 | Pin 2 | Use |
 | --- | --- | --- | --- | --- |
-| J1 VIN | XT30, right-angle male | GND (−) | VIN+ (+, 6–18 V) | Battery or XT30 supply in |
-| J2 VIN / THRU | 5.08 mm screw terminal | VIN+ (6–18 V) | GND | Wired supply in, or power out to the next board. In parallel with J1 |
+| J1 VIN | XT30, right-angle male | GND (−) | VIN+ (+, 6–30 V) | Battery or XT30 supply in |
+| J2 VIN / THRU | 5.08 mm screw terminal | VIN+ (6–30 V) | GND | Wired supply in, or power out to the next board. In parallel with J1 |
 | J4 MOTOR A | 3.5 mm screw terminal | OUT1 (A1) | OUT2 (A2) | Motor A |
 | J5 MOTOR B | 3.5 mm screw terminal | OUT1 (B1) | OUT2 (B2) | Motor B |
 | J3 LOGIC | 2.54 mm 1×10 header | GND | VLOGIC | Host connection, see [J3 pinout](j3-pinout.md) |

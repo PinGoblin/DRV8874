@@ -50,7 +50,7 @@ Abbreviations and terms used in this manual, in alphabetical order.
 | TVS | Transient-voltage suppressor | A diode (D2) that clamps voltage spikes on the motor supply |
 | UPS | Uninterruptible power supply | As in the PinGoblin UPS HAT+. Its QUAD and DUAL battery packs can also power this board |
 | USB | Universal serial bus | The connector on most microcontroller boards. A USB lead can supply the 5 V for VLOGIC when testing |
-| VIN | Voltage in | The motor supply input at J1 and J2, 6–18 V |
+| VIN | Voltage in | The motor supply input at J1 and J2, 6–30 V |
 | VLOGIC | Logic voltage | The host's 3.3 V or 5 V supply, fed in on J3 pin 2. Sets the logic level |
 | VM | Motor voltage | The motor supply after the fuse and reverse-polarity protection |
 | XT30 | — | A small, keyed, two-pin power connector made by AMASS, common on battery packs. J1 is an XT30 |

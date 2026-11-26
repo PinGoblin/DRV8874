@@ -6,7 +6,7 @@ Wire J3 to the host first, then the motors, then the motor supply last.
    least GND, VLOGIC, and one EN and one PH pin per motor.
 2. Connect each motor to J4 (A) or J5 (B). For less electrical noise, solder a 100 nF
    capacitor across each motor's terminals and twist its leads (see [Connectors](connectors.md)).
-3. Connect power: a battery to J1 (XT30), or a 6–18 V supply to J2 (positive to VIN+,
+3. Connect power: a battery to J1 (XT30), or a 6–30 V supply to J2 (positive to VIN+,
    negative to GND). See [Powering the board](power.md). The green power LED
    lights.
 4. Power the host. Motors stay stopped (braked) until the host drives an EN pin high.

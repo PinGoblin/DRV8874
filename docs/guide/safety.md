@@ -2,13 +2,13 @@
 
 Read these before connecting power.
 
-!!! danger "Never connect the motor supply voltage (6–18 V) to the J3 header"
+!!! danger "Never connect the motor supply voltage (6–30 V) to the J3 header"
     J3 is for logic signals only. The motor supply on any J3 pin will destroy the host and
     the drivers.
 
-- **Do not exceed 18 V on the motor supply, including supply tolerance.** A supply labelled 18 V can
+- **Do not exceed 30 V on the motor supply, including supply tolerance.** A supply labelled 30 V can
   measure higher: check it with a meter, or use a lower voltage. The surge suppressor
-  starts conducting at about 20 V and is not meant to carry continuous current.
+  starts conducting at about 33 V and is not meant to carry continuous current.
 - **Connect GND between the board and the host.** J3 pin 1 must go to a host GND pin.
 - **Wire with the power off.** Connect and disconnect motors only while the supply is off.
 - **The drivers get hot.** At high currents the chips and the board around them can exceed

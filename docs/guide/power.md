@@ -1,6 +1,6 @@
 # Powering the board
 
-The board runs from **6–18 V DC**. It has two power connectors, wired in parallel:
+The board runs from **6–30 V DC**, which covers 12 V and 24 V systems. It has two power connectors, wired in parallel:
 
 | Connector | Type | Use |
 | --- | --- | --- |
@@ -69,7 +69,7 @@ example 100 kΩ over 22 kΩ, which gives 3.0 V at 16.8 V).
 ## Other batteries
 
 Any battery with its own protection circuit (BMS), an XT30 plug and a full-charge voltage
-of 18 V or less:
+of 30 V or less:
 
 | Battery | Full charge | Suitable? |
 | --- | --- | --- |
@@ -78,10 +78,16 @@ of 18 V or less:
 | 4S Li-ion / LiPo | 16.8 V | Yes |
 | 4S LiFePO4 | 14.6 V | Yes |
 | 12 V lead-acid / AGM | 13.8–14.7 V while charging | Yes |
-| 5S Li-ion / LiPo or more | 21 V or more | **No** |
+| 5S Li-ion / LiPo | 21.0 V | Yes |
+| 6S Li-ion / LiPo | 25.2 V | Yes |
+| 7S Li-ion / LiPo | 29.4 V | Yes |
+| 8S LiFePO4 (24 V) | 29.2 V | Yes |
+| 24 V lead-acid / AGM | 27.6–29.4 V while charging | Yes, if the charger stays at or below 30 V |
+| 8S Li-ion / LiPo or more | 33.6 V or more | **No** |
 
 ## Wired supplies
 
 Connect plug-packs and bench supplies to J2: positive to pin 1 (VIN+), negative to pin 2
-(GND). Keep the supply at or below 18 V, including its tolerance: a supply labelled 18 V can
-measure higher. A 12 V supply suits most hobby motors.
+(GND). Keep the supply at or below 30 V, including its tolerance: a supply labelled 30 V can
+measure higher. A 12 V supply suits most hobby motors, and a 24 V supply suits industrial
+pumps, valves and actuators.
