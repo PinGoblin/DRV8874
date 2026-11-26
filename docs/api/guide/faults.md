@@ -67,3 +67,11 @@ board.motor_a.wait(timeout=10)       # returns when the stall brakes the motor
 ```
 
 See `python/examples/stall_homing.py` and `micropython/examples/pico_asyncio_stall_homing.py`.
+
+## Four-motor mode
+
+With `mode="independent"` the drivers don't limit current, so nFAULT low always means a
+driver shutdown and is reported as `DRIVER_FAULT`, even while motors run. `STALL`,
+`CURRENT_LIMIT`, `OPEN_LOAD` and `OVERLOAD` aren't detected, because ISENSE carries two
+motors at once. With a sensor on each driver, `BOARD_OVERLOAD` and `CHAIN_OVERLOAD` still
+work. See [Four-motor mode](../../guide/four-motor-mode.md).

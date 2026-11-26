@@ -10,13 +10,16 @@ current-sense output you can read with an ADC.
 - Two independent motor channels, motor supply 6–18 V (12 V nominal)
 - Direction + speed control (PH/EN, phase/enable mode), with a jumper for two-input
   PWM (pulse-width modulation) mode
+- [Four-motor mode](four-motor-mode.md): up to four one-direction motors, such as pumps
+  and fans
 - Analog current feedback per motor (0.675 V/A) for stall detection
 - Built-in current limit, overcurrent and over-temperature protection
 - Reverse-polarity protection, surge suppressor (TVS) and a 3 A resettable fuse on the motor supply
 - Push buttons to test each motor without writing code
 - Direction LEDs per motor, plus power and fault LEDs
 - Power through-terminal for daisy-chaining several boards from one supply
-- Safe start-up: motors stay off while the host boots
+- Safe start-up: motors stay off while the host boots (in four-motor mode this needs a
+  4.7 kΩ resistor on nSLEEP)
 
 ## Where to start
 

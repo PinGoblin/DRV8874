@@ -2,6 +2,7 @@
 
 Runs on ESP32 and Raspberry Pi Pico / Pico 2 with MicroPython 1.20 or later, and has the
 same class and method names as the Raspberry Pi library: `MotorBoard`, `Motor`,
+`HalfBridgeMotor` (four-motor mode),
 `MotorChain`, `forward()`, `reverse()`, `run()`, `start()`, `stop()` / `brake()`,
 `coast()`, `speed_pc` and `current`.
 
@@ -111,13 +112,22 @@ class MotorState:
 class ControlMode:
     """Control mode set by the PMODE jumper JP1 (string constants).
 
+    | Constant | JP1 | Motors per board | Control |
+    |---|---|---|---|
+    | `PH_EN` | Pads 1–2 (default) | 2, bidirectional | EN = on / speed (PWM), PH = direction |
+    | `PWM` | Pads 2–3 | 2, bidirectional | IN1 / IN2. Allows per-motor coast |
+    | `INDEPENDENT` | All pads open | 4, one direction each | Each input drives one output. Low = motor on |
+
     Attributes:
         PH_EN: `"ph_en"`: default (JP1 pads 1–2). EN = speed PWM, PH = direction.
         PWM: `"pwm"`: JP1 pads 2–3. IN1 / IN2; allows per-motor coast.
+        INDEPENDENT: `"independent"`: JP1 all pads open. Four unidirectional motors, each
+            between one output and VM (J6). No current limit. See `HalfBridgeMotor`.
     """
 
     PH_EN = "ph_en"         # JP1 pads 1-2 (default): EN = speed PWM, PH = direction
     PWM = "pwm"             # JP1 pads 2-3: IN1 / IN2
+    INDEPENDENT = "independent"   # JP1 open: four unidirectional motors
 
 
 class FaultType:
@@ -127,7 +137,7 @@ class FaultType:
     |---|---|---|
     | `STALL` | Current at or above `stall_current` for `stall_time` while driven, or nFAULT low for `stall_time` without a sensor | No |
     | `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | No |
-    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature | No |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven (in four-motor mode, at any time): short, overcurrent or over-temperature | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % or more | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
     | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (3 A) for 1 s | Yes |
@@ -792,8 +802,7 @@ class Motor:
         self._pins = pins
         self._en_pin = en_pin
         self._ph_pin = ph_pin
-        self._en = pins.pwm(en_pin, pwm_freq)
-        self._ph = pins.output(ph_pin, False) if mode == ControlMode.PH_EN else pins.pwm(ph_pin, pwm_freq)
+        self._setup_pins(pins, en_pin, ph_pin, pwm_freq)
         self._state = MotorState.STOPPED
         self._direction = None
         self._speed_pc = 0.0
@@ -806,6 +815,10 @@ class Motor:
         self.last_current = None
         self.last_isense_amps = None
         self._apply_brake()
+
+    def _setup_pins(self, pins, en_pin, ph_pin, pwm_freq):
+        self._en = pins.pwm(en_pin, pwm_freq)
+        self._ph = pins.output(ph_pin, False) if self.mode == ControlMode.PH_EN else pins.pwm(ph_pin, pwm_freq)
 
     # ---- properties
     @property
@@ -1147,6 +1160,125 @@ class Motor:
         if self.mode == ControlMode.PWM:
             self._ph.set_duty(0.0)
 
+
+class HalfBridgeMotor(Motor):
+    """One unidirectional motor in four-motor mode (JP1 all pads open).
+
+    Each DRV8874 output works on its own, so a board drives four motors: `a1` (J4 A1,
+    OUT1), `a2` (J4 A2, OUT2), `b1` (J5 B1) and `b2` (J5 B2). Wire each motor between its
+    output and a VM pin on J6. Create the motors through `MotorBoard(mode="independent")`.
+
+    | Input pin | Output | Motor |
+    |---|---|---|
+    | Low | Low-side on: OUT at 0 V | Runs (full VM across it) |
+    | High | High-side on: OUT at VM | Off, braking gently |
+    | (nSLEEP low) | Open | Coasts |
+
+    The motor runs while its input is **low**, so the library drives the pin at
+    `1 − speed`: `forward(30)` sets the pin to 70 % duty.
+
+    Differences from `Motor`:
+
+    - One direction only: `reverse()` and negative speeds raise an error; no `invert`.
+    - **No current limit.** The DRV8874 turns current regulation off in this mode.
+    - No per-motor current: ISENSE is the sum of both motors on a driver. Read it with
+      `MotorBoard.driver_current()`.
+    - `coast()` sleeps the drivers, so it works only when every other motor on the same
+      nSLEEP line is idle. Otherwise the motor brakes.
+
+    Example:
+        ```python
+        board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, sleep_pin=32, fault_pin=39,
+                           mode="independent")
+        board["a1"].forward(60)
+        board["b2"].forward(100, duration=3, wait=True)
+        board.close()          # stops all four and sleeps the drivers
+        ```
+    """
+
+    def __init__(self, name, board, pin, driver, output, pins, pwm_freq=20000, **options):
+        """
+        Args:
+            name: Motor name within its board, for example `"a1"`.
+            board: The owning `MotorBoard`.
+            pin: GPIO for the input that controls this output: A_EN / B_EN (J3 pin 3 / 5)
+                for OUT1, A_PH / B_PH (J3 pin 4 / 6) for OUT2.
+            driver: `"a"` (U1, J4) or `"b"` (U2, J5).
+            output: `1` (OUT1) or `2` (OUT2).
+            pins: The `PinFactory`.
+            pwm_freq: PWM frequency (Hz).
+            **options: The same options as `Motor` (`min_speed_pc`, `ramp_time`, `policy` and
+                so on). Direction, sensor and current options have no effect.
+
+        Raises:
+            ConfigError: `invert=True`, or an option is out of range.
+        """
+        if options.pop("invert", False):
+            raise ConfigError("invert is not available in four-motor mode: each motor runs one way")
+        options.pop("sensor", None)
+        self.driver = driver
+        self.output = output
+        super().__init__(name, board, pin, None, ControlMode.INDEPENDENT, pins, sensor=None,
+                         pwm_freq=pwm_freq, **options)
+
+    def _setup_pins(self, pins, en_pin, ph_pin, pwm_freq):
+        self._en = pins.pwm(en_pin, pwm_freq)
+        self._ph = None
+
+    @property
+    def terminal(self):
+        """Where the motor connects: for example `"J4 A1 (OUT1)"`."""
+        return "J%d %s%d (OUT%d)" % (4 if self.driver == "a" else 5, self.driver.upper(), self.output, self.output)
+
+    def reverse(self, speed_pc=100, duration=None, wait=False):
+        """Not available: a motor in four-motor mode runs one way only.
+
+        Raises:
+            ConfigError: Always.
+        """
+        raise ConfigError("%s: four-motor mode runs each motor one way only" % self.full_name)
+
+    def run(self, speed_pc, duration=None, wait=False):
+        """Run at a speed, 0–100 %. 0 stops the motor.
+
+        Args:
+            speed_pc: 0–100. Negative values are not allowed.
+            duration: Seconds to run before stopping, or `None`.
+            wait: With `duration`, block until the run ends.
+
+        Raises:
+            ValueError: Speed outside 0–100, or `duration` not positive.
+            MotorFaultError: The motor has a latched fault.
+        """
+        if speed_pc < 0:
+            raise ValueError("four-motor mode: speed must be 0-100 (one direction only)")
+        Motor.run(self, speed_pc, duration, wait)
+
+    def read_current(self):
+        """Not available per motor in four-motor mode. Use `MotorBoard.driver_current()`.
+
+        Raises:
+            ConfigError: Always.
+        """
+        raise ConfigError("%s: no per-motor current in four-motor mode; use board.driver_current()"
+                          % self.full_name)
+
+    def __repr__(self):
+        return "<HalfBridgeMotor %s %s %d%%>" % (self.full_name, self._state, int(self._speed_pc))
+
+    # Input low = low-side on = motor runs. Input high = high-side on = motor off (braked).
+    def _apply_drive(self, duty):
+        duty = 0.0 if duty < 0 else (1.0 if duty > 1 else duty)
+        self._duty = duty
+        self._en.set_duty(1.0 - duty)
+
+    def _apply_brake(self):
+        self._duty = 0.0
+        self._en.set_duty(1.0)
+
+    def _apply_coast(self):
+        self._apply_brake()
+
 # ---------------------------------------------------------------- board
 
 _sleep_groups = {}
@@ -1154,6 +1286,19 @@ _sleep_groups = {}
 
 class MotorBoard:
     """One Board A dual DC motor driver. Pins are GPIO numbers.
+
+    The `mode` must match the PMODE jumper JP1:
+
+    | `mode` | JP1 | Motors | Names (default) |
+    |---|---|---|---|
+    | `"ph_en"` | Pads 1–2 (default) | 2 × `Motor` | `a`, `b` |
+    | `"pwm"` | Pads 2–3 | 2 × `Motor` | `a`, `b` |
+    | `"independent"` | All pads open | 4 × `HalfBridgeMotor` | `a1`, `a2`, `b1`, `b2` |
+
+    In four-motor mode an input that isn't driven turns its motor **on**. Wire `sleep_pin`
+    and fit a 4.7 kΩ resistor from J3 pin 9 to GND, so the drivers sleep unless your
+    program holds nSLEEP high. The library keeps the drivers asleep until the first run
+    command and puts them to sleep in `close()`.
 
     Example:
         ```python
@@ -1170,7 +1315,7 @@ class MotorBoard:
                  sleep_pin=None, fault_pin=None, mode="ph_en", logic_voltage=3.3,
                  adc=None, a_sense_channel=None, b_sense_channel=None,
                  a_sensor=None, b_sensor=None, sense_samples=None, pins=None,
-                 pwm_freq=20000, motor_names=("a", "b"), motor_options=None,
+                 pwm_freq=20000, motor_names=None, motor_options=None,
                  a_options=None, b_options=None, fuse_rating=3.0):
         """
         Args:
@@ -1179,31 +1324,40 @@ class MotorBoard:
             a_ph: GPIO for A_PH (J3 pin 4).
             b_en: GPIO for B_EN (J3 pin 5), or `None` for a single motor.
             b_ph: GPIO for B_PH (J3 pin 6), or `None`.
-            sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`.
+            sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`. Required in four-motor mode.
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection without a sensor.
-            mode: `"ph_en"` (JP1 pads 1–2, default) or `"pwm"` (JP1 pads 2–3).
+            mode: `"ph_en"` (JP1 pads 1–2, default), `"pwm"` (JP1 pads 2–3) or
+                `"independent"` (JP1 all pads open: four-motor mode).
             logic_voltage: VLOGIC (V). Sets the current limit: 2.0 A at 3.3 V, 3.0 A at 5 V.
             adc: An `ADS1115` for current sensing.
-            a_sense_channel: ADS1115 input wired to A_ISENSE.
+            a_sense_channel: ADS1115 input wired to A_ISENSE (A1 + A2 in four-motor mode).
             b_sense_channel: ADS1115 input wired to B_ISENSE.
             a_sensor: Any sensor with `read_voltage()` for motor A, such as `ADCChannel(34)`.
             b_sensor: The same for motor B.
             sense_samples: Samples per reading. Default: 16 for `ADCChannel`, otherwise 4.
             pins: `PinFactory`. Default: `MachinePins()`.
             pwm_freq: PWM frequency (Hz). Default 20 kHz.
-            motor_names: Names for motors A and B.
-            motor_options: Keyword arguments for both `Motor`s.
-            a_options: Keyword arguments for motor A only.
-            b_options: Keyword arguments for motor B only.
+            motor_names: Names for motors A and B, or four names (A1, A2, B1, B2) in
+                four-motor mode. Default `("a", "b")` or `("a1", "a2", "b1", "b2")`.
+            motor_options: Keyword arguments for every motor.
+            a_options: Keyword arguments for motor A only (A1 and A2 in four-motor mode).
+            b_options: Keyword arguments for motor B only (B1 and B2 in four-motor mode).
             fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
 
         Raises:
-            ConfigError: Invalid mode, voltage, names or pins.
+            ConfigError: Invalid mode, voltage, names or pins, or four-motor mode without
+                `sleep_pin`.
         """
         if a_en is None or a_ph is None:
             raise ConfigError("a_en and a_ph are required")
-        if mode not in (ControlMode.PH_EN, ControlMode.PWM):
-            raise ConfigError("mode must be 'ph_en' or 'pwm'")
+        if mode not in (ControlMode.PH_EN, ControlMode.PWM, ControlMode.INDEPENDENT):
+            raise ConfigError("mode must be 'ph_en', 'pwm' or 'independent'")
+        four = mode == ControlMode.INDEPENDENT
+        if four and sleep_pin is None:
+            raise ConfigError("four-motor mode needs sleep_pin: an undriven input turns its motor on")
+        n = 4 if four else 2
+        if motor_names is None:
+            motor_names = ("a1", "a2", "b1", "b2") if four else ("a", "b")
         if logic_voltage < 3.0 or logic_voltage > 5.5:
             raise ConfigError("logic_voltage must be 3.0-5.5 V")
         if (b_en is None) != (b_ph is None):
@@ -1213,9 +1367,9 @@ class MotorBoard:
             raise ConfigError("motor control pins must all be different")
         if sleep_pin in used or fault_pin in used:
             raise ConfigError("sleep/fault pins must not reuse a motor pin")
-        if "." in name or len(motor_names) != 2 or motor_names[0] == motor_names[1] \
-                or "." in motor_names[0] or "." in motor_names[1]:
-            raise ConfigError("names must be unique and must not contain '.'")
+        if "." in name or len(motor_names) != n or len(set(motor_names)) != n \
+                or any("." in m for m in motor_names):
+            raise ConfigError("names must be unique and must not contain '.' (%d motor names)" % n)
         self.name = name
         self.mode = mode
         self.logic_voltage = logic_voltage
@@ -1223,17 +1377,40 @@ class MotorBoard:
         self.pins = pins or MachinePins()
         self._sleep_pin = sleep_pin
         self._fault_pin = fault_pin
-        self._sleep = self.pins.output(sleep_pin, True) if sleep_pin is not None else None
+        # Four-motor mode: stay asleep until the first run, so the inputs are set first.
+        self._sleep = self.pins.output(sleep_pin, not four) if sleep_pin is not None else None
         self._fault = self.pins.input(fault_pin) if fault_pin is not None else None
         if sleep_pin is not None:
             _sleep_groups.setdefault((id(self.pins), sleep_pin), []).append(self)
         self._chain = None
         self.monitor = None
         self.motors = {}
+        self._driver_sensors = {}
+        self._driver_amps = {}
+        self._order = []
+        if four:
+            drivers = [("a", a_en, a_ph, a_sense_channel, a_sensor, a_options)]
+            if b_en is not None:
+                drivers.append(("b", b_en, b_ph, b_sense_channel, b_sensor, b_options))
+            for i, (drv, p1, p2, ch, src, opts) in enumerate(drivers):
+                if src is None and adc is not None and ch is not None:
+                    src = ADS1115Channel(adc, ch)
+                sensor = None
+                if src is not None:
+                    sensor = MotorCurrentSensor(src, sense_samples or (16 if isinstance(src, ADCChannel) else 4))
+                self._driver_sensors[drv] = sensor
+                self._driver_amps[drv] = None
+                kw = dict(motor_options or {})
+                kw.update(opts or {})
+                for out, pin in ((1, p1), (2, p2)):
+                    mname = motor_names[2 * i + out - 1]
+                    self.motors[mname] = HalfBridgeMotor(mname, self, pin, drv, out, self.pins,
+                                                         pwm_freq=pwm_freq, **kw)
+                    self._order.append(mname)
+            return
         specs = [(motor_names[0], a_en, a_ph, a_sense_channel, a_sensor, a_options)]
         if b_en is not None:
             specs.append((motor_names[1], b_en, b_ph, b_sense_channel, b_sensor, b_options))
-        self._order = []
         for mname, en, ph, ch, src, opts in specs:
             kw = dict(motor_options or {})
             kw.update(opts or {})
@@ -1255,13 +1432,28 @@ class MotorBoard:
 
     @property
     def motor_a(self):
-        """The first `Motor` (J4)."""
+        """The first `Motor` (J4).
+
+        Raises:
+            ConfigError: In four-motor mode. Use `board["a1"]` and so on.
+        """
+        self._two_motor_only()
         return self.motors[self._order[0]]
 
     @property
     def motor_b(self):
-        """The second `Motor` (J5), or `None`."""
+        """The second `Motor` (J5), or `None`.
+
+        Raises:
+            ConfigError: In four-motor mode. Use `board["b1"]` and so on.
+        """
+        self._two_motor_only()
         return self.motors[self._order[1]] if len(self._order) > 1 else None
+
+    @property
+    def is_four_motor(self):
+        """`True` in four-motor mode (`mode="independent"`)."""
+        return self.mode == ControlMode.INDEPENDENT
 
     @property
     def is_asleep(self):
@@ -1275,7 +1467,13 @@ class MotorBoard:
 
     @property
     def total_current(self):
-        """Sum of the motors' last supply-side readings (A), or `None` unless every motor has been read."""
+        """Sum of the motors' last supply-side readings (A), or `None` unless every motor (every
+        driver, in four-motor mode) has a sensor and has been read."""
+        if self.is_four_motor:
+            vals = list(self._driver_amps.values())
+            if not vals or None in vals or None in self._driver_sensors.values():
+                return None
+            return sum(vals)
         vals = [m.last_isense_amps for m in self.motors.values() if m.has_sensor]
         if not vals or None in vals:
             return None
@@ -1288,6 +1486,31 @@ class MotorBoard:
         return iter([self.motors[n] for n in self._order])
 
     # ---- commands
+    def driver_current(self, driver):
+        """Read one driver's ISENSE now (four-motor mode): the combined current of both motors
+        on that driver (A1 + A2, or B1 + B2), averaged over the PWM cycle.
+
+        Args:
+            driver: `"a"` (U1, J4) or `"b"` (U2, J5).
+
+        Returns:
+            Current (A).
+
+        Raises:
+            ConfigError: Not in four-motor mode, unknown driver, or no sensor for it.
+            SensorError: The reading failed.
+        """
+        if not self.is_four_motor:
+            raise ConfigError("driver_current() is for four-motor mode; use motor.current")
+        if driver not in self._driver_sensors:
+            raise ConfigError("unknown driver '%s'" % driver)
+        sensor = self._driver_sensors[driver]
+        if sensor is None:
+            raise ConfigError("%s: no current sensor for driver %s" % (self.name, driver))
+        amps = sensor.read_isense_amps()
+        self._driver_amps[driver] = amps
+        return amps
+
     def sleep(self):
         """Stop every motor on this nSLEEP line, then pull nSLEEP low (motors coast).
 
@@ -1313,7 +1536,7 @@ class MotorBoard:
             m.stop()
 
     def coast_all(self):
-        """Coast every motor (sleeps the board in PH/EN mode; brakes without a sleep pin)."""
+        """Coast every motor (sleeps the board in PH/EN and four-motor modes; brakes without a sleep pin)."""
         self.stop_all()
         if self.mode == ControlMode.PWM:
             for m in self.motors.values():
@@ -1376,7 +1599,15 @@ class MotorBoard:
             await asyncio.sleep(interval)
 
     def close(self):
-        """Brake every motor and release every pin."""
+        """Brake every motor and release every pin.
+
+        In four-motor mode the drivers are put to sleep first, so the motors don't start when
+        the inputs are released.
+        """
+        if self.is_four_motor and self._sleep is not None:
+            for m in self.motors.values():
+                m.stop()
+            self._sleep.set(False)
         for m in self.motors.values():
             m.close()
         if self._sleep_pin is not None:
@@ -1396,6 +1627,10 @@ class MotorBoard:
         return "<MotorBoard %s %s motors=%s>" % (self.name, self.mode, self._order)
 
     # ---- internals
+    def _two_motor_only(self):
+        if self.is_four_motor:
+            raise ConfigError("four-motor mode: use board['a1'], board['a2'], board['b1'], board['b2']")
+
     def _owner(self):
         return self._chain if self._chain is not None else self
 
@@ -1662,6 +1897,10 @@ class FaultMonitor:
     Without a current sensor, a stall is inferred from nFAULT staying low for `stall_time`.
     If both motors on a board are running, both are stopped.
 
+    In four-motor mode the drivers don't limit current, so nFAULT low always means a driver
+    shutdown (`DRIVER_FAULT`). Per-motor stall, open-load and overload checks are not
+    available; `BOARD_OVERLOAD` and `CHAIN_OVERLOAD` use the two ISENSE readings.
+
     Attributes:
         faults (list): Fault history, oldest first.
         max_history (int): History length (default 50).
@@ -1752,6 +1991,8 @@ class FaultMonitor:
                 self._tracks[id(m)] = _Track()
             self._drv[key] = None
             return 0.0, True
+        if board.is_four_motor:
+            return self._check_four_motor(board, now, found)
         nfault = board.fault_active
         driving = [m for m in board.motors.values() if m.is_running and m.duty > 0]
 
@@ -1844,6 +2085,52 @@ class FaultMonitor:
             else:
                 tr.over = None
 
+        if known and total > board.fuse_rating:
+            since = self._bover.get(key)
+            if since is None:
+                self._bover[key] = now
+            elif ticks_diff(now, since) >= OVERLOAD_DEBOUNCE_MS:
+                msg = "board draws %.2f A, above the %.1f A fuse rating" % (total, board.fuse_rating)
+                for m in board.motors.values():
+                    if m.is_running:
+                        self._emit(Fault(FaultType.BOARD_OVERLOAD, msg, board.name, m.name, total, now), m, found)
+                self._bover[key] = None
+        else:
+            self._bover[key] = None
+        return total, known
+
+    def _check_four_motor(self, board, now, found):
+        key = id(board)
+        if board.fault_active:
+            since = self._drv.get(key)
+            if since is None:
+                self._drv[key] = now
+            elif ticks_diff(now, since) >= DRIVER_FAULT_DEBOUNCE_MS:
+                f = Fault(FaultType.DRIVER_FAULT, "nFAULT low in four-motor mode: driver shut down "
+                          "(overcurrent, over-temperature or undervoltage)", board.name, None, None, now)
+                self._record(f, found)
+                board._report_board_fault(f)
+                self._drv[key] = None
+        else:
+            self._drv[key] = None
+        total = 0.0
+        known = True
+        for drv, sensor in board._driver_sensors.items():
+            tk = (key, drv)
+            tr = self._tracks.get(tk)
+            if tr is None:
+                tr = self._tracks[tk] = _Track()
+            if sensor is None:
+                known = False
+                continue
+            try:
+                total += board.driver_current(drv)
+                tr.sensor_failed = False
+            except SensorError as exc:
+                known = False
+                if not tr.sensor_failed:
+                    tr.sensor_failed = True
+                    self._record(Fault(FaultType.SENSOR_ERROR, str(exc), board.name, None, None, now), found)
         if known and total > board.fuse_rating:
             since = self._bover.get(key)
             if since is None:

@@ -7,6 +7,10 @@ line and, where fitted, each motor's current sensor. It detects every
 Without a current sensor, a stall is inferred from nFAULT staying low (the driver
 current-limiting) for `stall_time`. If both motors on a board are running, the board
 can't tell which one stalled, so both are stopped.
+
+In four-motor mode the drivers don't limit current, so nFAULT low always means a driver
+shutdown (`DRIVER_FAULT`), even while motors run. Per-motor stall, open-load and overload
+checks are not available; `BOARD_OVERLOAD` and `CHAIN_OVERLOAD` use the two ISENSE readings.
 """
 from __future__ import annotations
 
@@ -66,7 +70,7 @@ class FaultMonitor:
         self.clock = clock
         self.faults: List[Fault] = []
         self._handlers: List[Callable[[Fault], None]] = []
-        self._tracks: Dict[int, _Track] = {}
+        self._tracks: Dict[object, _Track] = {}
         self._board_since: Dict[int, Optional[float]] = {}
         self._board_over_since: Dict[int, Optional[float]] = {}
         self._chain_since: Optional[float] = None
@@ -161,6 +165,9 @@ class FaultMonitor:
                 self._tracks[id(m)] = _Track()
             self._board_since[key] = None
             return 0.0, True
+
+        if getattr(board, "is_four_motor", False):
+            return self._check_four_motor(board, now, found)
 
         nfault = board.fault_active                    # None if not wired
         driving = [m for m in board.motors.values() if m.is_running and m.duty > 0]
@@ -258,6 +265,53 @@ class FaultMonitor:
                     tr.over_since = None
             else:
                 tr.over_since = None
+
+        # -- BOARD_OVERLOAD
+        if known and total > board.fuse_rating:
+            since = self._board_over_since.get(key)
+            if since is None:
+                self._board_over_since[key] = now
+            elif now - since >= OVERLOAD_DEBOUNCE:
+                msg = f"board draws {total:.2f} A, above the {board.fuse_rating:.1f} A fuse rating"
+                for m in board.motors.values():
+                    if m.is_running:
+                        self._emit(Fault(FaultType.BOARD_OVERLOAD, msg, board.name, m.name, total, now), m, found)
+                self._board_over_since[key] = None
+        else:
+            self._board_over_since[key] = None
+        return total, known
+
+    def _check_four_motor(self, board, now: float, found: List[Fault]):
+        key = id(board)
+        # -- DRIVER_FAULT: no current regulation in this mode, so nFAULT low = shutdown
+        if board.fault_active:
+            since = self._board_since.get(key)
+            if since is None:
+                self._board_since[key] = now
+            elif now - since >= DRIVER_FAULT_DEBOUNCE:
+                f = Fault(FaultType.DRIVER_FAULT,
+                          "nFAULT low in four-motor mode: driver shut down (overcurrent, "
+                          "over-temperature or undervoltage)", board.name, None, None, now)
+                self._record(f, found)
+                board._report_board_fault(f)
+                self._board_since[key] = None
+        else:
+            self._board_since[key] = None
+
+        total, known = 0.0, True
+        for drv, sensor in board._driver_sensors.items():
+            tr = self._tracks.setdefault((key, drv), _Track())
+            if sensor is None:
+                known = False
+                continue
+            try:
+                total += board.driver_current(drv)
+                tr.sensor_failed = False
+            except SensorError as exc:
+                known = False
+                if not tr.sensor_failed:
+                    tr.sensor_failed = True
+                    self._record(Fault(FaultType.SENSOR_ERROR, str(exc), board.name, None, None, now), found)
 
         # -- BOARD_OVERLOAD
         if known and total > board.fuse_rating:

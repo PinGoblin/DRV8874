@@ -28,6 +28,8 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
   [100% duty and the current limit](configuration.md#practical-limits).
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
+- In [four-motor mode](four-motor-mode.md) there is no current limit, and each ISENSE
+  output carries the combined current of the two motors on that driver.
 - Both motors share the 3 A board fuse. If both run near their limit at 5 V logic for more
   than a few seconds, the fuse will trip. Once power is removed it resets within about a
   minute.

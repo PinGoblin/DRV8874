@@ -15,6 +15,9 @@
 
     The [Glossary](glossary.md) lists every abbreviation used in this manual.
 
+This page covers the two-motor modes. For up to four one-direction motors, see
+[Four-motor mode](four-motor-mode.md).
+
 In the default PH/EN (phase/enable) mode, each motor needs two pins: **EN** (enable) turns it
 on and sets the speed with PWM (pulse-width modulation), and **PH** (phase) sets the direction. This is the same scheme as gpiozero's
 `PhaseEnableMotor`, except that gpiozero calls PH low "forward" (see below). The table is for motor A; motor B is identical using B_EN and B_PH.

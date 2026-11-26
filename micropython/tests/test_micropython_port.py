@@ -353,3 +353,83 @@ def test_asyncio_run_monitor_task():
     assert b.motor_a.state == MotorState.STOPPED          # timed stop handled by the task
     assert got and got[0].type == FaultType.SENSOR_ERROR
     b.close()
+
+
+# ------------------------------------------------------------- four-motor mode
+def make_four(pins=None, sensors=False, **kw):
+    pins = pins or MockPins()
+    sa = MockSensor() if sensors else None
+    sb = MockSensor() if sensors else None
+    b = MotorBoard("q", a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
+                   mode="independent", pins=pins, a_sensor=sa, b_sensor=sb, sense_samples=1, **kw)
+    return b, pins, sa, sb
+
+
+def test_four_motor_setup_asleep_and_stopped():
+    b, pins, *_ = make_four()
+    assert list(b.motors) == ["a1", "a2", "b1", "b2"]
+    assert all(isinstance(m, pm.HalfBridgeMotor) for m in b)
+    assert b.is_asleep
+    assert all(P(pins)[p].duty == 1.0 for p in (12, 5, 13, 6))
+    assert b["a2"].terminal == "J4 A2 (OUT2)"
+    b.close()
+
+
+def test_four_motor_inverted_drive():
+    b, pins, *_ = make_four()
+    b["b1"].forward(25)
+    assert not b.is_asleep and P(pins)[13].duty == pytest.approx(0.75)
+    b["b1"].stop()
+    assert P(pins)[13].duty == 1.0
+    with pytest.raises(ConfigError):
+        b["b1"].reverse(10)
+    with pytest.raises(ValueError):
+        b["b1"].run(-10)
+    with pytest.raises(ConfigError):
+        b.motor_a
+    b.close()
+
+
+def test_four_motor_needs_sleep_pin_and_four_names():
+    with pytest.raises(ConfigError):
+        MotorBoard(a_en=12, a_ph=5, mode="independent", pins=MockPins())
+    with pytest.raises(ConfigError):
+        make_four(motor_names=("x", "y"))
+    with pytest.raises(ConfigError):
+        make_four(motor_options=dict(invert=True))
+
+
+def test_four_motor_close_sleeps():
+    b, pins, *_ = make_four()
+    b["a1"].forward(50)
+    s = P(pins)[26]
+    b.close()
+    assert s.value is False
+
+
+def test_four_motor_timed_run():
+    b, pins, *_ = make_four()
+    b["a2"].forward(60, duration=1)
+    adv(1100)
+    b.update()
+    assert b["a2"].state == MotorState.STOPPED and P(pins)[5].duty == 1.0
+    b.close()
+
+
+def test_four_motor_nfault_and_overload():
+    b, pins, sa, sb = make_four(sensors=True)
+    m = mon(b)
+    b["a1"].forward(100)
+    sa.amps, sb.amps = 2.5, 1.0
+    assert b.driver_current("a") == pytest.approx(2.5, abs=0.01)
+    m.check_once(); adv(1100)
+    assert FaultType.BOARD_OVERLOAD in [f.type for f in m.check_once()]
+    b["a1"].clear_fault()
+    sa.amps = sb.amps = 0.0
+    b["a1"].forward(50)
+    P(pins)[19].level = False
+    m.check_once(); adv(250)
+    types = [f.type for f in m.check_once()]
+    assert FaultType.DRIVER_FAULT in types and FaultType.STALL not in types
+    assert FaultType.CURRENT_LIMIT not in types
+    b.close()

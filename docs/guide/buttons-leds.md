@@ -14,7 +14,10 @@ check the wiring before writing any code.
   any source, such as a USB 5 V lead, and GND to J3 pin 1.
 - They are safe to press while a host is connected, even if the host is driving the pins
   low: 1 kΩ resistors protect the host's GPIOs.
-- They work only in PH/EN mode (the default jumper setting).
+- They work as described here only in PH/EN mode (the default jumper setting). In PWM
+  mode FWD brakes the motor and REV runs it forward. In four-motor mode the buttons can
+  only turn motors off, and the direction LEDs don't show motor status: see
+  [buttons and LEDs in four-motor mode](four-motor-mode.md#test-buttons-and-leds-in-four-motor-mode).
 
 !!! info "Pressing FWD and REV together gives forward"
     FWD drives both EN and PH high, while REV only drives EN, so FWD wins. The result is
@@ -28,7 +31,7 @@ check the wiring before writing any code.
 | LED | Colour | Meaning |
 | --- | --- | --- |
 | Power | Green | Motor supply present (after the reverse-polarity switch) |
-| Fault | Red | A driver is limiting current or has detected a fault (same signal as nFAULT) |
+| Fault | Red | A driver is limiting current or has detected a fault (same signal as nFAULT). In four-motor mode, a driver fault only |
 | Motor A / B direction | Green | Motor running forward (OUT1 positive). Brightness follows PWM duty |
 | Motor A / B direction | Red | Motor running reverse (OUT2 positive). Brightness follows PWM duty |
 

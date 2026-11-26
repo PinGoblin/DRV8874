@@ -8,20 +8,28 @@ pads 1–2 bridged (PH/EN mode).
 - **PWM mode (IN1/IN2, input 1 / input 2):** each pin drives one side of the motor
   directly. This matches two-input drivers such as the L298N and DRV8833, and lets each
   motor coast on its own, but needs PWM on both pins for full control.
+- **Four-motor mode (all pads open):** each pin drives one output on its own, so the
+  board runs four one-direction motors, each wired between a motor terminal and the VM
+  header J6. There is no current limit, and an undriven input turns its motor on, so it
+  needs extra setup. See [Four-motor mode](four-motor-mode.md).
 
 See the [Glossary](glossary.md) for PWM, duty cycle and other terms.
 
 !!! warning
-    Never leave all three pads open: that selects a half-bridge mode this board isn't
-    designed for.
+    Leaving all three pads open selects four-motor mode. Do this only on purpose: in that
+    mode an input that isn't driven runs its motor at full speed. Read
+    [Four-motor mode](four-motor-mode.md) first.
 
 | JP1 setting | Mode | J3 pin 3 / 5 | J3 pin 4 / 6 | Test buttons | Library |
 | --- | --- | --- | --- | --- | --- |
 | 1–2 bridged (default) | PH/EN | EN: on/off + PWM speed | PH: direction | Forward / reverse control | `mode="ph_en"` |
 | 2–3 bridged | PWM (IN1/IN2) | IN1 | IN2 | Not supported: FWD brakes the motor and REV runs it forward | `mode="pwm"` |
+| All open | Four-motor | Motor A1 / B1: low = on | Motor A2 / B2: low = on | Turn motors off only: see [buttons in four-motor mode](four-motor-mode.md#test-buttons-and-leds-in-four-motor-mode) | `mode="independent"` |
 
 To change it, cut the thin trace between pads 1 and 2 with a craft knife, check with a
-multimeter that they're open, then bridge pads 2 and 3 with solder.
+multimeter that they're open, then bridge pads 2 and 3 with solder (PWM mode) or leave
+all pads open (four-motor mode). The drivers read JP1 when they wake, so the new mode takes
+effect at the next power-up or wake from sleep.
 
 ## PWM mode truth table
 
@@ -43,7 +51,7 @@ In PWM mode each motor can coast on its own, without sleeping the board.
 
 ## Speed control in each mode
 
-In both modes, speed comes from the **PWM duty cycle**: the fraction of each PWM period
+In every mode, speed comes from the **PWM duty cycle**: the fraction of each PWM period
 for which the motor is connected to the supply. A motor driven at 60% duty sees, on
 average, about 60% of VM, so it runs at roughly 60% of its full speed at that load. What
 differs between the modes is which pin you switch, and what the motor does in the
@@ -54,6 +62,7 @@ off-time.
 | PH/EN (default) | PH high, EN PWM at duty *d* | PH low, EN PWM at duty *d* | Brake | Firm, close to linear |
 | PWM, slow decay (what the library uses) | IN1 high, IN2 PWM at duty 1 − *d* | IN2 high, IN1 PWM at duty 1 − *d* | Brake | The same as PH/EN |
 | PWM, fast decay | IN1 PWM at duty *d*, IN2 low | IN2 PWM at duty *d*, IN1 low | Coast | Softer; speed falls away at low duty |
+| Four-motor | Input PWM at duty 1 − *d* (one direction only) | Not available | Brake (through the high side) | The same as PH/EN |
 
 **PH/EN mode.** EN carries the speed and PH the direction, so a single PWM channel per
 motor is enough. During the off-time both low-side switches are on (brake, also called

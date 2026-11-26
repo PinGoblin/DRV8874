@@ -1,4 +1,4 @@
-"""[`MotorBoard`][pingoblin_motor.board.MotorBoard]: one Board A (two DRV8874 channels) and its shared lines."""
+"""[`MotorBoard`][pingoblin_motor.board.MotorBoard]: one Board A (two DRV8874 drivers) and its shared lines."""
 from __future__ import annotations
 
 import logging
@@ -8,7 +8,7 @@ from typing import Dict, Iterator, Optional
 
 from .backends import Backend, default_backend
 from .faults import ConfigError, Fault, FaultType
-from .motor import ControlMode, Motor, MotorState
+from .motor import ControlMode, HalfBridgeMotor, Motor, MotorState
 from .sensors import ADS1115, CurrentSensor, MotorCurrentSensor, make_sensor
 
 _log = logging.getLogger("pingoblin_motor")
@@ -26,6 +26,14 @@ class MotorBoard:
     (one e-stop line) and `fault_pin` (wired-OR fault line): pass the same GPIO to each
     board. Boards work as context managers and close on exit.
 
+    The `mode` must match the PMODE jumper JP1:
+
+    | `mode` | JP1 | Motors | Names (default) |
+    |---|---|---|---|
+    | `"ph_en"` | Pads 1–2 (default) | 2 × [`Motor`][pingoblin_motor.motor.Motor] | `a`, `b` |
+    | `"pwm"` | Pads 2–3 | 2 × [`Motor`][pingoblin_motor.motor.Motor] | `a`, `b` |
+    | `"independent"` | All pads open | 4 × [`HalfBridgeMotor`][pingoblin_motor.motor.HalfBridgeMotor] | `a1`, `a2`, `b1`, `b2` |
+
     Example:
         ```python
         from pingoblin_motor import MotorBoard
@@ -35,6 +43,20 @@ class MotorBoard:
             board.start_monitor(on_fault=print)
             board.motor_a.forward(60, duration=2, wait=True)
         ```
+
+    Four-motor mode:
+        ```python
+        with MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
+                        mode="independent") as board:
+            board["a1"].forward(50)
+            board["b2"].forward(80, duration=2, wait=True)
+        ```
+
+        In this mode an input that isn't driven turns its motor **on**. The board must have
+        `sleep_pin` wired, with a 4.7 kΩ resistor from J3 pin 9 to GND, so the drivers
+        sleep whenever your program isn't holding nSLEEP high. The library keeps the drivers
+        asleep until the first run command, and puts them to sleep in
+        [`close()`][pingoblin_motor.board.MotorBoard.close].
     """
 
     _sleep_groups: Dict[tuple, list] = {}
@@ -48,7 +70,7 @@ class MotorBoard:
                  b_sense_channel: Optional[int] = None, sense_samples: int = 4,
                  a_sensor: Optional[CurrentSensor] = None, b_sensor: Optional[CurrentSensor] = None,
                  backend: Optional[Backend] = None, pwm_frequency: float = 1000.0,
-                 motor_names=("a", "b"), motor_options: Optional[dict] = None,
+                 motor_names=None, motor_options: Optional[dict] = None,
                  a_options: Optional[dict] = None, b_options: Optional[dict] = None,
                  fuse_rating: float = 3.0):
         """
@@ -59,14 +81,17 @@ class MotorBoard:
             b_en: GPIO for B_EN (J3 pin 5), or `None` for a single motor.
             b_ph: GPIO for B_PH (J3 pin 6), or `None`.
             sleep_pin: GPIO for nSLEEP (J3 pin 9), or `None`. Needed to coast in PH/EN mode and
-                for [`sleep()`][pingoblin_motor.board.MotorBoard.sleep].
+                for [`sleep()`][pingoblin_motor.board.MotorBoard.sleep]. Required in
+                four-motor mode.
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection
                 without a current sensor.
-            mode: `"ph_en"` (JP1 pads 1–2, default) or `"pwm"` (JP1 pads 2–3).
+            mode: `"ph_en"` (JP1 pads 1–2, default), `"pwm"` (JP1 pads 2–3) or
+                `"independent"` (JP1 all pads open: four-motor mode).
             logic_voltage: VLOGIC (V). Sets the current limit: about 2.0 A at 3.3 V and
                 3.0 A at 5 V.
             adc: An [`ADS1115`][pingoblin_motor.sensors.ADS1115] for current sensing.
-            a_sense_channel: ADS1115 input wired to A_ISENSE.
+            a_sense_channel: ADS1115 input wired to A_ISENSE. In four-motor mode this reads
+                motors `a1` and `a2` together.
             b_sense_channel: ADS1115 input wired to B_ISENSE.
             sense_samples: Readings averaged per current measurement.
             a_sensor: Any [`CurrentSensor`][pingoblin_motor.sensors.CurrentSensor] for motor A,
@@ -75,19 +100,27 @@ class MotorBoard:
             backend: Pin [`Backend`][pingoblin_motor.backends.Backend]. Default:
                 [`GpiozeroBackend`][pingoblin_motor.backends.GpiozeroBackend].
             pwm_frequency: PWM frequency (Hz).
-            motor_names: Names for motors A and B, for example `("left", "right")`.
-            motor_options: Keyword arguments for both [`Motor`][pingoblin_motor.motor.Motor]s.
-            a_options: Keyword arguments for motor A only (override `motor_options`).
-            b_options: Keyword arguments for motor B only.
+            motor_names: Names for motors A and B, for example `("left", "right")`. In
+                four-motor mode, four names for A1, A2, B1 and B2. Default: `("a", "b")`, or
+                `("a1", "a2", "b1", "b2")` in four-motor mode.
+            motor_options: Keyword arguments for every motor.
+            a_options: Keyword arguments for motor A only (override `motor_options`). In
+                four-motor mode they apply to A1 and A2.
+            b_options: Keyword arguments for motor B only (B1 and B2 in four-motor mode).
             fuse_rating: Board fuse hold current (A), for `BOARD_OVERLOAD`.
 
         Raises:
-            ConfigError: Invalid mode, voltage, names or pins.
+            ConfigError: Invalid mode, voltage, names or pins, or four-motor mode without
+                `sleep_pin`.
         """
         try:
             self.mode = ControlMode(mode)
         except ValueError:
-            raise ConfigError("mode must be 'ph_en' or 'pwm'") from None
+            raise ConfigError("mode must be 'ph_en', 'pwm' or 'independent'") from None
+        four = self.mode is ControlMode.INDEPENDENT
+        if four and sleep_pin is None:
+            raise ConfigError("four-motor mode needs sleep_pin: an undriven input turns its motor on, "
+                              "so the drivers must sleep whenever the program isn't running")
         if not 3.0 <= logic_voltage <= 5.5:
             raise ConfigError("logic_voltage must be 3.0-5.5 V")
         if (b_en is None) != (b_ph is None):
@@ -105,8 +138,9 @@ class MotorBoard:
         self.fuse_rating = fuse_rating
         self.backend = backend or default_backend()
         self._sleep_pin, self._fault_pin = sleep_pin, fault_pin
-        # Drive nSLEEP high (awake) at start; the board's pull-up also keeps it high.
-        self._sleep = self.backend.output(sleep_pin, True) if sleep_pin is not None else None
+        # Drive nSLEEP high (awake) at start; the board's pull-up also keeps it high. In
+        # four-motor mode stay asleep until the first run, so the inputs are set first.
+        self._sleep = self.backend.output(sleep_pin, not four) if sleep_pin is not None else None
         self._fault = self.backend.input(fault_pin) if fault_pin is not None else None
         if sleep_pin is not None:
             with MotorBoard._group_lock:
@@ -114,8 +148,30 @@ class MotorBoard:
 
         common = dict(motor_options or {})
         self.motors: Dict[str, Motor] = {}
-        if len(motor_names) != 2 or motor_names[0] == motor_names[1] or any("." in n for n in motor_names):
-            raise ConfigError("motor_names must be two different names without '.'")
+        self._driver_sensors: Dict[str, Optional[MotorCurrentSensor]] = {}
+        self._driver_amps: Dict[str, Optional[float]] = {}
+        n = 4 if four else 2
+        if motor_names is None:
+            motor_names = ("a1", "a2", "b1", "b2") if four else ("a", "b")
+        motor_names = tuple(motor_names)
+        if len(motor_names) != n or len(set(motor_names)) != n or any("." in m for m in motor_names):
+            raise ConfigError(f"motor_names must be {n} different names without '.'")
+        if four:
+            drivers = [("a", a_en, a_ph, a_sense_channel, a_sensor, a_options)]
+            if b_en is not None:
+                drivers.append(("b", b_en, b_ph, b_sense_channel, b_sensor, b_options))
+            for i, (drv, p1, p2, ch, src, opts) in enumerate(drivers):
+                self._driver_sensors[drv] = (MotorCurrentSensor(src, samples=sense_samples) if src is not None
+                                             else make_sensor(adc, ch, sense_samples))
+                self._driver_amps[drv] = None
+                kw = {**common, **(opts or {})}
+                for out, pin in ((1, p1), (2, p2)):
+                    mname = motor_names[2 * i + out - 1]
+                    self.motors[mname] = HalfBridgeMotor(
+                        mname, self, pin, driver=drv, output=out, backend=self.backend,
+                        pwm_frequency=pwm_frequency, **kw)
+            self._monitor = None
+            return
         specs = [(motor_names[0], a_en, a_ph, a_sense_channel, a_sensor, a_options)]
         if b_en is not None:
             specs.append((motor_names[1], b_en, b_ph, b_sense_channel, b_sensor, b_options))
@@ -140,14 +196,29 @@ class MotorBoard:
 
     @property
     def motor_a(self) -> Motor:
-        """The first [`Motor`][pingoblin_motor.motor.Motor] (J4)."""
+        """The first [`Motor`][pingoblin_motor.motor.Motor] (J4).
+
+        Raises:
+            ConfigError: In four-motor mode. Use `board["a1"]`, `board["a2"]` and so on.
+        """
+        self._two_motor_only()
         return list(self.motors.values())[0]
 
     @property
     def motor_b(self) -> Optional[Motor]:
-        """The second [`Motor`][pingoblin_motor.motor.Motor] (J5), or `None` on a single-motor setup."""
+        """The second [`Motor`][pingoblin_motor.motor.Motor] (J5), or `None` on a single-motor setup.
+
+        Raises:
+            ConfigError: In four-motor mode. Use `board["b1"]`, `board["b2"]` and so on.
+        """
+        self._two_motor_only()
         vals = list(self.motors.values())
         return vals[1] if len(vals) > 1 else None
+
+    @property
+    def is_four_motor(self) -> bool:
+        """`True` in four-motor mode (`mode="independent"`)."""
+        return self.mode is ControlMode.INDEPENDENT
 
     @property
     def is_asleep(self) -> bool:
@@ -167,8 +238,14 @@ class MotorBoard:
     def total_current(self) -> Optional[float]:
         """Sum of the motors' last supply-side current readings (A).
 
-        `None` unless every motor has a sensor and has been read at least once.
+        `None` unless every motor (every driver, in four-motor mode) has a sensor and has
+        been read at least once.
         """
+        if self.is_four_motor:
+            vals = list(self._driver_amps.values())
+            if not vals or any(v is None for v in vals) or any(s is None for s in self._driver_sensors.values()):
+                return None
+            return sum(vals)
         vals = [m.last_isense_amps for m in self.motors.values() if m.has_sensor]
         if not vals or any(v is None for v in vals):
             return None
@@ -181,6 +258,34 @@ class MotorBoard:
         return iter(self.motors.values())
 
     # ------------------------------------------------------------ commands
+    def driver_current(self, driver: str) -> float:
+        """Read one driver's ISENSE now (four-motor mode).
+
+        In four-motor mode ISENSE carries the combined current of both motors on that
+        driver (A1 + A2, or B1 + B2), averaged over the PWM cycle: the current the pair draws
+        from the supply.
+
+        Args:
+            driver: `"a"` (U1, J4) or `"b"` (U2, J5).
+
+        Returns:
+            Current (A).
+
+        Raises:
+            ConfigError: Not in four-motor mode, unknown driver, or no sensor for it.
+            SensorError: The reading failed.
+        """
+        if not self.is_four_motor:
+            raise ConfigError("driver_current() is for four-motor mode; use motor.current")
+        if driver not in self._driver_sensors:
+            raise ConfigError(f"unknown driver '{driver}'")
+        sensor = self._driver_sensors[driver]
+        if sensor is None:
+            raise ConfigError(f"{self.name}: no current sensor for driver {driver}")
+        amps = sensor.read_isense_amps()
+        self._driver_amps[driver] = amps
+        return amps
+
     def sleep(self) -> None:
         """Pull nSLEEP low: every motor on this nSLEEP line coasts and the drivers draw almost no current.
 
@@ -210,14 +315,16 @@ class MotorBoard:
     def coast_all(self) -> None:
         """Coast every motor on this board.
 
-        In PH/EN mode this sleeps the board, so it needs `sleep_pin`. Without one the motors brake.
+        In PH/EN and four-motor modes this sleeps the board, so it needs `sleep_pin`. Without
+        one the motors brake.
         """
         for m in self.motors.values():
             m.stop()
         if self.mode is ControlMode.PWM:
             for m in self.motors.values():
                 m.coast()
-        elif self._sleep is not None:
+            return
+        if self._sleep is not None:
             self.sleep()
             for m in self.motors.values():
                 if m.fault is None:
@@ -253,8 +360,16 @@ class MotorBoard:
             self._monitor = None
 
     def close(self) -> None:
-        """Stop the monitor, brake every motor and release every pin."""
+        """Stop the monitor, brake every motor and release every pin.
+
+        In four-motor mode the drivers are put to sleep first, so the motors don't start when
+        the inputs are released.
+        """
         self.stop_monitor()
+        if self.is_four_motor and self._sleep is not None:
+            for m in self.motors.values():
+                m.stop()
+            self._sleep.set(False)
         for m in self.motors.values():
             m.close()
         if self._sleep_pin is not None:
@@ -275,6 +390,10 @@ class MotorBoard:
         return f"<MotorBoard {self.name} {self.mode.value} motors={list(self.motors)}>"
 
     # ------------------------------------------------------------ internals
+    def _two_motor_only(self) -> None:
+        if self.is_four_motor:
+            raise ConfigError("four-motor mode: use board['a1'], board['a2'], board['b1'], board['b2']")
+
     def _sleep_group(self):
         if self._sleep_pin is None:
             return [self]

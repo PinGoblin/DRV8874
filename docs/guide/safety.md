@@ -16,5 +16,8 @@ Read these before connecting power.
   the total current through a board's terminals at or below 6 A.
 - **One power source per chain.** J1 and J2 are connected together. Never connect a battery
   and a supply at the same time: see [Powering the board](power.md).
+- **Four-motor mode has no current limit,** and an input that isn't driven turns its
+  motor on. Fit the nSLEEP pull-down described in [Four-motor mode](four-motor-mode.md)
+  before connecting motors.
 - **Use a fused or current-limited supply.** The on-board fuse protects the board, not your
   wiring or batteries.
