@@ -3,17 +3,15 @@
 Wire J3 to the host first, then the motors, then the motor supply last.
 
 1. With everything unpowered, connect J3 to the host using the table below. You need at
-   least GND, VLOGIC, nSLEEP, and one EN and one PH pin per motor.
+   least GND, VLOGIC, and one EN and one PH pin per motor.
 2. Connect each motor to J4 (A) or J5 (B). For less electrical noise, solder a 100 nF
    capacitor across each motor's terminals and twist its leads (see [Connectors](connectors.md)).
 3. Connect power: a battery to J1 (XT30), or a 6–18 V supply to J2 (positive to VIN+,
    negative to GND). See [Powering the board](power.md). The green power LED
    lights.
-4. Power the host. The drivers stay asleep, with the motors off, until your program drives
-   nSLEEP high.
+4. Power the host. Motors stay stopped (braked) until the host drives an EN pin high.
 5. Optional: check each motor turns with the FWD and REV [test buttons](buttons-leds.md)
-   before writing any code. With no program running, link J3 pin 9 to pin 2 while you
-   test, so the drivers wake.
+   before writing any code.
 
 ## Wiring
 
@@ -27,16 +25,14 @@ Wire J3 to the host first, then the motors, then the motor supply last.
 | 6 | B_PH | GPIO6 (optional) | GPIO33 (optional) | GP5 (optional) |
 | 7 | A_ISENSE | PinGoblin ADS1115 board (optional; the Pi has no ADC) | GPIO34, ADC1 (optional) | GP26, ADC0 (optional) |
 | 8 | B_ISENSE | PinGoblin ADS1115 board (optional) | GPIO35, ADC1 (optional) | GP27, ADC1 (optional) |
-| 9 | nSLEEP | GPIO26 | GPIO32 | GP6 |
+| 9 | nSLEEP | GPIO26 (optional) | GPIO32 (optional) | GP6 (optional) |
 | 10 | nFAULT | GPIO19 (optional) | GPIO39 (optional, input only) | GP7 (optional) |
 
-nSLEEP is pulled low on the board, so the drivers sleep until the host drives it high.
-The library does this automatically. If you do not need sleep or coast control, you can
-link J3 pin 9 to pin 2 (VLOGIC) instead of using a GPIO, except in
-[four-motor mode](four-motor-mode.md). Pins 5 and 6 are needed only for motor B, and pins
-7 and 8 only for current sensing.
+nSLEEP is pulled high on the board, so it can be left unconnected if sleep and coast
+control are not needed. Pins 5 and 6 are needed only for motor B, pins 7 and 8 only for
+current sensing, and pin 10 only for fault detection.
 
-Every input on J3 has a 10 kΩ pull-down, so the motors stay off while the host boots,
+EN and PH have 10 kΩ pull-downs, so the motors stay braked while the host boots,
 whichever GPIOs you use. On a Raspberry Pi, do not use GPIO2 and GPIO3: they carry I2C for
 the ADS1115 board. On an ESP32, avoid the boot-strapping pins (GPIO0, 2, 12, 15): the
 board's pull-downs can stop the ESP32 booting normally. Also avoid GPIO14, which toggles

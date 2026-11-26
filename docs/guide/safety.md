@@ -18,8 +18,5 @@ Read these before connecting power.
 - **Only connect one power source at a time to J1 and J2.** J1 and J2 are connected
   together. For example, never connect a battery to J1 and a separate power supply to J2
   at the same time. See [Powering the board](power.md).
-- **Four-motor mode has no current limit,** and an input that is not driven turns its
-  motor on. Wire nSLEEP (J3 pin 9) to a GPIO, and do not also connect it to VLOGIC while
-  in four-motor mode: see [Four-motor mode](four-motor-mode.md).
 - **Use a fused or current-limited supply.** The on-board fuse protects the board, not your
   wiring or batteries.

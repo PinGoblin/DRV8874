@@ -5,7 +5,7 @@ hide:
 
 # PinGoblin Dual DC Motor Board
 
-Board A drives two brushed DC motors in both directions (or four in one direction) from a Raspberry Pi, ESP32,
+Board A drives two brushed DC motors in both directions from a Raspberry Pi, ESP32,
 Raspberry Pi Pico or any other 3.3 V or 5 V microcontroller. It uses two TI DRV8874
 H-bridges, runs from a 6–18 V motor supply, and adds current sensing, protection and
 test buttons.

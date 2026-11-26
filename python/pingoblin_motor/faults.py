@@ -19,14 +19,12 @@ class FaultType(enum.Enum):
 
     Faults marked *needs sensor* are only detected when the motor has a current sensor
     (for example a PinGoblin ADS1115 board). The others work from the board's nFAULT line.
-    In four-motor mode only `DRIVER_FAULT`, `BOARD_OVERLOAD`, `CHAIN_OVERLOAD` and
-    `SENSOR_ERROR` are detected.
 
     | Member | Detected when | Needs sensor |
     |---|---|---|
     | `STALL` | Motor current at or above `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` when there is no sensor | No |
     | `CURRENT_LIMIT` | nFAULT low while a motor is driven. A warning, repeated at most every 5 s | No |
-    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven (in four-motor mode, at any time): output short, overcurrent or over-temperature shutdown | No |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % duty or more: motor disconnected, broken wire, motor supply off or board fuse tripped | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
     | `BOARD_OVERLOAD` | Board supply current above the 3 A fuse rating for 1 s | Yes |
@@ -146,7 +144,7 @@ class Fault:
     """A record of one detected fault. Immutable.
 
     `str(fault)` gives a one-line summary such as
-    `[stall] front.a: motor stalled: 1.82 A for 0.5 s`.
+    `[stall] front.a: motor stalled: 2.61 A for 0.5 s`.
 
     Attributes:
         type (FaultType): What was detected.

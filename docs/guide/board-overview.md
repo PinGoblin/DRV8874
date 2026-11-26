@@ -16,7 +16,6 @@
 | --- | --- | --- |
 | J4 | Motor A | Motor A terminals (OUT1 = A1, OUT2 = A2) |
 | J5 | Motor B | Motor B terminals (OUT1 = B1, OUT2 = B2) |
-| J6 | VM header | Four VM pins: the common motor lead in [four-motor mode](four-motor-mode.md) |
 
 ## Controls
 
@@ -24,7 +23,7 @@
 | --- | --- | --- |
 | SW1 / SW2 | A FWD / A REV | Run motor A forward or reverse at full speed while held |
 | SW3 / SW4 | B FWD / B REV | Run motor B forward or reverse at full speed while held |
-| JP1 | PMODE jumper | Selects PH/EN mode (default), PWM mode or four-motor mode. See [Configuration](configuration.md) |
+| JP1 | PMODE jumper | Open: PH/EN mode (default). Bridged: PWM mode. See [Configuration](configuration.md) |
 
 See [Test buttons and LEDs](buttons-leds.md) for how the buttons behave with a host connected.
 

@@ -1,10 +1,4 @@
-"""Motor classes.
-
-- [`Motor`][pingoblin_motor.motor.Motor]: one bidirectional brushed DC motor on one DRV8874
-  (PH/EN and PWM modes).
-- [`HalfBridgeMotor`][pingoblin_motor.motor.HalfBridgeMotor]: one unidirectional motor on one
-  DRV8874 output (four-motor mode).
-"""
+"""The [`Motor`][pingoblin_motor.motor.Motor] class: one brushed DC motor on one DRV8874 channel."""
 from __future__ import annotations
 
 import enum
@@ -57,23 +51,13 @@ class MotorState(enum.Enum):
 class ControlMode(enum.Enum):
     """Control mode, set by the PMODE jumper JP1 on the board.
 
-    | Member | JP1 | Motors per board | Control |
-    |---|---|---|---|
-    | `PH_EN` | Pads 1–2 (default) | 2, bidirectional | EN = on / speed (PWM), PH = direction |
-    | `PWM` | Pads 2–3 | 2, bidirectional | IN1 / IN2. Allows per-motor coast |
-    | `INDEPENDENT` | All pads open | 4, one direction each | Each input drives one output. Low = motor on |
-
     Attributes:
         PH_EN: Default (JP1 pads 1–2): EN = speed PWM, PH = direction.
         PWM: JP1 pads 2–3: IN1 / IN2. Allows per-motor coast.
-        INDEPENDENT: JP1 all pads open (DRV8874 independent half-bridge mode). Four
-            unidirectional motors, each wired between one output and VM (J6). No current
-            limit. See [`HalfBridgeMotor`][pingoblin_motor.motor.HalfBridgeMotor].
     """
 
     PH_EN = "ph_en"   #: default (JP1 pads 1-2): EN = speed PWM, PH = direction
     PWM = "pwm"       #: JP1 pads 2-3: IN1/IN2
-    INDEPENDENT = "independent"   #: JP1 open: four unidirectional motors
 
 
 class Motor:
@@ -158,7 +142,12 @@ class Motor:
 
         self._backend = backend
         self._en_pin, self._ph_pin = en_pin, ph_pin
-        self._setup_pins(backend, en_pin, ph_pin, pwm_frequency)
+        if mode is ControlMode.PH_EN:
+            self._en = backend.pwm(en_pin, pwm_frequency)
+            self._ph = backend.output(ph_pin, False)
+        else:
+            self._en = backend.pwm(en_pin, pwm_frequency)   # IN1
+            self._ph = backend.pwm(ph_pin, pwm_frequency)   # IN2
 
         self._lock = threading.RLock()
         self._state = MotorState.STOPPED
@@ -176,14 +165,6 @@ class Motor:
         self.last_current: Optional[float] = None       # estimated motor amps
         self.last_isense_amps: Optional[float] = None   # supply-side (duty-weighted) amps
         self._apply_brake()
-
-    def _setup_pins(self, backend, en_pin, ph_pin, pwm_frequency) -> None:
-        if self.mode is ControlMode.PH_EN:
-            self._en = backend.pwm(en_pin, pwm_frequency)
-            self._ph = backend.output(ph_pin, False)
-        else:
-            self._en = backend.pwm(en_pin, pwm_frequency)   # IN1
-            self._ph = backend.pwm(ph_pin, pwm_frequency)   # IN2
 
     # ------------------------------------------------------------ properties
     @property
@@ -574,138 +555,3 @@ class Motor:
     def __repr__(self) -> str:
         d = self._direction.value if self._direction else "-"
         return f"<Motor {self.full_name} {self._state.value} {d} {self._speed_pc:.0f}%>"
-
-
-class HalfBridgeMotor(Motor):
-    """One unidirectional brushed DC motor in four-motor mode (JP1 all pads open).
-
-    In this mode each DRV8874 output works on its own, so each board drives four motors:
-    `a1` (J4 A1, OUT1), `a2` (J4 A2, OUT2), `b1` (J5 B1) and `b2` (J5 B2). Wire each motor
-    between its output and one of the four VM pins on J6. Create the motors through
-    [`MotorBoard`][pingoblin_motor.board.MotorBoard] with `mode="independent"`, not directly.
-
-    How the output drives the motor:
-
-    | Input pin | Output | Motor |
-    |---|---|---|
-    | Low | Low-side on: OUT at 0 V | Runs (full VM across it) |
-    | High | High-side on: OUT at VM | Off, braking gently |
-    | (nSLEEP low) | Open | Coasts |
-
-    The motor runs while its input is **low**, so the library drives the pin at
-    `1 − speed`: `forward(30)` sets the pin to 70 % duty. You don't need to invert anything
-    yourself.
-
-    Differences from [`Motor`][pingoblin_motor.motor.Motor]:
-
-    - One direction only. [`reverse()`][pingoblin_motor.motor.HalfBridgeMotor.reverse] and
-      negative speeds raise an error; `invert` is not allowed.
-    - **No current limit.** The DRV8874 turns its current regulation off in this mode. A
-      stalled motor draws its full stall current until the driver's overcurrent protection
-      (about 6 A or more) or the board fuse trips.
-    - No per-motor current reading. ISENSE carries the sum of both motors on one driver;
-      read it with [`MotorBoard.driver_current()`][pingoblin_motor.board.MotorBoard.driver_current].
-      Stall, open-load and overload checks per motor are not available.
-    - [`coast()`][pingoblin_motor.motor.Motor.coast] needs the drivers to sleep, so it coasts
-      only when every other motor on the same nSLEEP line is idle. Otherwise the motor brakes.
-
-    Example:
-        ```python
-        from pingoblin_motor import MotorBoard
-
-        board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
-                           mode="independent")
-        board["a1"].forward(60)                 # pump on at 60 %
-        board["b2"].forward(100, duration=3)    # fan on for 3 s
-        board["a1"].stop()
-        board.close()                           # stops all four and sleeps the drivers
-        ```
-    """
-
-    def __init__(self, name: str, board: "MotorBoard", pin: int, *, driver: str, output: int,
-                 backend, pwm_frequency: float = 1000.0, **options):
-        """
-        Args:
-            name: Motor name within its board, for example `"a1"`.
-            board: The owning [`MotorBoard`][pingoblin_motor.board.MotorBoard].
-            pin: GPIO for the input that controls this output: A_EN / B_EN (J3 pin 3 / 5)
-                for OUT1, A_PH / B_PH (J3 pin 4 / 6) for OUT2.
-            driver: `"a"` (U1, J4) or `"b"` (U2, J5).
-            output: `1` (OUT1) or `2` (OUT2).
-            backend: The [`Backend`][pingoblin_motor.backends.Backend] that creates the pins.
-            pwm_frequency: PWM frequency (Hz).
-            **options: The same options as [`Motor`][pingoblin_motor.motor.Motor]:
-                `min_speed_pc`, `ramp_time`, `policy` and so on. Direction, sensor and
-                current options are accepted but have no effect.
-
-        Raises:
-            ConfigError: `invert=True`, or an option is out of range.
-        """
-        if options.pop("invert", False):
-            raise ConfigError("invert is not available in four-motor mode: each motor runs one way")
-        options.pop("sensor", None)
-        self.driver = driver
-        self.output = output
-        super().__init__(name, board, pin, None, mode=ControlMode.INDEPENDENT, backend=backend,
-                         sensor=None, pwm_frequency=pwm_frequency, **options)
-
-    def _setup_pins(self, backend, en_pin, ph_pin, pwm_frequency) -> None:
-        self._en = backend.pwm(en_pin, pwm_frequency)
-        self._ph = None
-
-    @property
-    def terminal(self) -> str:
-        """Where the motor connects: for example `"J4 A1 (OUT1)"`."""
-        return f"J{4 if self.driver == 'a' else 5} {self.driver.upper()}{self.output} (OUT{self.output})"
-
-    def reverse(self, speed_pc: float = 100.0, duration: Optional[float] = None, wait: bool = False) -> None:
-        """Not available: a motor in four-motor mode runs one way only.
-
-        Raises:
-            ConfigError: Always.
-        """
-        raise ConfigError(f"{self.full_name}: four-motor mode runs each motor one way only")
-
-    def run(self, speed_pc: float, duration: Optional[float] = None, wait: bool = False) -> None:
-        """Run at a speed, 0–100 %. 0 stops the motor.
-
-        Args:
-            speed_pc: 0–100. Negative values are not allowed.
-            duration: Seconds to run before stopping. `None` runs until told otherwise.
-            wait: With `duration`, block until the run ends.
-
-        Raises:
-            ValueError: Speed outside 0–100, or `duration` not positive.
-            MotorFaultError: The motor has a latched fault.
-        """
-        if speed_pc < 0:
-            raise ValueError("four-motor mode: speed must be 0-100 (one direction only)")
-        super().run(speed_pc, duration, wait)
-
-    def read_current(self) -> float:
-        """Not available per motor in four-motor mode.
-
-        Use [`MotorBoard.driver_current()`][pingoblin_motor.board.MotorBoard.driver_current]
-        for the combined current of both motors on a driver.
-
-        Raises:
-            ConfigError: Always.
-        """
-        raise ConfigError(f"{self.full_name}: no per-motor current in four-motor mode; "
-                          "use board.driver_current()")
-
-    # Input low = low-side on = motor runs. Input high = high-side on = motor off (braked).
-    def _apply_drive(self, duty: float) -> None:
-        duty = max(0.0, min(1.0, duty))
-        self._duty = duty
-        self._en.set_duty(1.0 - duty)
-
-    def _apply_brake(self) -> None:
-        self._duty = 0.0
-        self._en.set_duty(1.0)
-
-    def _apply_coast(self) -> None:   # only possible by sleeping; see coast()
-        self._apply_brake()
-
-    def __repr__(self) -> str:
-        return f"<HalfBridgeMotor {self.full_name} {self._state.value} {self._speed_pc:.0f}%>"

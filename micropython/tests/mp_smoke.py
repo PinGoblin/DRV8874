@@ -32,7 +32,7 @@ assert not b.is_running, b
 
 # Stall from the current sensor
 a.forward(80)
-sa.amps = 1.9
+sa.amps = 2.6
 board.pause(1.2)
 assert a.fault is not None and a.fault.type == pm.FaultType.STALL, a.fault
 try:
@@ -62,16 +62,4 @@ if asyncio:
 
 board.close()
 
-# Four-motor mode (independent half-bridge): inverted drive, sleeps until first run
-pins4 = pm.MockPins()
-q = pm.MotorBoard("q", a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, mode="independent", pins=pins4)
-assert q.is_asleep and isinstance(q["a1"], pm.HalfBridgeMotor)
-q["a1"].forward(30)
-assert not q.is_asleep and abs(pins4.pins[12].duty - 0.7) < 0.01
-try:
-    q["a1"].reverse(10)
-    raise AssertionError("reverse should fail in four-motor mode")
-except pm.ConfigError:
-    pass
-q.close()
 print("mp_smoke: OK")

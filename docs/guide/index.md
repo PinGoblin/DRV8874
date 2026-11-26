@@ -2,24 +2,21 @@
 
 ![Board A, angled view of the top side](../images/board-a-3d.png)
 
-Board A drives two brushed DC motors in both directions, or up to four motors in one
-direction, from any 3.3 V or 5 V microcontroller, such as a Raspberry Pi, ESP32, Raspberry
-Pi Pico or Arduino. It uses two TI DRV8874 drivers: speed is set by PWM, and each driver
-has a current-sense output that can be read with an ADC.
+Board A drives two brushed DC motors in both directions from any 3.3 V or 5 V
+microcontroller, such as a Raspberry Pi, ESP32, Raspberry Pi Pico or Arduino. Each motor
+has its own TI DRV8874 H-bridge, with speed set by PWM, direction set by one pin, and a
+current-sense output that can be read with an ADC.
 
 - Two independent motor channels, motor supply 6–18 V (12 V nominal)
 - Direction + speed control (PH/EN, phase/enable mode), with a jumper for two-input
   PWM (pulse-width modulation) mode
-- [Four-motor mode](four-motor-mode.md): up to four one-direction motors, such as pumps
-  and fans
 - Analog current feedback per motor (0.675 V/A) for stall detection
-- Built-in current limit, overcurrent and over-temperature protection
+- Built-in 3 A current limit per motor, overcurrent and over-temperature protection
 - Reverse-polarity protection, surge suppressor (TVS) and a 3 A resettable fuse on the motor supply
 - Push buttons to test each motor without writing code (PH/EN mode, the default)
-- Direction LEDs per motor (except in four-motor mode), plus power and fault LEDs
+- Direction LEDs per motor, plus power and fault LEDs
 - Power through-terminal for daisy-chaining several boards from one supply
-- Safe start-up: the drivers sleep until the host enables them, so motors stay off while
-  the host boots, in every mode
+- Safe start-up: motors are held in brake while the host boots
 
 ## Where to start
 

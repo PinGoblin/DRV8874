@@ -4,9 +4,8 @@
 
 | Class | What it is |
 | --- | --- |
-| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One Board A: two motors (four in four-motor mode) plus its nSLEEP and nFAULT lines |
+| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One Board A: two motors plus its nSLEEP and nFAULT lines |
 | [`Motor`][pingoblin_motor.motor.Motor] | One motor channel (`board.motor_a`, `board.motor_b`, or `board["a"]`) |
-| [`HalfBridgeMotor`][pingoblin_motor.motor.HalfBridgeMotor] | One unidirectional motor in four-motor mode (`board["a1"]` to `board["b2"]`) |
 | [`MotorChain`][pingoblin_motor.chain.MotorChain] | Several daisy-chained boards managed as one system, with one fault monitor |
 | [`ADS1115`][pingoblin_motor.sensors.ADS1115] | Driver for a PinGoblin ADS1115 board (or any ADS1115), used for current sensing |
 | [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor] | Detects faults. Started by `board.start_monitor()` or by `MotorChain` |
@@ -22,19 +21,16 @@ board = MotorBoard(
     "front",                     # board name, used in "front.a"
     a_en=12, a_ph=5,             # J3 pins 3, 4
     b_en=13, b_ph=6,             # J3 pins 5, 6 (optional)
-    sleep_pin=26,                # J3 pin 9: the board sleeps until this is driven high
+    sleep_pin=26,                # J3 pin 9 (optional; needed for coast in PH/EN mode)
     fault_pin=19,                # J3 pin 10 (optional; one GPIO per board)
-    mode="ph_en",                # "ph_en" (JP1 pads 1-2, default), "pwm" (JP1 pads 2-3)
-                                 # or "independent" (JP1 open: four-motor mode)
-    logic_voltage=3.3,           # VLOGIC: sets the current limit (about 2.0 A at 3.3 V, 3.0 A at 5 V)
+    mode="ph_en",                # "ph_en" (JP1 open, default) or "pwm" (JP1 bridged)
     motor_names=("left", "right"),
     motor_options=dict(ramp_time=0.5),   # options for both motors
 )
 ```
 
-`sleep_pin` can only be left out if J3 pin 9 is linked to VLOGIC (pin 2), because the
-board pulls nSLEEP low. Several boards can share one `sleep_pin`, but each needs its own
-`fault_pin`.
+Several boards can share one `sleep_pin`, but each needs its own `fault_pin`. The current
+limit is fixed at about 3 A per motor (`board.current_limit`).
 
 Boards work as context managers (`with MotorBoard(...) as board:`), which brake the motors
 and release the pins on exit.
@@ -78,33 +74,6 @@ In PH/EN mode the DRV8874 can only coast by sleeping, and nSLEEP is shared by bo
 on a board (and by every board wired to the same GPIO). `coast()` therefore sleeps the line
 only if every other motor on it is idle. Otherwise it brakes and returns `False`. In PWM
 mode (`mode="pwm"`), each motor coasts independently.
-
-## Four-motor mode
-
-With JP1 open, `mode="independent"` gives four
-[`HalfBridgeMotor`][pingoblin_motor.motor.HalfBridgeMotor]s instead of two motors. Each
-runs one way only and is driven by one input pin: A_EN → `a1`, A_PH → `a2`, B_EN → `b1`,
-B_PH → `b2`.
-
-```python
-board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
-                   mode="independent", motor_names=("pump", "fan", "valve", "light"))
-board["pump"].forward(60)           # 60 % (the library inverts the pin duty for you)
-board["valve"].forward(100, duration=0.5)
-board.driver_current("a")           # pump + fan together, if a sensor is configured
-```
-
-- `sleep_pin` is required, and J3 pin 9 must not also be connected to VLOGIC. The
-  drivers stay asleep until the first run command, and
-  [`close()`][pingoblin_motor.board.MotorBoard.close] puts them to sleep before releasing
-  the pins. The board's pull-down on nSLEEP then keeps the motors off whenever your program
-  is not running. See [Four-motor mode](../../guide/four-motor-mode.md).
-- `reverse()`, negative speeds and `invert` raise errors. `board.motor_a` and
-  `board.motor_b` raise [`ConfigError`][pingoblin_motor.faults.ConfigError]: use the names.
-- `coast()` sleeps the drivers, so it only coasts when every other motor on the nSLEEP
-  line is idle.
-- The fault monitor reports `DRIVER_FAULT` (nFAULT low) and, with sensors,
-  `BOARD_OVERLOAD`. There are no per-motor stall, open-load or overload checks.
 
 ## PWM frequency
 

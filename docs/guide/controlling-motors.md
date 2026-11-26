@@ -15,27 +15,25 @@
 
     The [Glossary](glossary.md) lists every abbreviation used in this manual.
 
-The board has three control modes, selected with the [PMODE jumper JP1](configuration.md).
-This page covers the two modes that drive two motors in both directions: PH/EN mode (the
-default) and PWM mode. For up to four one-direction motors, see
-[Four-motor mode](four-motor-mode.md).
+The board has two control modes, selected with the [PMODE jumper JP1](configuration.md):
+PH/EN mode (the default) and PWM mode.
 
 The tables on this page are for motor A. Motor B is identical, using B_EN and B_PH (J3
 pins 5 and 6).
 
 ## PH/EN mode (default)
 
-JP1 pads 1–2 bridged (as supplied). Each motor uses two pins: **EN** (enable) turns the
+JP1 open (as supplied). Each motor uses two pins: **EN** (enable) turns the
 motor on and sets its speed with PWM, and **PH** (phase) sets the direction. One PWM
 channel per motor is enough. This is the same scheme as gpiozero's `PhaseEnableMotor`,
 except that gpiozero calls PH low "forward" (see [Direction](#direction)).
 
 | nSLEEP | A_EN (pin 3) | A_PH (pin 4) | OUT1 | OUT2 | Motor | LED |
 | --- | --- | --- | --- | --- | --- | --- |
-| Low (default) | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
-| High | Low | Any | Low | Low | Brake (stops quickly) | Off |
+| High (default) | Low | Any | Low | Low | Brake (stops quickly) | Off |
 | High | High / PWM | High | High | Low | Forward | Green |
 | High | High / PWM | Low | Low | High | Reverse | Red |
+| Low | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
 
 **Speed:** drive EN with PWM. The duty cycle sets the speed. During the PWM off-time the
 motor brakes, which gives a firm, close-to-linear response. The library's `speed_pc`
@@ -50,17 +48,17 @@ while held. See [Test buttons and LEDs](buttons-leds.md).
 
 ## PWM mode (IN1/IN2)
 
-JP1 pads 2–3 bridged. Each pin drives one side of the motor directly, as on two-input
+JP1 bridged. Each pin drives one side of the motor directly, as on two-input
 drivers such as the L298N and DRV8833. PWM mode lets each motor coast on its own, without
 sleeping the board, but needs PWM on both pins for full control.
 
 | nSLEEP | A_EN = IN1 (pin 3) | A_PH = IN2 (pin 4) | OUT1 | OUT2 | Motor | LED |
 | --- | --- | --- | --- | --- | --- | --- |
-| Low (default) | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
-| High | Low | Low | Open | Open | Coast | Off |
+| High (default) | Low | Low | Open | Open | Coast | Off |
 | High | High | Low | High | Low | Forward | Green |
 | High | Low | High | Low | High | Reverse | Red |
 | High | High | High | Low | Low | Brake | Off |
+| Low | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
 
 **Speed:** hold one input high and switch the other (slow decay), or hold one input low
 and switch the other (fast decay). See [Speed control](#speed-control) below. In
@@ -85,7 +83,6 @@ modes differ in which pin is switched, and in what the motor does during the off
 | PH/EN (default) | PH high, EN PWM at duty *d* | PH low, EN PWM at duty *d* | Brake | Firm, close to linear |
 | PWM, slow decay (used by the library) | IN1 high, IN2 PWM at duty 1 − *d* | IN2 high, IN1 PWM at duty 1 − *d* | Brake | The same as PH/EN |
 | PWM, fast decay | IN1 PWM at duty *d*, IN2 low | IN2 PWM at duty *d*, IN1 low | Coast | Softer; speed falls away at low duty |
-| [Four-motor](four-motor-mode.md) | Input PWM at duty 1 − *d* (one direction only) | Not available | Brake (through the high side) | The same as PH/EN |
 
 **PH/EN mode.** During the off-time both low-side switches are on (brake, also called slow
 decay), so the motor's current keeps circulating and the speed follows the duty cycle
@@ -137,14 +134,13 @@ motor.
 ## Sleep, emergency stop and start-up
 
 **Sleep / emergency stop:** pull nSLEEP low to put both drivers to sleep (outputs open,
-motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-down on the board, so
-the drivers sleep until the host drives it high: your program must do this before the
-motors will run. The library does this automatically.
+motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-up to VLOGIC on the
+board, so the drivers are awake whenever VLOGIC is present and nSLEEP is not driven low.
+Connecting nSLEEP is optional.
 
-**Start-up behaviour:** nSLEEP, EN and PH all have 10 kΩ pull-downs, so while the host is
-booting, and after your program exits, the drivers sleep and the motors coast. If the
-motor's load can turn it backwards (a lift, an arm, a robot parked on a slope), have your
-program wake the board with EN low as soon as it starts: the motor is then braked.
+**Start-up behaviour:** EN and PH have 10 kΩ pull-downs, so while the host is booting,
+and after your program exits, both motors are held in brake in PH/EN mode. In PWM mode
+the same pull-downs make the motors coast.
 
 ## Driving the pins directly
 
@@ -176,7 +172,7 @@ also be driven directly, as below (PH/EN mode). Speed runs from −1.0 (full rev
     for _ in range(30):
         a = amps(A_SENSE)
         print("Motor A: %.2f A  fault/limit: %s" % (a, FAULT.value() == 0))
-        if a > 1.6:              # about 80% of the 2 A limit at 3.3 V logic
+        if a > 2.4:              # about 80% of the 3 A current limit
             print("Stall - stopping")
             break
         time.sleep(0.1)

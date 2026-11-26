@@ -42,7 +42,6 @@ nav:
       - Test buttons and LEDs: guide/buttons-leds.md
       - Current sensing and current limit: guide/current-sensing.md
       - "Configuration: PMODE jumper (JP1)": guide/configuration.md
-      - Four-motor mode: guide/four-motor-mode.md
       - Daisy-chaining boards: guide/daisy-chain.md
       - Troubleshooting: guide/troubleshooting.md
       - Glossary: guide/glossary.md

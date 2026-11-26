@@ -5,15 +5,15 @@
 | Motor supply (VIN) | 6–18 V DC (18 V maximum, including supply tolerance), 12 V nominal |
 | Logic supply (VLOGIC) | 3.3–5 V, from the host |
 | Logic input high | 1.5 V min (3.3 V and 5 V logic both work) |
-| Default state | Drivers asleep until nSLEEP (J3 pin 9) is driven high; all inputs have 10 kΩ pull-downs |
-| Motor channels | 2, bidirectional, or 4, one direction each ([four-motor mode](four-motor-mode.md)) |
+| Default state | Drivers awake (nSLEEP pulled high); EN and PH pulled low, so motors are braked |
+| Motor channels | 2, bidirectional |
 | Continuous current per motor | About 1.5–2 A at 25 °C (to be confirmed by prototype thermal tests) |
 | Total board current | 3 A continuous (resettable fuse: 3 A hold, 6 A trip) |
-| Current limit per motor | About 2.0 A with 3.3 V logic, about 3.0 A with 5 V logic (none in four-motor mode) |
+| Current limit per motor | About 3.0 A, fixed (independent of VLOGIC) |
 | Current-sense output | 0.675 V per amp |
 | PWM frequency | Up to 100 kHz (20 kHz recommended, which is above human hearing) |
 | Driver IC | TI DRV8874 (×2) |
-| Connectors | XT30 right-angle male and 5.08 mm screw terminal (power), 3.5 mm screw terminals (motors), 2.54 mm 10-pin header (logic), 2.54 mm 2×2 header (VM, four-motor mode) |
+| Connectors | XT30 right-angle male and 5.08 mm screw terminal (power), 3.5 mm screw terminals (motors), 2.54 mm 10-pin header (logic) |
 | Mounting | M2.5 holes |
 
 !!! note "20 kHz and pets"

@@ -17,10 +17,9 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
 - Each driver limits motor current on every PWM cycle (cycle-by-cycle chopping). The limit
   is set from VLOGIC:
 
-| Host logic (VLOGIC) | Current limit per motor | ISENSE at the limit |
-| --- | --- | --- |
-| 3.3 V | About 2.0 A | About 1.32 V |
-| 5.0 V | About 3.0 A | About 2.0 V |
+| Current limit per motor | ISENSE at the limit |
+| --- | --- |
+| About 3.0 A (fixed, for any VLOGIC) | About 2.07 V |
 
 - While limiting, the red fault LED lights and nFAULT goes low. Normal operation resumes
   on the next PWM cycle once the load drops. At exactly 100% duty there is no next cycle,
@@ -28,9 +27,6 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
   [100% duty and the current limit](controlling-motors.md#practical-limits).
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
-- In [four-motor mode](four-motor-mode.md) there is no current limit, and each ISENSE
-  output carries the combined current of the two motors on that driver. It can rise above
-  3.3 V there.
 - Both motors share the 3 A board fuse. If both run near their limit at 5 V logic for more
   than a few seconds, the fuse will trip. Once power is removed it resets within about a
   minute.
@@ -69,7 +65,7 @@ shaft for under a second). Then:
 
 Limits of this estimate:
 
-- The current limit (2 A or 3 A) clamps the current, so the line ends there. Any heavier
+- The 3 A current limit clamps the current, so the line ends there. Any heavier
   load reads as the limit.
 - Winding resistance rises about 0.4% per °C as the motor warms, which shifts the line.
 - Gearbox friction and brush noise add error. Average several readings.
