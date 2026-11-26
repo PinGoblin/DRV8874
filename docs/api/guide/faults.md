@@ -15,7 +15,7 @@ Start the fault monitor with `board.start_monitor()` (Raspberry Pi), `board.enab
 | `SENSOR_ERROR` | Current-sensor read fails (reported once until it recovers) | Yes | None | No |
 
 Without a sensor, a stall is inferred from nFAULT. If both motors on a board are running,
-the board can't tell which one stalled, so both are stopped.
+the board cannot tell which one stalled, so both are stopped.
 
 ## Tuning detection
 
@@ -53,7 +53,7 @@ board.motor_a.clear_fault()
 
 ## Stall homing
 
-Driving into an end stop and stopping on the stall is a cheap way to home an axis:
+Driving into an end stop and stopping on the stall is a low-cost way to home an axis without a limit switch:
 
 ```python
 from pingoblin_motor import FaultAction, FaultPolicy, FaultType, MotorBoard
@@ -70,8 +70,8 @@ See `python/examples/stall_homing.py` and `micropython/examples/pico_asyncio_sta
 
 ## Four-motor mode
 
-With `mode="independent"` the drivers don't limit current, so nFAULT low always means a
+With `mode="independent"` the drivers do not limit current, so nFAULT low always means a
 driver shutdown and is reported as `DRIVER_FAULT`, even while motors run. `STALL`,
-`CURRENT_LIMIT`, `OPEN_LOAD` and `OVERLOAD` aren't detected, because ISENSE carries two
+`CURRENT_LIMIT`, `OPEN_LOAD` and `OVERLOAD` are not detected, because ISENSE carries two
 motors at once. With a sensor on each driver, `BOARD_OVERLOAD` and `CHAIN_OVERLOAD` still
 work. See [Four-motor mode](../../guide/four-motor-mode.md).

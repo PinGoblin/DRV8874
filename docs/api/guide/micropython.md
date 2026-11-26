@@ -20,7 +20,7 @@ fault checks all happen inside `update()`. Run it in one of three ways:
 | Blocking helpers | `motor.forward(..., duration=2, wait=True)`, `motor.wait()`, `board.pause(seconds)`. These call `update()` while they wait |
 | Your own loop | Call `board.update()` every 10–50 ms |
 
-If nothing calls `update()`, a `duration=` run won't stop on its own, a ramp won't
+If nothing calls `update()`, a `duration=` run will not stop on its own, a ramp will not
 progress, and no faults are detected.
 
 ```python

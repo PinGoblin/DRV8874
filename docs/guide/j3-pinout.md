@@ -11,7 +11,7 @@ mode.](../images/j3-pinout.svg)
 | Pin | Signal | Direction | PH/EN mode (default) | PWM mode | Four-motor mode |
 | --- | --- | --- | --- | --- | --- |
 | 10 | nFAULT | Output | Low = fault or current limiting. One GPIO per board | Same | Low = driver fault |
-| 9 | nSLEEP | Input | Low or open = sleep, motors coast. Drive high to run | Same | Same. Use a GPIO: never link to VLOGIC |
+| 9 | nSLEEP | Input | Low or open = sleep, motors coast. Drive high to run | Same | Same. Wire to a GPIO; do not also connect to VLOGIC |
 | 8 | B_ISENSE | Output | Motor B current, 0.675 V/A | Same | Motors B1 + B2 together |
 | 7 | A_ISENSE | Output | Motor A current, 0.675 V/A | Same | Motors A1 + A2 together |
 | 6 | B_PH | Input | Motor B direction | IN2, motor B | Motor B2, low = on |

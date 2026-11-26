@@ -11,7 +11,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
 - The reading is only valid while the motor is driven (EN high). During PWM off-time it
   drops to zero, so average several samples, or sample in the PWM on-time. The library
   does this for you (see [Current sensing in the API](../api/guide/current-sensing.md)).
-- A stalled motor shows as a reading that sits at the current limit while the shaft isn't
+- A stalled motor shows as a reading that sits at the current limit while the shaft is not
   turning. A typical approach: if the reading stays above about 80% of the limit for more
   than 200 ms, stop the motor. The library's stall detection works this way.
 - Each driver limits motor current on every PWM cycle (cycle-by-cycle chopping). The limit
@@ -25,7 +25,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
 - While limiting, the red fault LED lights and nFAULT goes low. Normal operation resumes
   on the next PWM cycle once the load drops. At exactly 100% duty there is no next cycle,
   so the motor stays braked until the input changes: see
-  [100% duty and the current limit](configuration.md#practical-limits).
+  [100% duty and the current limit](controlling-motors.md#practical-limits).
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
 - In [four-motor mode](four-motor-mode.md) there is no current limit, and each ISENSE
@@ -35,10 +35,10 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
   than a few seconds, the fuse will trip. Once power is removed it resets within about a
   minute.
 
-## Is ISENSE related to motor speed?
+## ISENSE and motor speed
 
-Not directly. ISENSE measures current, and in a brushed DC motor current follows the
-**load torque**, not the speed. At a fixed supply voltage and PWM duty, current and speed
+ISENSE does not measure motor speed. It measures current, and in a brushed DC motor
+current follows the **load torque**, not the speed. At a fixed supply voltage and PWM duty, current and speed
 are linearly related but in opposite directions: as load slows the motor, its back-EMF
 falls and the current rises.
 
@@ -55,7 +55,7 @@ What this means in practice:
 - **Fixed duty and supply:** speed and current fall on a straight line. Speed is highest
   at the no-load current and zero at the stall current.
 - **Change the duty or the supply:** the line shifts, so the same current can mean very
-  different speeds. ISENSE alone can't tell you RPM.
+  different speeds. ISENSE alone cannot give the RPM.
 - **No load:** a free-running motor draws almost the same small current at any speed,
   because only friction loads it. ISENSE barely changes with RPM.
 
@@ -69,8 +69,8 @@ shaft for under a second). Then:
 
 Limits of this estimate:
 
-- The current limit (2 A or 3 A) clamps the current, so the line ends there. Any load
-  heavier than that just reads as the limit.
+- The current limit (2 A or 3 A) clamps the current, so the line ends there. Any heavier
+  load reads as the limit.
 - Winding resistance rises about 0.4% per °C as the motor warms, which shifts the line.
 - Gearbox friction and brush noise add error. Average several readings.
 

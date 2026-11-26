@@ -15,23 +15,25 @@ the four VM pins on J6.
 | Coast one motor on its own | PWM mode only | No (only by sleeping the whole board) |
 | JP1 | Pads 1–2 or 2–3 bridged | All three pads open |
 
-!!! danger "An input that isn't driven turns its motor on"
-    In four-motor mode a motor runs while its input is **low**. The board's pull-down
-    resistors, which keep the motors stopped in the other modes, hold every input low.
-    So whenever the drivers are awake and the host isn't driving the inputs high, **all
-    four motors run at full speed with no current limit**.
+!!! danger "In four-motor mode a motor runs while its input is low"
+    The board's pull-down resistors, which keep the motors stopped in the other modes,
+    hold every input low. Whenever the drivers are awake and the host is not driving the
+    inputs high, **all four motors run at full speed with no current limit**.
 
     The board guards against this with a 10 kΩ pull-down on nSLEEP: the drivers sleep
-    (outputs open, motors off) unless the host holds nSLEEP high. That only works if you:
+    (outputs open, motors off) unless the host holds nSLEEP high. This protection requires that you:
 
     1. Wire **nSLEEP (J3 pin 9) to a GPIO** on the host, and drive it high only while your
        program is controlling the inputs. The library does this: it keeps the drivers
        asleep until the first run command, and puts them to sleep again when the board is
        closed.
-    2. **Never link J3 pin 9 to VLOGIC** in this mode, as you might for button tests in the
-       other modes.
+    2. **Do not also connect nSLEEP to VLOGIC** while in four-motor mode, as you might for
+       button tests in the other modes. With nSLEEP held at VLOGIC the drivers stay awake,
+       so any input that is not driven runs its motor. In addition, whenever the nSLEEP GPIO drives
+       low, it is shorted to VLOGIC: the current can exceed the GPIO pin's limit and damage
+       your microcontroller board.
 
-    Check it: with your program stopped and VLOGIC present, nSLEEP should measure below
+    To verify: with your program stopped and VLOGIC present, nSLEEP should measure below
     0.5 V and no motor should turn.
 
 ## Setting up
@@ -56,7 +58,7 @@ the four VM pins on J6.
 
 The terminal labels A1, A2, B1 and B2 are printed on the board next to J4 and J5.
 
-You don't need all four motors: leave unused terminals empty. You also don't need
+You do not need all four motors: leave unused terminals empty. You also do not need
 external flyback diodes. When an input goes high, the driver's high-side switch carries
 the motor's current back to VM. That makes this mode suitable for solenoids and valves
 too.
@@ -83,13 +85,13 @@ while the input is **low**. The duty is therefore inverted: for 30% speed, the i
 low 30% of the time, so it runs at 70% duty. The library does this inversion for you.
 During the off-time the motor brakes through the high-side switch, so the speed follows
 the duty cycle closely, like slow decay in the other modes. See
-[Speed control in each mode](configuration.md#speed-control-in-each-mode) for the
+[Speed control](controlling-motors.md#speed-control) for the
 practical limits on minimum speed and PWM frequency.
 
 ### No current limit
 
 The DRV8874 turns its current regulation off in this mode, so the current limit set by
-VLOGIC doesn't apply. A stalled motor draws its full stall current. What still protects
+VLOGIC does not apply. A stalled motor draws its full stall current. What still protects
 the board:
 
 - each driver's overcurrent shutdown, which trips at several amps and retries
@@ -111,11 +113,11 @@ reads A1 + A2, and B_ISENSE reads B1 + B2, at the usual 0.675 V per amp.
     With no current limit, ISENSE passes 3.3 V once a pair draws about 4.9 A (for example,
     two stalled motors) and can rise to about 4.5 V. The 1 kΩ series resistor limits the
     current into the host's pin to about 1 mA, but that is still outside a 3.3 V ADC's
-    rating. Use a PinGoblin ADS1115 board, or choose motors that can't draw that much
+    rating. Use a PinGoblin ADS1115 board, or choose motors that cannot draw that much
     between them. Averaged over
 several samples, it gives the supply current the pair draws. The library reads it with
-`board.driver_current("a")`. Per-motor stall detection isn't possible in this mode,
-because the board can't tell the two motors apart.
+`board.driver_current("a")`. Per-motor stall detection is not possible in this mode,
+because the board cannot tell the two motors apart.
 
 nFAULT, and the red fault LED, now only signal a real driver fault: an overcurrent,
 over-temperature or undervoltage shutdown.

@@ -9,10 +9,11 @@ The board runs from **6–18 V DC**. It has two power connectors, wired in paral
 
 The board draws up to 3 A in total (both motors). The supply or battery must be able to deliver that, plus the motors' start-up surge.
 
-!!! danger "One power source per chain"
-    J1 and J2 are connected together, and so is every board in a daisy chain. Never connect
-    a battery and a supply at the same time, on this board or any other board in the chain:
-    the supply would push current into the battery with no charge control.
+!!! danger "Only connect one power source at a time to J1 and J2"
+    J1 and J2 are connected together, and so is every board in a daisy chain. For example,
+    never connect a battery to J1 and a separate power supply to J2 at the same time, on
+    this board or on any other board in the chain: the supply would push current into the
+    battery with no charge control.
 
 ## PinGoblin battery packs
 
@@ -43,7 +44,7 @@ Rules for two packs:
 - Use two packs of the same type (both QUAD or both DUAL), fully charged on the UPS HAT+
   before use, and switch both on.
 - Charge each pack on its own on the UPS HAT+. Never charge through the series lead.
-- If either pack's protection switches off, the whole string stops. That's safe: recharge
+- If either pack's protection switches off, the whole string stops. This is safe: recharge
   both packs.
 
 !!! danger "Never plug the series lead into a UPS HAT+"
@@ -53,7 +54,7 @@ Rules for two packs:
 ### Low battery
 
 The board has no low-voltage cut-off: it keeps running until the packs' own protection
-switches off at 2.8 V per cell (5.6 V for one pack, 11.2 V for two). That's safe, but
+switches off at 2.8 V per cell (5.6 V for one pack, 11.2 V for two). This is safe, but
 regularly discharging that far shortens cell life. For the longest life, stop at 3.1 V per
 cell, where the UPS HAT+ software stops:
 

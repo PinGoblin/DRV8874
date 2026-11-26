@@ -94,11 +94,11 @@ board["valve"].forward(100, duration=0.5)
 board.driver_current("a")           # pump + fan together, if a sensor is configured
 ```
 
-- `sleep_pin` is required, and J3 pin 9 must never be linked to VLOGIC in this mode. The
+- `sleep_pin` is required, and J3 pin 9 must not also be connected to VLOGIC. The
   drivers stay asleep until the first run command, and
   [`close()`][pingoblin_motor.board.MotorBoard.close] puts them to sleep before releasing
   the pins. The board's pull-down on nSLEEP then keeps the motors off whenever your program
-  isn't running. See [Four-motor mode](../../guide/four-motor-mode.md).
+  is not running. See [Four-motor mode](../../guide/four-motor-mode.md).
 - `reverse()`, negative speeds and `invert` raise errors. `board.motor_a` and
   `board.motor_b` raise [`ConfigError`][pingoblin_motor.faults.ConfigError]: use the names.
 - `coast()` sleeps the drivers, so it only coasts when every other motor on the nSLEEP
