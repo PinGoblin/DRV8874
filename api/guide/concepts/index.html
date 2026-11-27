@@ -1865,7 +1865,7 @@
 <span class="p">)</span>
 </code></pre></div>
 <p>Several boards can share one <code>sleep_pin</code>, but each needs its own <code>fault_pin</code>. The current
-limit is fixed at about 4.6 A per motor (<code>board.current_limit</code>).</p>
+limit is 4.6 A per motor, peak (<code>board.current_limit</code>).</p>
 <p>Boards work as context managers (<code>with MotorBoard(...) as board:</code>), which brake the motors
 and release the pins on exit.</p>
 <h2 id="speed-and-direction">Speed and direction<a class="headerlink" href="#speed-and-direction" title="Permanent link">&para;</a></h2>

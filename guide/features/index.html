@@ -1825,9 +1825,9 @@ controlled from a documented Python and MicroPython library.</p>
 <li><strong>Low-loss MOSFET bridges.</strong> The DRV8874's switches have a combined resistance of about
   0.2 Ω, so little of the supply voltage is lost in the driver and it runs cool at
   normal loads.</li>
-<li><strong>Fixed 4.6 A current limit per motor.</strong> The limit is set by an on-board voltage reference,
-  so it does not change with the host's logic voltage. Stalls and start-up surges are
-  held at about 4.6 A instead of reaching the motor's full stall current.</li>
+<li><strong>4.6 A per motor (peak).</strong> A fixed current limit holds stalls and start-up surges at
+  4.6 A, whatever the host's logic voltage.</li>
+<li><strong>5 A continuous for the whole board</strong>, both motors combined.</li>
 <li><strong>Two control modes</strong>, selected by jumper JP1: PH/EN (one direction pin and one PWM pin
   per motor) or two-input PWM (IN1/IN2, which also allows coasting each motor separately).</li>
 <li><strong>PWM up to 100 kHz.</strong> 20 kHz is recommended, which is above human hearing.</li>
@@ -1914,27 +1914,27 @@ board:</p>
 </tr>
 <tr>
 <td>Current limit</td>
-<td>Fixed at about 4.6 A per motor</td>
+<td>4.6 A per motor (peak)</td>
 <td>Often none, or set by a trimmer</td>
 </tr>
 <tr>
 <td>Reverse-polarity, surge and fuse protection</td>
-<td>All three</td>
+<td>✓ All three</td>
 <td>Usually none</td>
 </tr>
 <tr>
 <td>Current-sense output to the host</td>
-<td>Yes, per motor</td>
+<td>✓ per motor</td>
 <td>Often absent</td>
 </tr>
 <tr>
 <td>Test buttons and direction LEDs</td>
-<td>Yes</td>
+<td>✓</td>
 <td>Rarely</td>
 </tr>
 <tr>
 <td>Battery connector (XT30) and power through-terminal</td>
-<td>Yes</td>
+<td>✓</td>
 <td>Rarely</td>
 </tr>
 <tr>

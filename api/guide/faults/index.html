@@ -1751,58 +1751,58 @@
 <tr>
 <td><code>STALL</code></td>
 <td>Current ≥ <code>stall_current</code> for <code>stall_time</code> while driven, or nFAULT low (current limiting) for <code>stall_time</code> without a sensor</td>
-<td>No</td>
+<td>✗</td>
 <td>Brake</td>
-<td>Yes</td>
+<td>✓</td>
 </tr>
 <tr>
 <td><code>CURRENT_LIMIT</code></td>
 <td>nFAULT low while driven (warning, at most every 5 s)</td>
-<td>No</td>
+<td>✗</td>
 <td>None</td>
-<td>No</td>
+<td>✗</td>
 </tr>
 <tr>
 <td><code>DRIVER_FAULT</code></td>
 <td>nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown</td>
-<td>No</td>
+<td>✗</td>
 <td>Sleep board (brake if no sleep pin)</td>
-<td>Yes</td>
+<td>✓</td>
 </tr>
 <tr>
 <td><code>OPEN_LOAD</code></td>
 <td>Under 30 mA for 1 s while driven at ≥ 20 %: motor disconnected, broken wire, motor supply off or fuse blown</td>
-<td>Yes</td>
+<td>✓</td>
 <td>Brake</td>
-<td>Yes</td>
+<td>✓</td>
 </tr>
 <tr>
 <td><code>OVERLOAD</code></td>
 <td>Over <code>continuous_current</code> for <code>overload_time</code></td>
-<td>Yes</td>
+<td>✓</td>
 <td>Brake</td>
-<td>Yes</td>
+<td>✓</td>
 </tr>
 <tr>
 <td><code>BOARD_OVERLOAD</code></td>
 <td>Board supply current over the 5 A continuous board rating for 1 s</td>
-<td>Yes</td>
+<td>✓</td>
 <td>Brake</td>
-<td>No</td>
+<td>✗</td>
 </tr>
 <tr>
 <td><code>CHAIN_OVERLOAD</code></td>
 <td>Daisy-chain supply current over 6 A for 1 s</td>
-<td>Yes</td>
+<td>✓</td>
 <td>Brake</td>
-<td>No</td>
+<td>✗</td>
 </tr>
 <tr>
 <td><code>SENSOR_ERROR</code></td>
 <td>Current-sensor read fails (reported once until it recovers)</td>
-<td>Yes</td>
+<td>✓</td>
 <td>None</td>
-<td>No</td>
+<td>✗</td>
 </tr>
 </tbody>
 </table>

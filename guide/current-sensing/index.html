@@ -1708,8 +1708,8 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 </thead>
 <tbody>
 <tr>
-<td>About 4.6 A (4.2–5.1 A, fixed, for any VLOGIC)</td>
-<td>About 2.07 V</td>
+<td>4.6 A (peak), fixed</td>
+<td>2.07 V</td>
 </tr>
 </tbody>
 </table>
@@ -1721,7 +1721,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 <li>A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.</li>
 <li>Both motors share a 5 A continuous board rating. Two motors held at the 4.6 A current
-  limit (for example, both stalled) draw about 9 A, which can blow the board's 7 A fuse,
+  limit (for example, both stalled) draw 9.2 A, which can blow the board's 7 A fuse,
   and the fuse is not resettable. Detect stalls and stop the motors, as the library does.</li>
 </ul>
 <h2 id="isense-and-motor-speed">ISENSE and motor speed<a class="headerlink" href="#isense-and-motor-speed" title="Permanent link">&para;</a></h2>
