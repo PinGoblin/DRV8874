@@ -2096,13 +2096,13 @@ also be driven directly, as below (PH/EN mode). Speed runs from −1.0 (full rev
     <span class="n">en</span><span class="o">.</span><span class="n">duty_u16</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">speed</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">))</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">amps</span><span class="p">(</span><span class="n">adc</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">adc</span><span class="o">.</span><span class="n">read_uv</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1_000_000</span> <span class="o">/</span> <span class="mf">0.675</span>   <span class="c1"># 0.675 V per amp</span>
+    <span class="k">return</span> <span class="n">adc</span><span class="o">.</span><span class="n">read_uv</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1_000_000</span> <span class="o">/</span> <span class="mf">0.45</span>    <span class="c1"># 0.45 V per amp</span>
 
 <span class="n">drive</span><span class="p">(</span><span class="n">A_EN</span><span class="p">,</span> <span class="n">A_PH</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">amps</span><span class="p">(</span><span class="n">A_SENSE</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Motor A: </span><span class="si">%.2f</span><span class="s2"> A  fault/limit: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">FAULT</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mf">2.4</span><span class="p">:</span>              <span class="c1"># about 80% of the 3 A current limit</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mf">3.7</span><span class="p">:</span>              <span class="c1"># about 80% of the 4.6 A current limit</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Stall - stopping"</span><span class="p">)</span>
         <span class="k">break</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>

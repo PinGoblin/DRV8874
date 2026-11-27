@@ -1825,9 +1825,9 @@ controlled from a documented Python and MicroPython library.</p>
 <li><strong>Low-loss MOSFET bridges.</strong> The DRV8874's switches have a combined resistance of about
   0.2 Ω, so little of the supply voltage is lost in the driver and it runs cool at
   normal loads.</li>
-<li><strong>Fixed 3 A current limit per motor.</strong> The limit is set by an on-board voltage reference,
+<li><strong>Fixed 4.6 A current limit per motor.</strong> The limit is set by an on-board voltage reference,
   so it does not change with the host's logic voltage. Stalls and start-up surges are
-  held at about 3 A instead of reaching the motor's full stall current.</li>
+  held at about 4.6 A instead of reaching the motor's full stall current.</li>
 <li><strong>Two control modes</strong>, selected by jumper JP1: PH/EN (one direction pin and one PWM pin
   per motor) or two-input PWM (IN1/IN2, which also allows coasting each motor separately).</li>
 <li><strong>PWM up to 100 kHz.</strong> 20 kHz is recommended, which is above human hearing.</li>
@@ -1840,7 +1840,7 @@ controlled from a documented Python and MicroPython library.</p>
   no voltage loss in normal use.</li>
 <li><strong>Surge suppressor (TVS diode)</strong> on the motor supply, to absorb voltage spikes from long
   supply leads and from the motors.</li>
-<li><strong>4 A fuse</strong> on the motor supply, to protect the supply wiring if a component fails.</li>
+<li><strong>7 A fuse</strong> on the motor supply, to protect the supply wiring if a component fails.</li>
 <li><strong>Driver protection</strong> built into each DRV8874: overcurrent, over-temperature and
   undervoltage shutdown, with automatic recovery.</li>
 <li><strong>Safe start-up.</strong> The drive inputs are pulled low, so both motors are held in brake
@@ -1862,7 +1862,7 @@ controlled from a documented Python and MicroPython library.</p>
 </ul>
 <h2 id="feedback">Feedback<a class="headerlink" href="#feedback" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Current-sense output per motor</strong> (0.675 V per amp), for reading motor current with an
+<li><strong>Current-sense output per motor</strong> (0.45 V per amp), for reading motor current with an
   ADC to measure load or detect a stall. See
   <a href="../current-sensing/">Current sensing and current limit</a>.</li>
 <li><strong>Fault output</strong> (nFAULT), shared by both drivers on the board, which signals current
@@ -1914,7 +1914,7 @@ board:</p>
 </tr>
 <tr>
 <td>Current limit</td>
-<td>Fixed at about 3 A per motor</td>
+<td>Fixed at about 4.6 A per motor</td>
 <td>Often none, or set by a trimmer</td>
 </tr>
 <tr>

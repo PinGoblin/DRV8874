@@ -1683,11 +1683,11 @@
 
 
 <h1 id="current-sensing-and-current-limit">Current sensing and current limit<a class="headerlink" href="#current-sensing-and-current-limit" title="Permanent link">&para;</a></h1>
-<p>A_ISENSE and B_ISENSE output 0.675 V for every amp flowing in that motor. Read them with
+<p>A_ISENSE and B_ISENSE output 0.45 V for every amp flowing in that motor. Read them with
 an ADC to measure load or detect a stall. On a Raspberry Pi, use a PinGoblin ADS1115
 board; an ESP32 or Pico can use its own ADC.</p>
 <div class="arithmatex">\[
-I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
+I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 \]</div>
 <ul>
 <li>The reading is only valid while the motor is driven (EN high). During PWM off-time it
@@ -1708,7 +1708,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
 </thead>
 <tbody>
 <tr>
-<td>About 3.0 A (fixed, for any VLOGIC)</td>
+<td>About 4.6 A (4.2–5.1 A, fixed, for any VLOGIC)</td>
 <td>About 2.07 V</td>
 </tr>
 </tbody>
@@ -1720,8 +1720,8 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
   <a href="../controlling-motors/#practical-limits">100% duty and the current limit</a>.</li>
 <li>A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.</li>
-<li>Both motors share a 3 A continuous board rating. Two motors held at the 3 A current
-  limit (for example, both stalled) draw about 6 A, which can blow the board's 4 A fuse,
+<li>Both motors share a 5 A continuous board rating. Two motors held at the 4.6 A current
+  limit (for example, both stalled) draw about 9 A, which can blow the board's 7 A fuse,
   and the fuse is not resettable. Detect stalls and stop the motors, as the library does.</li>
 </ul>
 <h2 id="isense-and-motor-speed">ISENSE and motor speed<a class="headerlink" href="#isense-and-motor-speed" title="Permanent link">&para;</a></h2>
@@ -1733,7 +1733,7 @@ falls and the current rises.</p>
 \omega = \frac{D \cdot V_{M} - I \cdot R}{K_e}
 \]</div>
 <p>Here <span class="arithmatex">\(\omega\)</span> is motor speed, <span class="arithmatex">\(D\)</span> the PWM duty (0–1), <span class="arithmatex">\(V_M\)</span> the motor supply
-voltage, <span class="arithmatex">\(I\)</span> the motor current (<span class="arithmatex">\(V_{ISENSE} / 0.675\)</span>), <span class="arithmatex">\(R\)</span> the motor's winding
+voltage, <span class="arithmatex">\(I\)</span> the motor current (<span class="arithmatex">\(V_{ISENSE} / 0.45\)</span>), <span class="arithmatex">\(R\)</span> the motor's winding
 resistance and <span class="arithmatex">\(K_e\)</span> its back-EMF constant.</p>
 <p>What this means in practice:</p>
 <ul>
@@ -1752,7 +1752,7 @@ shaft for under a second). Then:</p>
 \]</div>
 <p>Limits of this estimate:</p>
 <ul>
-<li>The 3 A current limit clamps the current, so the line ends there. Any heavier
+<li>The 4.6 A current limit clamps the current, so the line ends there. Any heavier
   load reads as the limit.</li>
 <li>Winding resistance rises about 0.4% per °C as the motor warms, which shifts the line.</li>
 <li>Gearbox friction and brush noise add error. Average several readings.</li>

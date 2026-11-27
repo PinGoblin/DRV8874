@@ -1650,14 +1650,14 @@ motor in PWM mode." src="../../images/j3-pinout.svg" /></p>
 <td>8</td>
 <td>B_ISENSE</td>
 <td>Output</td>
-<td>Motor B current, 0.675 V/A</td>
+<td>Motor B current, 0.45 V/A</td>
 <td>Same</td>
 </tr>
 <tr>
 <td>7</td>
 <td>A_ISENSE</td>
 <td>Output</td>
-<td>Motor A current, 0.675 V/A</td>
+<td>Motor A current, 0.45 V/A</td>
 <td>Same</td>
 </tr>
 <tr>
@@ -1711,7 +1711,7 @@ PH have 10 kΩ pull-downs and nSLEEP has a 10 kΩ pull-up on the board, so unuse
 can be left open.</p>
 <p>nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give
 each board its own nFAULT GPIO: see <a href="../daisy-chain/">Daisy-chaining boards</a>.</p>
-<p>The 3 A current limit keeps ISENSE at or below about 2.1 V, within the range of any
+<p>The 4.6 A current limit keeps ISENSE at or below about 2.1 V, within the range of any
 3.3 V or 5 V ADC.</p>
 <p>Signal names: <strong>EN</strong> = enable (on/off and PWM speed), <strong>PH</strong> = phase (direction),
 <strong>IN1 / IN2</strong> = input 1 / input 2 (PWM mode), <strong>ISENSE</strong> = current sense output. A leading

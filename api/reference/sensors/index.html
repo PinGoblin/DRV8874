@@ -1991,7 +1991,7 @@
     <div class="doc doc-contents first">
 
         <p>Current sensing: current-sensor classes and the adapter for an ADS1115 board.</p>
-<p>The PinGoblin DRV8874 outputs 0.675 V per amp on A_ISENSE and B_ISENSE (J3 pins 7 and 8). The Raspberry
+<p>The PinGoblin DRV8874 outputs 0.45 V per amp on A_ISENSE and B_ISENSE (J3 pins 7 and 8). The Raspberry
 Pi has no ADC, so read ISENSE with a PinGoblin ADS1115 board and its library,
 <a href="https://pingoblin.github.io/ADS1115/"><code>pingoblin_ads1115</code></a>. One ADS1115 has four inputs,
 so it reads two boards (four motors). Up to four ADS1115 boards share one I²C bus
@@ -2031,12 +2031,12 @@ divides by the duty to estimate the motor current.</p>
   </span>
 
 <a href="#pingoblin_motor.sensors.ISENSE_V_PER_A" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">ISENSE_V_PER_A</span> <span class="o">=</span> <span class="mf">0.675</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">ISENSE_V_PER_A</span> <span class="o">=</span> <span class="mf">0.45</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>PinGoblin DRV8874 ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A, the DRV8874 IPROPI gain).</p>
+        <p>PinGoblin DRV8874 ISENSE gain: 0.45 V per amp (1.0 kΩ × 450 µA/A, the DRV8874 IPROPI gain).</p>
 
     </div>
 
@@ -2454,7 +2454,7 @@ thread.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>ISENSE gain (V/A): 0.675 on the PinGoblin DRV8874.</p>
+                <p>ISENSE gain (V/A): 0.45 on the PinGoblin DRV8874.</p>
               </div>
             </td>
             <td>

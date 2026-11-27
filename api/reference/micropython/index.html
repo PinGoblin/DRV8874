@@ -4109,12 +4109,12 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
   </span>
 
 <a href="#pingoblin_motor_mp.ISENSE_V_PER_A" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">ISENSE_V_PER_A</span> <span class="o">=</span> <span class="mf">0.675</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">ISENSE_V_PER_A</span> <span class="o">=</span> <span class="mf">0.45</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>PinGoblin DRV8874 ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A).</p>
+        <p>PinGoblin DRV8874 ISENSE gain: 0.45 V per amp (1.0 kΩ × 450 µA/A).</p>
 
     </div>
 
@@ -4602,7 +4602,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
 </tr>
 <tr>
 <td><code>BOARD_OVERLOAD</code></td>
-<td>Board supply current above <code>fuse_rating</code> (3 A continuous board rating) for 1 s</td>
+<td>Board supply current above <code>fuse_rating</code> (5 A continuous board rating) for 1 s</td>
 <td>Yes</td>
 </tr>
 <tr>
@@ -6425,7 +6425,7 @@ On the ESP32 the input range is set to about 0–3.1 V (11 dB attenuation).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return <code>amps × 0.675</code>.</p>
+        <p>Return <code>amps × 0.45</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -6559,7 +6559,7 @@ On the ESP32 the input range is set to about 0–3.1 V (11 dB attenuation).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>ISENSE gain (V/A): 0.675 on the PinGoblin DRV8874.</p>
+                <p>ISENSE gain (V/A): 0.45 on the PinGoblin DRV8874.</p>
               </div>
             </td>
             <td>
@@ -8131,7 +8131,7 @@ only when every other motor on that line is idle; otherwise the motor brakes.</p
 
 
 <a href="#pingoblin_motor_mp.MotorBoard" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">MotorBoard</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'board'</span><span class="p">,</span> <span class="n">a_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'ph_en'</span><span class="p">,</span> <span class="n">logic_voltage</span><span class="o">=</span><span class="mf">3.3</span><span class="p">,</span> <span class="n">adc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sense_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pwm_freq</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">motor_names</span><span class="o">=</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">),</span> <span class="n">motor_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fuse_rating</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">supply_voltage</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">MotorBoard</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'board'</span><span class="p">,</span> <span class="n">a_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'ph_en'</span><span class="p">,</span> <span class="n">logic_voltage</span><span class="o">=</span><span class="mf">3.3</span><span class="p">,</span> <span class="n">adc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sense_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pwm_freq</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">motor_names</span><span class="o">=</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">),</span> <span class="n">motor_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">a_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fuse_rating</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">supply_voltage</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -8297,7 +8297,7 @@ sensor. Must be a different GPIO for each board.</p>
             <td>
               <div class="doc-md-description">
                 <p>VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is fixed
-at about 3 A.</p>
+at about 4.6 A.</p>
               </div>
             </td>
             <td>
@@ -8494,11 +8494,11 @@ sensing.</p>
             <td>
               <div class="doc-md-description">
                 <p>The board's continuous current rating (A), for <code>BOARD_OVERLOAD</code>.
-The on-board 4 A fast-acting (high I2t) fuse allows 3 A continuously.</p>
+The on-board 7 A fast-acting (high I2t) fuse allows 5 A continuously.</p>
               </div>
             </td>
             <td>
-                  <code>3.0</code>
+                  <code>5.0</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -8581,7 +8581,7 @@ another open board.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Driver current limit per motor (A): about 3 A, fixed on the board (VREF ≈ 2.07 V / 0.675 V/A).</p>
+        <p>Driver current limit per motor (A): about 4.6 A, fixed on the board (VREF ≈ 2.07 V / 0.45 V/A).</p>
 
     </div>
 

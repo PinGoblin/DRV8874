@@ -1662,7 +1662,7 @@
 </tr>
 <tr>
 <td>Motor stutters, fault LED flickers</td>
-<td>Current limit active (load near 3 A)</td>
+<td>Current limit active (load near 4.6 A)</td>
 <td>Reduce the load or speed. A larger motor needs a larger driver</td>
 </tr>
 <tr>
@@ -1682,18 +1682,18 @@
 </tr>
 <tr>
 <td>Small motor stalls and gets hot, but no <code>STALL</code> is reported</td>
-<td>Stall current below the 3 A current limit, so nFAULT never goes low</td>
+<td>Stall current below the 4.6 A current limit, so nFAULT never goes low</td>
 <td>Fit a current sensor and set <code>stall_current</code>, or stop the motor with a time-out. See <a href="../choosing-a-motor/#stall-detection-for-small-motors">Choosing a motor</a></td>
 </tr>
 <tr>
 <td>Large motor is slow, weak or reports <code>STALL</code> under load</td>
-<td>Motor needs more than the 3 A current limit</td>
+<td>Motor needs more than the 4.6 A current limit</td>
 <td>Use a motor with a lower stall current. See <a href="../choosing-a-motor/">Choosing a motor</a></td>
 </tr>
 <tr>
 <td>Motor runs, then stops and restarts every few seconds</td>
 <td>Driver overheating</td>
-<td>Improve airflow and reduce continuous current. Keep the total under 3 A</td>
+<td>Improve airflow and reduce continuous current. Keep each motor under 2.5 A and the total under 5 A</td>
 </tr>
 <tr>
 <td>Motor whines</td>
