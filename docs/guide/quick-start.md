@@ -2,8 +2,9 @@
 
 Wire J3 to the host first, then the motors, then the motor supply last.
 
-1. With everything unpowered, connect J3 to the host using the table below. You need at
-   least GND, VLOGIC, and one EN and one PH pin per motor.
+1. With everything unpowered, connect J3 to the host using the table below. One motor
+   needs only 4 wires to J3: GND, VLOGIC, A_EN and A_PH. Add B_EN and B_PH for a second
+   motor.
 2. Connect each motor to J4 (A) or J5 (B). For less electrical noise, solder a 100 nF
    capacitor across each motor's terminals and twist its leads (see [Connectors](connectors.md)).
 3. Connect power: a battery to J1 (XT30), or a 6–30 V supply to J2 (positive to VIN+,
@@ -15,18 +16,18 @@ Wire J3 to the host first, then the motors, then the motor supply last.
 
 ## Wiring
 
-| J3 pin | Signal | Raspberry Pi (BCM) | ESP32 DevKit | Pico |
-| --- | --- | --- | --- | --- |
-| 1 | GND | GND (pin 6) | GND | GND |
-| 2 | VLOGIC | 3V3 (pin 1) | 3V3 | 3V3(OUT) |
-| 3 | A_EN | GPIO12 (PWM0) | GPIO25 | GP2 |
-| 4 | A_PH | GPIO5 | GPIO26 | GP3 |
-| 5 | B_EN | GPIO13 (PWM1) (optional) | GPIO27 (optional) | GP4 (optional) |
-| 6 | B_PH | GPIO6 (optional) | GPIO33 (optional) | GP5 (optional) |
-| 7 | A_ISENSE | PinGoblin ADS1115 board (optional; the Pi has no ADC) | GPIO34, ADC1 (optional) | GP26, ADC0 (optional) |
-| 8 | B_ISENSE | PinGoblin ADS1115 board (optional) | GPIO35, ADC1 (optional) | GP27, ADC1 (optional) |
-| 9 | nSLEEP | GPIO26 (optional) | GPIO32 (optional) | GP6 (optional) |
-| 10 | nFAULT | GPIO19 (optional) | GPIO39 (optional, input only) | GP7 (optional) |
+| J3 pin | Signal | Connection | Raspberry Pi (BCM) | ESP32 DevKit | Pico |
+| --- | --- | --- | --- | --- | --- |
+| 1 | GND | **(Required)** | GND (pin 6) | GND | GND |
+| 2 | VLOGIC | **(Required)** | 3V3 (pin 1) | 3V3 | 3V3(OUT) |
+| 3 | A_EN | **(Required)** | GPIO12 (PWM0) | GPIO25 | GP2 |
+| 4 | A_PH | **(Required)** | GPIO5 | GPIO26 | GP3 |
+| 5 | B_EN | (Optional) | GPIO13 (PWM1) | GPIO27 | GP4 |
+| 6 | B_PH | (Optional) | GPIO6 | GPIO33 | GP5 |
+| 7 | A_ISENSE | (Optional) | PinGoblin ADS1115 board (the Pi has no ADC) | GPIO34, ADC1 | GP26, ADC0 |
+| 8 | B_ISENSE | (Optional) | PinGoblin ADS1115 board | GPIO35, ADC1 | GP27, ADC1 |
+| 9 | nSLEEP | (Optional) | GPIO26 | GPIO32 | GP6 |
+| 10 | nFAULT | (Optional) | GPIO19 | GPIO39 (input only) | GP7 |
 
 nSLEEP is pulled high on the board, so it can be left unconnected if sleep and coast
 control are not needed. Pins 5 and 6 are needed only for motor B, pins 7 and 8 only for
