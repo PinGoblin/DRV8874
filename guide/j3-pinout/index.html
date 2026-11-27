@@ -1619,6 +1619,15 @@
 <p>J3 is a single row of 10 pins on the left edge of the board. Looking at the component
 side, pin 10 (nFAULT) is at the top and pin 1 (GND, square pad) is at the bottom, nearest
 the test buttons.</p>
+<div class="admonition tip">
+<p class="admonition-title">Minimum wiring for one motor</p>
+<ul>
+<li><strong>J3:</strong> 4 wires: GND, VLOGIC, A_EN and A_PH (pins 1–4).</li>
+<li><strong>Motor supply:</strong> 2 wires to J2, or one XT30 plug in J1.</li>
+<li><strong>Motor:</strong> 2 wires to J4.</li>
+</ul>
+<p>Every other J3 pin is optional and can be left unconnected.</p>
+</div>
 <p><img alt="J3 pinout. Pins 3 to 6 are A_EN/A_IN1, A_PH/A_IN2, B_EN/B_IN1 and B_PH/B_IN2: the first
 name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout.svg" /></p>
 <table>
@@ -1626,6 +1635,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <th>Pin</th>
 <th>Signal</th>
+<th>Connection</th>
 <th>Direction</th>
 <th>PH/EN mode (default)</th>
 <th>PWM mode</th>
@@ -1635,6 +1645,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>10</td>
 <td>nFAULT</td>
+<td>(Optional)</td>
 <td>Output</td>
 <td>Low = fault or current limiting. One GPIO per board</td>
 <td>Same</td>
@@ -1642,13 +1653,15 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>9</td>
 <td>nSLEEP</td>
+<td>(Optional)</td>
 <td>Input</td>
-<td>Low = sleep, both motors coast. Pulled high on the board (optional)</td>
+<td>Low = sleep, both motors coast. Pulled high on the board</td>
 <td>Same</td>
 </tr>
 <tr>
 <td>8</td>
 <td>B_ISENSE</td>
+<td>(Optional)</td>
 <td>Output</td>
 <td>Motor B current, 0.45 V/A</td>
 <td>Same</td>
@@ -1656,6 +1669,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>7</td>
 <td>A_ISENSE</td>
+<td>(Optional)</td>
 <td>Output</td>
 <td>Motor A current, 0.45 V/A</td>
 <td>Same</td>
@@ -1663,6 +1677,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>6</td>
 <td>B_PH / B_IN2</td>
+<td>(Optional)</td>
 <td>Input</td>
 <td>Motor B direction</td>
 <td>IN2, motor B</td>
@@ -1670,6 +1685,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>5</td>
 <td>B_EN / B_IN1</td>
+<td>(Optional)</td>
 <td>Input</td>
 <td>Motor B on / speed (PWM)</td>
 <td>IN1, motor B</td>
@@ -1677,6 +1693,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>4</td>
 <td>A_PH / A_IN2</td>
+<td><strong>(Required)</strong></td>
 <td>Input</td>
 <td>Motor A direction</td>
 <td>IN2, motor A</td>
@@ -1684,6 +1701,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>3</td>
 <td>A_EN / A_IN1</td>
+<td><strong>(Required)</strong></td>
 <td>Input</td>
 <td>Motor A on / speed (PWM)</td>
 <td>IN1, motor A</td>
@@ -1691,6 +1709,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>2</td>
 <td>VLOGIC</td>
+<td><strong>(Required)</strong></td>
 <td>Power</td>
 <td>Logic supply in, 3.0–5.25 V</td>
 <td>Same</td>
@@ -1698,6 +1717,7 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 <tr>
 <td>1</td>
 <td>GND</td>
+<td><strong>(Required)</strong></td>
 <td>Power</td>
 <td>Ground, common with the host</td>
 <td>Same</td>

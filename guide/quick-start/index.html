@@ -1707,8 +1707,9 @@
 <h1 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h1>
 <p>Wire J3 to the host first, then the motors, then the motor supply last.</p>
 <ol>
-<li>With everything unpowered, connect J3 to the host using the table below. You need at
-   least GND, VLOGIC, and one EN and one PH pin per motor.</li>
+<li>With everything unpowered, connect J3 to the host using the table below. One motor
+   needs only 4 wires to J3: GND, VLOGIC, A_EN and A_PH. Add B_EN and B_PH for a second
+   motor.</li>
 <li>Connect each motor to J4 (A) or J5 (B). For less electrical noise, solder a 100 nF
    capacitor across each motor's terminals and twist its leads (see <a href="../connectors/">Connectors</a>).</li>
 <li>Connect power: a battery to J1 (XT30), or a 6–30 V supply to J2 (positive to VIN+,
@@ -1724,6 +1725,7 @@
 <tr>
 <th>J3 pin</th>
 <th>Signal</th>
+<th>Connection</th>
 <th>Raspberry Pi (BCM)</th>
 <th>ESP32 DevKit</th>
 <th>Pico</th>
@@ -1733,6 +1735,7 @@
 <tr>
 <td>1</td>
 <td>GND</td>
+<td><strong>(Required)</strong></td>
 <td>GND (pin 6)</td>
 <td>GND</td>
 <td>GND</td>
@@ -1740,6 +1743,7 @@
 <tr>
 <td>2</td>
 <td>VLOGIC</td>
+<td><strong>(Required)</strong></td>
 <td>3V3 (pin 1)</td>
 <td>3V3</td>
 <td>3V3(OUT)</td>
@@ -1747,6 +1751,7 @@
 <tr>
 <td>3</td>
 <td>A_EN</td>
+<td><strong>(Required)</strong></td>
 <td>GPIO12 (PWM0)</td>
 <td>GPIO25</td>
 <td>GP2</td>
@@ -1754,6 +1759,7 @@
 <tr>
 <td>4</td>
 <td>A_PH</td>
+<td><strong>(Required)</strong></td>
 <td>GPIO5</td>
 <td>GPIO26</td>
 <td>GP3</td>
@@ -1761,44 +1767,50 @@
 <tr>
 <td>5</td>
 <td>B_EN</td>
-<td>GPIO13 (PWM1) (optional)</td>
-<td>GPIO27 (optional)</td>
-<td>GP4 (optional)</td>
+<td>(Optional)</td>
+<td>GPIO13 (PWM1)</td>
+<td>GPIO27</td>
+<td>GP4</td>
 </tr>
 <tr>
 <td>6</td>
 <td>B_PH</td>
-<td>GPIO6 (optional)</td>
-<td>GPIO33 (optional)</td>
-<td>GP5 (optional)</td>
+<td>(Optional)</td>
+<td>GPIO6</td>
+<td>GPIO33</td>
+<td>GP5</td>
 </tr>
 <tr>
 <td>7</td>
 <td>A_ISENSE</td>
-<td>PinGoblin ADS1115 board (optional; the Pi has no ADC)</td>
-<td>GPIO34, ADC1 (optional)</td>
-<td>GP26, ADC0 (optional)</td>
+<td>(Optional)</td>
+<td>PinGoblin ADS1115 board (the Pi has no ADC)</td>
+<td>GPIO34, ADC1</td>
+<td>GP26, ADC0</td>
 </tr>
 <tr>
 <td>8</td>
 <td>B_ISENSE</td>
-<td>PinGoblin ADS1115 board (optional)</td>
-<td>GPIO35, ADC1 (optional)</td>
-<td>GP27, ADC1 (optional)</td>
+<td>(Optional)</td>
+<td>PinGoblin ADS1115 board</td>
+<td>GPIO35, ADC1</td>
+<td>GP27, ADC1</td>
 </tr>
 <tr>
 <td>9</td>
 <td>nSLEEP</td>
-<td>GPIO26 (optional)</td>
-<td>GPIO32 (optional)</td>
-<td>GP6 (optional)</td>
+<td>(Optional)</td>
+<td>GPIO26</td>
+<td>GPIO32</td>
+<td>GP6</td>
 </tr>
 <tr>
 <td>10</td>
 <td>nFAULT</td>
-<td>GPIO19 (optional)</td>
-<td>GPIO39 (optional, input only)</td>
-<td>GP7 (optional)</td>
+<td>(Optional)</td>
+<td>GPIO19</td>
+<td>GPIO39 (input only)</td>
+<td>GP7</td>
 </tr>
 </tbody>
 </table>
