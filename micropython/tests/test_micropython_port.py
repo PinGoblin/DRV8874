@@ -171,7 +171,7 @@ def test_coast_ph_en_needs_other_motor_idle():
 
 def test_current_limit_and_config_errors():
     b, *_ = make_board(logic_voltage=5.0)
-    assert b.current_limit == pytest.approx(3.06, abs=0.01)
+    assert b.current_limit == pytest.approx(4.59, abs=0.01)
     b.close()
     with pytest.raises(ConfigError):
         MotorBoard(a_en=1, a_ph=1, pins=MockPins())
@@ -196,7 +196,7 @@ def test_stall_with_sensor_latches():
     b, pins, sa, _ = make_board(sensors=True)
     m = mon(b)
     b.motor_a.forward(100)
-    sa.amps = 2.6
+    sa.amps = 3.9
     adv(400); m.check_once()
     adv(600)
     assert [f.type for f in m.check_once()] == [FaultType.STALL]
@@ -254,7 +254,7 @@ def test_sensor_error_once_and_policy():
     assert [f.type for f in m.check_once()] == [FaultType.SENSOR_ERROR]
     assert m.check_once() == []
     sa.fail = False
-    b.motor_a.forward(100); sa.amps = 2.6
+    b.motor_a.forward(100); sa.amps = 3.9
     adv(400); m.check_once(); adv(600); m.check_once()
     assert seen[-1].type == FaultType.STALL and b.motor_a.is_running
     b.close()
@@ -324,9 +324,9 @@ class FakeADC:
 
 
 def test_ads1115_channel_adapter(capsys):
-    adc = FakeADC([0.0, 0.675, 1.35, 0.0])
+    adc = FakeADC([0.0, 0.45, 0.9, 0.0])
     ch = ADS1115Channel(adc, 2)
-    assert ch.read_voltage() == pytest.approx(1.35)
+    assert ch.read_voltage() == pytest.approx(0.9)
     adc.fail = True
     with pytest.raises(SensorError):
         ch.read_voltage()
@@ -339,7 +339,7 @@ def test_ads1115_channel_adapter(capsys):
 
 
 def test_board_current_through_adc():
-    adc = FakeADC([0.675, 0.3375, 0.0, 0.0])
+    adc = FakeADC([0.45, 0.225, 0.0, 0.0])
     b = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, pins=MockPins(),
                    adc=adc, a_sense_channel=0, b_sense_channel=1)
     assert b.motor_a.sensor.read_isense_amps() == pytest.approx(1.0)
@@ -359,12 +359,12 @@ def test_with_ads1115_module():
     sys.path.insert(0, path)
     from ads1115 import ADS1115
 
-    class I2C:                       # simulated chip: 0.675 V on every input
+    class I2C:                       # simulated chip: 0.45 V on every input
         def writeto_mem(self, addr, reg, buf):
             pass
 
         def readfrom_mem_into(self, addr, reg, buf):
-            raw = 0x8000 if reg == 1 else round(0.675 / 4.096 * 32768)
+            raw = 0x8000 if reg == 1 else round(0.45 / 4.096 * 32768)
             buf[0], buf[1] = raw >> 8, raw & 0xFF
 
     adc = ADS1115(I2C(), address=0x48, rate=860)

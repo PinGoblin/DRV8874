@@ -140,10 +140,10 @@ def test_coast_ph_en_uses_sleep_only_when_other_motor_idle():
     board.close()
 
 
-def test_current_limit_fixed_3a():
+def test_current_limit_fixed():
     b33, *_ = make_board()
     b5, *_ = make_board(name="b5", logic_voltage=5.0)
-    assert b33.current_limit == pytest.approx(3.06, abs=0.01)
+    assert b33.current_limit == pytest.approx(4.59, abs=0.01)
     assert b5.current_limit == b33.current_limit
     b33.close(); b5.close()
 
@@ -186,7 +186,7 @@ def test_stall_with_sensor_brakes_and_latches():
     mon, clk = monitor_for(board)
     a = board.motor_a
     a.forward(100)
-    sa.amps = 2.6                       # above 80 % of the 3.06 A limit
+    sa.amps = 3.9                       # above 80 % of the 4.59 A limit
     clk.advance(0.4)                    # past start_grace
     assert mon.check_once() == []
     clk.advance(0.6)                    # stall_time elapsed
@@ -281,7 +281,7 @@ def test_board_overload():
                                                       stall_current=5.0))
     mon, clk = monitor_for(board)
     board.motor_a.forward(100); board.motor_b.forward(100)
-    sa.amps = sb.amps = 1.7             # 3.4 A total > 3 A fuse
+    sa.amps = sb.amps = 2.6             # 5.2 A total > 5 A board rating
     clk.advance(0.4); mon.check_once()
     clk.advance(1.1)
     assert {f.type for f in mon.check_once()} == {FaultType.BOARD_OVERLOAD}
@@ -304,7 +304,7 @@ def test_policy_override_and_handler():
     board.motor_a.add_fault_handler(seen.append)
     mon, clk = monitor_for(board)
     board.motor_a.forward(100)
-    sa.amps = 2.6
+    sa.amps = 3.9
     clk.advance(0.4); mon.check_once(); clk.advance(0.6); mon.check_once()
     assert seen and seen[0].type is FaultType.STALL
     assert board.motor_a.is_running     # policy NONE: keeps running
@@ -357,7 +357,7 @@ def test_chain_overload():
     for m in chain:
         m.forward(100)
     for s in sensors:
-        s.amps = 1.2                    # 7.2 A total > 6 A; each board 2.4 A < 3 A
+        s.amps = 1.2                    # 7.2 A total > 6 A; each board 2.4 A < 5 A
     clk.advance(0.4); chain.check_faults()
     clk.advance(1.1)
     assert {f.type for f in chain.check_faults()} == {FaultType.CHAIN_OVERLOAD}
@@ -388,9 +388,9 @@ class FakeADC:
 
 
 def test_ads1115_channel_adapter():
-    adc = FakeADC([0.0, 0.675, 1.35, 0.0])
+    adc = FakeADC([0.0, 0.45, 0.9, 0.0])
     ch = ADS1115Channel(adc, 2)
-    assert ch.read_voltage() == pytest.approx(1.35)
+    assert ch.read_voltage() == pytest.approx(0.9)
     adc.fail = True
     with pytest.raises(SensorError):
         ch.read_voltage()
@@ -403,7 +403,7 @@ def test_ads1115_channel_adapter():
 
 
 def test_board_reads_current_through_adc():
-    adc = FakeADC([0.675, 0.3375, 0.0, 0.0])          # 1 A and 0.5 A at ISENSE
+    adc = FakeADC([0.45, 0.225, 0.0, 0.0])          # 1 A and 0.5 A at ISENSE
     be = MockBackend()
     board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, backend=be,
                        adc=adc, a_sense_channel=0, b_sense_channel=1)
@@ -415,14 +415,14 @@ def test_board_reads_current_through_adc():
 def test_with_pingoblin_ads1115_package():
     ads = pytest.importorskip("pingoblin_ads1115")
 
-    class Bus:                                            # simulated chip: 0.675 V on every input
+    class Bus:                                            # simulated chip: 0.45 V on every input
         def write_i2c_block_data(self, addr, reg, data):
             pass
 
         def read_i2c_block_data(self, addr, reg, n):
             if reg == 0x01:
                 return [0x80, 0x00]                       # conversion done
-            raw = round(0.675 / 4.096 * 32768)
+            raw = round(0.45 / 4.096 * 32768)
             return [raw >> 8, raw & 0xFF]
 
     adc = ads.ADS1115(Bus(), address=0x48, rate=860)

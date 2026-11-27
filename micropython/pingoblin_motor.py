@@ -72,9 +72,9 @@ def _advance_clock(ms):
     _clock_offset[0] += int(ms)
 
 
-VREF_V = 1.24 * (1 + 10 / 15)   # on-board TLV431 reference: ITRIP about 3 A, fixed
-ISENSE_V_PER_A = 0.675     # 1.5 kOhm x 450 uA/A (DRV8874 IPROPI)
-"""PinGoblin DRV8874 ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A)."""
+VREF_V = 1.24 * (1 + 10 / 15)   # on-board TLV431 reference: ITRIP about 4.6 A, fixed
+ISENSE_V_PER_A = 0.45      # 1.0 kOhm x 450 uA/A (DRV8874 IPROPI)
+"""PinGoblin DRV8874 ISENSE gain: 0.45 V per amp (1.0 kΩ × 450 µA/A)."""
 WAKE_MS = 2                # DRV8874 wake-up from sleep is about 1 ms
 RELATCH_MS = 2             # nSLEEP low time at start-up; DRV8874 tSLEEP is 1 ms max
 """Milliseconds to wait after waking the drivers (the DRV8874 needs about 1 ms)."""
@@ -132,7 +132,7 @@ class FaultType:
     | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature, or motor supply below about 4.5 V | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % or more | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
-    | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (3 A continuous board rating) for 1 s | Yes |
+    | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (5 A continuous board rating) for 1 s | Yes |
     | `CHAIN_OVERLOAD` | Chain supply current above the chain limit (6 A) for 1 s | Yes |
     | `SENSOR_ERROR` | The current sensor could not be read | Yes |
     """
@@ -601,7 +601,7 @@ class MockSensor:
         self.fail = False
 
     def read_voltage(self):
-        """Return `amps × 0.675`.
+        """Return `amps × 0.45`.
 
         Returns:
             The simulated ISENSE voltage (V).
@@ -622,7 +622,7 @@ class MotorCurrentSensor:
         Args:
             source: Any object with `read_voltage()` (`ADS1115Channel`, `ADCChannel`, `MockSensor`).
             samples: Samples averaged per reading.
-            v_per_a: ISENSE gain (V/A): 0.675 on the PinGoblin DRV8874.
+            v_per_a: ISENSE gain (V/A): 0.45 on the PinGoblin DRV8874.
         """
         self.source = source
         self.samples = samples if samples > 0 else 1
@@ -1121,7 +1121,7 @@ class MotorBoard:
                  adc=None, a_sense_channel=None, b_sense_channel=None,
                  a_sensor=None, b_sensor=None, sense_samples=None, pins=None,
                  pwm_freq=20000, motor_names=("a", "b"), motor_options=None,
-                 a_options=None, b_options=None, fuse_rating=3.0, supply_voltage=None):
+                 a_options=None, b_options=None, fuse_rating=5.0, supply_voltage=None):
         """
         Args:
             name: Board name, used in `"board.motor"` addresses. Must not contain `.`.
@@ -1135,7 +1135,7 @@ class MotorBoard:
                 sensor. Must be a different GPIO for each board.
             mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
             logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is fixed
-                at about 3 A.
+                at about 4.6 A.
             adc: An `ADS1115` from the `ads1115` module, created with `rate=860`, for current
                 sensing.
             a_sense_channel: ADS1115 input wired to A_ISENSE.
@@ -1150,7 +1150,7 @@ class MotorBoard:
             a_options: Keyword arguments for motor A only.
             b_options: Keyword arguments for motor B only.
             fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
-                The on-board 4 A fast-acting (high I2t) fuse allows 3 A continuously.
+                The on-board 7 A fast-acting (high I2t) fuse allows 5 A continuously.
             supply_voltage: Motor supply voltage (V), 6–30, or `None`. Required when a motor
                 is given `motor_voltage`: the library then limits that motor's PWM duty so the
                 average voltage across it does not exceed its rating.
@@ -1232,7 +1232,7 @@ class MotorBoard:
     # ---- properties
     @property
     def current_limit(self):
-        """Driver current limit per motor (A): about 3 A, fixed on the board (VREF ≈ 2.07 V / 0.675 V/A)."""
+        """Driver current limit per motor (A): about 4.6 A, fixed on the board (VREF ≈ 2.07 V / 0.45 V/A)."""
         return VREF_V / ISENSE_V_PER_A
 
     @property

@@ -11,9 +11,9 @@ controlled from a documented Python and MicroPython library.
 - **Low-loss MOSFET bridges.** The DRV8874's switches have a combined resistance of about
   0.2 Ω, so little of the supply voltage is lost in the driver and it runs cool at
   normal loads.
-- **Fixed 3 A current limit per motor.** The limit is set by an on-board voltage reference,
+- **Fixed 4.6 A current limit per motor.** The limit is set by an on-board voltage reference,
   so it does not change with the host's logic voltage. Stalls and start-up surges are
-  held at about 3 A instead of reaching the motor's full stall current.
+  held at about 4.6 A instead of reaching the motor's full stall current.
 - **Two control modes**, selected by jumper JP1: PH/EN (one direction pin and one PWM pin
   per motor) or two-input PWM (IN1/IN2, which also allows coasting each motor separately).
 - **PWM up to 100 kHz.** 20 kHz is recommended, which is above human hearing.
@@ -26,7 +26,7 @@ controlled from a documented Python and MicroPython library.
   no voltage loss in normal use.
 - **Surge suppressor (TVS diode)** on the motor supply, to absorb voltage spikes from long
   supply leads and from the motors.
-- **4 A fuse** on the motor supply, to protect the supply wiring if a component fails.
+- **7 A fuse** on the motor supply, to protect the supply wiring if a component fails.
 - **Driver protection** built into each DRV8874: overcurrent, over-temperature and
   undervoltage shutdown, with automatic recovery.
 - **Safe start-up.** The drive inputs are pulled low, so both motors are held in brake
@@ -48,7 +48,7 @@ controlled from a documented Python and MicroPython library.
 
 ## Feedback
 
-- **Current-sense output per motor** (0.675 V per amp), for reading motor current with an
+- **Current-sense output per motor** (0.45 V per amp), for reading motor current with an
   ADC to measure load or detect a stall. See
   [Current sensing and current limit](current-sensing.md).
 - **Fault output** (nFAULT), shared by both drivers on the board, which signals current
@@ -85,7 +85,7 @@ board:
 | --- | --- | --- |
 | Motor channels | 2 | Often 1 |
 | Motor supply | 6–30 V | Often limited to 10–16 V, or starting at 9 V |
-| Current limit | Fixed at about 3 A per motor | Often none, or set by a trimmer |
+| Current limit | Fixed at about 4.6 A per motor | Often none, or set by a trimmer |
 | Reverse-polarity, surge and fuse protection | All three | Usually none |
 | Current-sense output to the host | Yes, per motor | Often absent |
 | Test buttons and direction LEDs | Yes | Rarely |

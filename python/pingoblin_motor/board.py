@@ -13,8 +13,8 @@ from .sensors import CurrentSensor, MotorCurrentSensor, make_sensor
 
 _log = logging.getLogger("pingoblin_motor")
 
-ISENSE_V_PER_A = 0.675
-"""PinGoblin DRV8874 ISENSE gain: 0.675 V per amp."""
+ISENSE_V_PER_A = 0.45
+"""PinGoblin DRV8874 ISENSE gain: 0.45 V per amp."""
 VREF_V = 1.24 * (1 + 10.0 / 15.0)
 """PinGoblin DRV8874 current-limit reference: a TLV431 set to about 2.07 V, independent of VLOGIC."""
 WAKE_TIME_S = 0.0015           # DRV8874 wake-up time from sleep is about 1 ms
@@ -57,7 +57,7 @@ class MotorBoard:
                  backend: Optional[Backend] = None, pwm_frequency: float = 1000.0,
                  motor_names=("a", "b"), motor_options: Optional[dict] = None,
                  a_options: Optional[dict] = None, b_options: Optional[dict] = None,
-                 fuse_rating: float = 3.0, supply_voltage: Optional[float] = None):
+                 fuse_rating: float = 5.0, supply_voltage: Optional[float] = None):
         """
         Args:
             name: Board name, used in `"board.motor"` addresses. Must not contain `.`.
@@ -72,7 +72,7 @@ class MotorBoard:
                 without a current sensor. Must be a different GPIO for each board.
             mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
             logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is
-                fixed at about 3 A whatever the logic voltage.
+                fixed at about 4.6 A whatever the logic voltage.
             adc: A `pingoblin_ads1115.ADS1115` for current sensing, created with `rate=860`.
                 See [`ADS1115Channel`][pingoblin_motor.sensors.ADS1115Channel].
             a_sense_channel: ADS1115 input wired to A_ISENSE.
@@ -89,7 +89,7 @@ class MotorBoard:
             a_options: Keyword arguments for motor A only (override `motor_options`).
             b_options: Keyword arguments for motor B only.
             fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
-                The on-board 4 A fast-acting (high I2t) fuse allows 3 A continuously.
+                The on-board 7 A fast-acting (high I2t) fuse allows 5 A continuously.
             supply_voltage: Motor supply voltage (V), 6–30, or `None`. Required when a motor
                 is given `motor_voltage`: the library then limits that motor's PWM duty so the
                 average voltage across it does not exceed its rating.
@@ -171,9 +171,9 @@ class MotorBoard:
     # ------------------------------------------------------------ properties
     @property
     def current_limit(self) -> float:
-        """Driver current limit per motor (A): about 3 A, fixed on the board.
+        """Driver current limit per motor (A): about 4.6 A, fixed on the board.
 
-        ITRIP = VREF / 0.675 V/A, with VREF ≈ 2.07 V from an on-board reference.
+        ITRIP = VREF / 0.45 V/A, with VREF ≈ 2.07 V from an on-board reference.
         """
         return VREF_V / ISENSE_V_PER_A
 

@@ -167,13 +167,13 @@ also be driven directly, as below (PH/EN mode). Speed runs from −1.0 (full rev
         en.duty_u16(int(min(abs(speed), 1.0) * 65535))
 
     def amps(adc):
-        return adc.read_uv() / 1_000_000 / 0.675   # 0.675 V per amp
+        return adc.read_uv() / 1_000_000 / 0.45    # 0.45 V per amp
 
     drive(A_EN, A_PH, 0.6)
     for _ in range(30):
         a = amps(A_SENSE)
         print("Motor A: %.2f A  fault/limit: %s" % (a, FAULT.value() == 0))
-        if a > 2.4:              # about 80% of the 3 A current limit
+        if a > 3.7:              # about 80% of the 4.6 A current limit
             print("Stall - stopping")
             break
         time.sleep(0.1)

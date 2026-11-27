@@ -1,11 +1,11 @@
 # Current sensing and current limit
 
-A_ISENSE and B_ISENSE output 0.675 V for every amp flowing in that motor. Read them with
+A_ISENSE and B_ISENSE output 0.45 V for every amp flowing in that motor. Read them with
 an ADC to measure load or detect a stall. On a Raspberry Pi, use a PinGoblin ADS1115
 board; an ESP32 or Pico can use its own ADC.
 
 \[
-I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
+I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 \]
 
 - The reading is only valid while the motor is driven (EN high). During PWM off-time it
@@ -19,7 +19,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
 
 | Current limit per motor | ISENSE at the limit |
 | --- | --- |
-| About 3.0 A (fixed, for any VLOGIC) | About 2.07 V |
+| About 4.6 A (4.2–5.1 A, fixed, for any VLOGIC) | About 2.07 V |
 
 - While limiting, the red fault LED lights and nFAULT goes low. Normal operation resumes
   on the next PWM cycle once the load drops. At exactly 100% duty there is no next cycle,
@@ -27,8 +27,8 @@ I_{motor} = \frac{V_{ISENSE}}{0.675\ \mathrm{V/A}}
   [100% duty and the current limit](controlling-motors.md#practical-limits).
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
-- Both motors share a 3 A continuous board rating. Two motors held at the 3 A current
-  limit (for example, both stalled) draw about 6 A, which can blow the board's 4 A fuse,
+- Both motors share a 5 A continuous board rating. Two motors held at the 4.6 A current
+  limit (for example, both stalled) draw about 9 A, which can blow the board's 7 A fuse,
   and the fuse is not resettable. Detect stalls and stop the motors, as the library does.
 
 ## ISENSE and motor speed
@@ -43,7 +43,7 @@ falls and the current rises.
 \]
 
 Here \(\omega\) is motor speed, \(D\) the PWM duty (0–1), \(V_M\) the motor supply
-voltage, \(I\) the motor current (\(V_{ISENSE} / 0.675\)), \(R\) the motor's winding
+voltage, \(I\) the motor current (\(V_{ISENSE} / 0.45\)), \(R\) the motor's winding
 resistance and \(K_e\) its back-EMF constant.
 
 What this means in practice:
@@ -65,7 +65,7 @@ shaft for under a second). Then:
 
 Limits of this estimate:
 
-- The 3 A current limit clamps the current, so the line ends there. Any heavier
+- The 4.6 A current limit clamps the current, so the line ends there. Any heavier
   load reads as the limit.
 - Winding resistance rises about 0.4% per °C as the motor warms, which shifts the line.
 - Gearbox friction and brush noise add error. Average several readings.

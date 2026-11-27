@@ -1,8 +1,8 @@
 # Choosing a motor
 
-The board suits brushed DC motors that draw no more than about 3 A in normal use. Each
-driver limits its motor to about 3 A (2.8–3.4 A across component tolerances), and the
-board as a whole is rated for 3 A continuous. A motor that needs more current than this
+The board suits brushed DC motors that draw no more than about 2.5 A continuously in
+normal use. Each driver limits its motor to about 4.6 A (4.2–5.1 A across component
+tolerances), and the board as a whole is rated for 5 A continuous. A motor that needs more current than this
 still runs, but only with reduced torque.
 
 Check two figures on the motor's datasheet before buying: its **stall current** and its
@@ -12,20 +12,20 @@ Check two figures on the motor's datasheet before buying: its **stall current** 
 
 | Stall current at the voltage used | Result on this board |
 | --- | --- |
-| Up to 3 A | Full performance. The current limit never acts, even at stall |
-| 3–6 A | Good. The current limit acts only near stall, and the motor's efficient operating range is fully available |
-| 6–25 A | Light loads only. The motor reaches its no-load speed, but torque is limited to roughly 10–40 % of its stall torque and the fault LED flickers under load |
-| Above 25 A, or no-load current above 2 A | Not suitable. The motor spends most of its time at the current limit, the driver runs hot, and start-up may be reported as a stall |
+| Up to 4.2 A | Full performance. The current limit never acts, even at stall |
+| 4.2–9 A | Good. The current limit acts only near stall, and the motor's efficient operating range is fully available |
+| 9–35 A | Light loads only. The motor reaches its no-load speed, but torque is limited to roughly 13–50 % of its stall torque and the fault LED flickers under load |
+| Above 35 A, or no-load current above 2.5 A | Not suitable. The motor spends most of its time at the current limit, the driver runs hot, and start-up may be reported as a stall |
 
 Where only the no-load current and the stall current are given, estimate the share of
 stall torque available at the board's limit as:
 
 \[
-\frac{3\,\text{A} - I_{no\text{-}load}}{I_{stall} - I_{no\text{-}load}}
+\frac{4.6\,\text{A} - I_{no\text{-}load}}{I_{stall} - I_{no\text{-}load}}
 \]
 
 Motor manufacturers recommend running continuously at no more than 20–30 % of stall
-torque, so a motor whose stall current is 4–12 A uses the board well.
+torque, so a motor whose stall current is 6–18 A uses the board well.
 
 ### Typical motors
 
@@ -35,10 +35,10 @@ torque, so a motor whose stall current is 4–12 A uses the board well.
 | Slow gearhead motor | 12 V | 0.03–0.07 A | 0.35–1.7 A | Full performance |
 | 37 mm metal gearmotor, 24 V | 24 V | About 0.1 A | About 3 A | Full performance |
 | 37 mm metal gearmotor, 12 V | 12 V | About 0.2 A | About 5.5 A | Good |
-| 130-size hobby motor | 1.5–4.5 V | About 0.25 A | Up to about 3.5 A | Good. Set `motor_voltage` (see below) |
-| 280/300-size motor | 6 V | About 0.55 A | About 5.6 A | Good. About half of stall torque available. Set `motor_voltage` above a 6 V supply |
-| Large gearhead motor (high torque) | 12 V | About 0.45 A | About 18 A | Light loads only |
-| 380/540-size high-speed motor | 12 V | 0.6–0.8 A | 17–24 A | Light loads only |
+| 130-size hobby motor | 1.5–4.5 V | About 0.25 A | Up to about 3.5 A | Full performance. Set `motor_voltage` (see below) |
+| 280/300-size motor | 6 V | About 0.55 A | About 5.6 A | Good. About 80 % of stall torque available. Set `motor_voltage` above a 6 V supply |
+| Large gearhead motor (high torque) | 12 V | About 0.45 A | About 18 A | Good at moderate loads (about 25 % of stall torque) |
+| 380/540-size high-speed motor | 12 V | 0.6–0.8 A | 17–24 A | Light to moderate loads (about 15–25 % of stall torque) |
 | 550/775-size high-power motor | 6–12 V | 1.3–4 A | 60–110 A | Not suitable |
 
 !!! tip "Choose the higher-voltage version of a motor"
@@ -69,7 +69,7 @@ below the supply voltage.
 ## Stall detection for small motors
 
 Without a current sensor, the library detects a stall from the driver's current-limit
-signal (nFAULT). A motor whose stall current is below 3 A never reaches the current
+signal (nFAULT). A motor whose stall current is below 4.2 A never reaches the current
 limit, so a stall is not detected and the motor carries its full stall current until it is
 stopped. Small gearmotors can overheat within seconds in this condition. To protect them,
 fit a current sensor and set `stall_current`

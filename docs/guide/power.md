@@ -7,7 +7,7 @@ The board runs from **6–30 V DC**, which covers 12 V and 24 V systems. It has 
 | J1 | XT30, right-angle male | Batteries and supplies with an XT30 plug |
 | J2 | 5.08 mm screw terminal (pin 1 VIN+, pin 2 GND) | Wired supplies, or power out to the next board |
 
-The board draws up to 3 A in total (both motors). The supply or battery must be able to deliver that, plus the motors' start-up surge.
+The board draws up to 5 A continuously in total (both motors), and briefly up to about 9 A when both motors are at the current limit. The supply or battery must be able to deliver that, plus the motors' start-up surge.
 
 !!! danger "Only connect one power source at a time to J1 and J2"
     J1 and J2 are connected together, and so is every board in a daisy chain. For example,

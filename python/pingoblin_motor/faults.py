@@ -27,7 +27,7 @@ class FaultType(enum.Enum):
     | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown, or motor supply below about 4.5 V | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % duty or more: motor disconnected, broken wire, motor supply off or board fuse blown | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
-    | `BOARD_OVERLOAD` | Board supply current above the 3 A continuous board rating for 1 s | Yes |
+    | `BOARD_OVERLOAD` | Board supply current above the 5 A continuous board rating for 1 s | Yes |
     | `CHAIN_OVERLOAD` | Daisy-chain supply current above the chain limit (6 A) for 1 s | Yes |
     | `SENSOR_ERROR` | The current sensor could not be read (reported once until it recovers) | Yes |
     """
@@ -47,8 +47,8 @@ class FaultType(enum.Enum):
     #: Motor current above its continuous rating for longer than
     #: ``overload_time``. Risk of overheating. Needs a sensor.
     OVERLOAD = "overload"
-    #: Total current on one board is above its 3 A continuous rating.
-    #: Sustained, this will blow the board's 4 A fuse. Needs sensors.
+    #: Total current on one board is above its 5 A continuous rating.
+    #: Sustained, this will blow the board's 7 A fuse. Needs sensors.
     BOARD_OVERLOAD = "board_overload"
     #: Total current through a daisy chain is above the chain limit (6 A).
     #: Needs sensors.

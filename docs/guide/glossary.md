@@ -29,7 +29,7 @@ Abbreviations and terms used in this manual, in alphabetical order.
 | I2C | Inter-integrated circuit | A two-wire bus (SDA and SCL) for connecting chips such as the ADS1115 |
 | IC | Integrated circuit | A chip |
 | IN1 / IN2 | Input 1 / input 2 | PWM mode inputs. Each one controls one side of the motor (OUT1 or OUT2) |
-| ISENSE | Current sense | J3 output giving a voltage proportional to motor current (0.675 V per amp) |
+| ISENSE | Current sense | J3 output giving a voltage proportional to motor current (0.45 V per amp) |
 | LED | Light-emitting diode | An indicator light |
 | Li-ion / LiPo / LiFePO4 | Lithium-ion / lithium polymer / lithium iron phosphate | Rechargeable battery types. Full-charge voltage per cell is 4.2 V for Li-ion and LiPo, and 3.65 V for LiFePO4 |
 | MIT | Massachusetts Institute of Technology licence | The open-source licence the software is released under |

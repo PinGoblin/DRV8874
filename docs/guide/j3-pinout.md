@@ -11,8 +11,8 @@ motor in PWM mode.](../images/j3-pinout.svg)
 | --- | --- | --- | --- | --- |
 | 10 | nFAULT | Output | Low = fault or current limiting. One GPIO per board | Same |
 | 9 | nSLEEP | Input | Low = sleep, both motors coast. Pulled high on the board (optional) | Same |
-| 8 | B_ISENSE | Output | Motor B current, 0.675 V/A | Same |
-| 7 | A_ISENSE | Output | Motor A current, 0.675 V/A | Same |
+| 8 | B_ISENSE | Output | Motor B current, 0.45 V/A | Same |
+| 7 | A_ISENSE | Output | Motor A current, 0.45 V/A | Same |
 | 6 | B_PH | Input | Motor B direction | IN2, motor B |
 | 5 | B_EN | Input | Motor B on / speed (PWM) | IN1, motor B |
 | 4 | A_PH | Input | Motor A direction | IN2, motor A |
@@ -29,7 +29,7 @@ can be left open.
 nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give
 each board its own nFAULT GPIO: see [Daisy-chaining boards](daisy-chain.md).
 
-The 3 A current limit keeps ISENSE at or below about 2.1 V, within the range of any
+The 4.6 A current limit keeps ISENSE at or below about 2.1 V, within the range of any
 3.3 V or 5 V ADC.
 
 Signal names: **EN** = enable (on/off and PWM speed), **PH** = phase (direction),
