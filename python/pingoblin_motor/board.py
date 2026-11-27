@@ -18,6 +18,7 @@ ISENSE_V_PER_A = 0.675
 VREF_V = 1.24 * (1 + 10.0 / 15.0)
 """PinGoblin DRV8874 current-limit reference: a TLV431 set to about 2.07 V, independent of VLOGIC."""
 WAKE_TIME_S = 0.0015           # DRV8874 wake-up time from sleep is about 1 ms
+RELATCH_TIME_S = 0.0015        # nSLEEP low time at start-up; DRV8874 tSLEEP is 1 ms max
 """Seconds to wait after waking the drivers (the DRV8874 needs about 1 ms)."""
 
 
@@ -131,8 +132,19 @@ class MotorBoard:
         self.fuse_rating = fuse_rating
         self.backend = backend
         self._sleep_pin, self._fault_pin = sleep_pin, fault_pin
-        # Drive nSLEEP high (awake) at start; the board's pull-up also keeps it high.
-        self._sleep = self.backend.output(sleep_pin, True) if sleep_pin is not None else None
+        # Start-up re-latch: the DRV8874 samples PMODE when it wakes. If VLOGIC rose slowly,
+        # it may have sampled PMODE mid-ramp. Holding nSLEEP low for longer than tSLEEP and
+        # then releasing it makes the drivers sample PMODE again with VLOGIC settled. Skip the
+        # pulse when another board already drives this nSLEEP line, so its motors keep running.
+        self._sleep = None
+        if sleep_pin is not None:
+            with MotorBoard._group_lock:
+                first = not MotorBoard._sleep_groups.get((id(self.backend), sleep_pin))
+            self._sleep = self.backend.output(sleep_pin, not first)
+            if first:
+                time.sleep(RELATCH_TIME_S)
+                self._sleep.set(True)
+                time.sleep(WAKE_TIME_S)
         self._fault = self.backend.input(fault_pin) if fault_pin is not None else None
         with MotorBoard._group_lock:
             if sleep_pin is not None:

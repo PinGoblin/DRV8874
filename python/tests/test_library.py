@@ -482,3 +482,23 @@ def test_motor_voltage_error_leaves_pins_free():
         make_board(backend=be, a_options=dict(motor_voltage=6.0))
     b, *_ = make_board(backend=be)      # same fault_pin and backend: must not be "already used"
     b.close()
+
+
+def test_startup_relatches_pmode_with_sleep_pulse(monkeypatch):
+    from pingoblin_motor import backends as bk
+    log = []
+    init, setv = bk.MockOutput.__init__, bk.MockOutput.set
+    monkeypatch.setattr(bk.MockOutput, "__init__", lambda s, p, i: (init(s, p, i), log.append((p, bool(i))))[0])
+    monkeypatch.setattr(bk.MockOutput, "set", lambda s, v: (setv(s, v), log.append((s.pin, bool(v))))[0])
+    be = MockBackend()
+    t0 = time.monotonic()
+    front = MotorBoard("front", a_en=12, a_ph=5, sleep_pin=26, backend=be)
+    assert time.monotonic() - t0 >= 0.0015
+    assert [e for e in log if e[0] == 26] == [(26, False), (26, True)]
+    assert be.pins[26].value is True and not front.is_asleep
+    # A second board on the same nSLEEP line must not pulse it (the first may be running).
+    front.motor_a.forward(50)
+    log.clear()
+    MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, backend=be)
+    assert all(v for p, v in log if p == 26)
+    assert be.pins[12].duty == 0.5

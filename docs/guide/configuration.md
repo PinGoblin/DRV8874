@@ -2,7 +2,13 @@
 
 JP1 is a 2-pad solder jumper that sets the control mode for both drivers. It is supplied
 open (PH/EN mode). The drivers read JP1 when they wake, so a change takes effect at the
-next power-up or wake from sleep.
+next power-up or wake from sleep. Disconnect and reconnect power after changing JP1.
+
+When a `sleep_pin` is configured, the library holds nSLEEP low for at least 1.5 ms when the board
+is created, then releases it. This makes the drivers read JP1 again after VLOGIC has
+settled, so a slowly rising logic supply cannot leave them in the wrong mode. If you do
+not connect nSLEEP to the host, disconnect and reconnect power if a motor in PWM mode
+does not stop at the 3 A current limit.
 
 | JP1 setting | Mode | Library | Details |
 | --- | --- | --- | --- |

@@ -430,3 +430,25 @@ def test_motor_voltage_error_leaves_pins_free():
         make_board(pins=pins, a_options=dict(motor_voltage=6.0))
     b, *_ = make_board(pins=pins)
     b.close()
+
+
+def test_startup_relatches_pmode_with_sleep_pulse():
+    pins = MockPins()
+    log = []
+    orig = pins.output
+
+    def output(pin, initial=False):
+        o = orig(pin, initial)
+        if pin == 26 and not hasattr(o, "_logged"):
+            log.append(bool(initial))
+            s = o.set
+            o.set = lambda v: (s(v), log.append(bool(v)))[0]
+            o._logged = True
+        return o
+    pins.output = output
+    front = MotorBoard("front", a_en=12, a_ph=5, sleep_pin=26, pins=pins,
+                       motor_options=dict(reverse_delay=0))
+    assert log == [False, True] and not front.is_asleep
+    front.motor_a.forward(50)
+    MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, pins=pins, motor_options=dict(reverse_delay=0))
+    assert log == [False, True]

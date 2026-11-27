@@ -76,6 +76,7 @@ VREF_V = 1.24 * (1 + 10 / 15)   # on-board TLV431 reference: ITRIP about 3 A, fi
 ISENSE_V_PER_A = 0.675     # 1.5 kOhm x 450 uA/A (DRV8874 IPROPI)
 """PinGoblin DRV8874 ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A)."""
 WAKE_MS = 2                # DRV8874 wake-up from sleep is about 1 ms
+RELATCH_MS = 2             # nSLEEP low time at start-up; DRV8874 tSLEEP is 1 ms max
 """Milliseconds to wait after waking the drivers (the DRV8874 needs about 1 ms)."""
 
 # ---------------------------------------------------------------- constants
@@ -1192,7 +1193,17 @@ class MotorBoard:
         self.pins = pins
         self._sleep_pin = sleep_pin
         self._fault_pin = fault_pin
-        self._sleep = self.pins.output(sleep_pin, True) if sleep_pin is not None else None
+        # Start-up re-latch: the DRV8874 samples PMODE when it wakes. Holding nSLEEP low for
+        # longer than tSLEEP, then releasing it, makes the drivers sample PMODE again with
+        # VLOGIC settled. Skipped when another board already drives this nSLEEP line.
+        self._sleep = None
+        if sleep_pin is not None:
+            first = not _sleep_groups.get((id(pins), sleep_pin))
+            self._sleep = self.pins.output(sleep_pin, not first)
+            if first:
+                sleep_ms(RELATCH_MS)
+                self._sleep.set(True)
+                sleep_ms(WAKE_MS)
         self._fault = self.pins.input(fault_pin) if fault_pin is not None else None
         if sleep_pin is not None:
             _sleep_groups.setdefault((id(self.pins), sleep_pin), []).append(self)

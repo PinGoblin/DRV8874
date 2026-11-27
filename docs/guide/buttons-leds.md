@@ -19,8 +19,23 @@ Each motor has a FWD and a REV button that runs it at full speed while held, in 
   high, REV runs the motor forward.
 - They always drive the motor at 100 % duty, that is, at the full supply voltage. Do not
   use them with a motor rated below the supply voltage.
-- They work as described here only in PH/EN mode (the default jumper setting). In PWM
-  mode FWD brakes the motor and REV runs it forward.
+- They work as described above only in PH/EN mode (the default jumper setting). In PWM
+  mode they behave differently: see the next section.
+
+## Buttons in PWM mode (JP1 bridged)
+
+In PWM mode the drivers read the EN and PH lines as IN1 and IN2. The buttons still drive
+the same lines, so their labels no longer match what the motor does:
+
+| Button held | IN1 (EN line) | IN2 (PH line) | Motor |
+| --- | --- | --- | --- |
+| None, host absent | Low | Low | Coasts (outputs off) |
+| FWD (SW1 / SW3) | High | High | Brakes (both outputs low) |
+| REV (SW2 / SW4) | High | Low | Runs forward (OUT1 positive, green LED) |
+
+There is no button combination that runs a motor in reverse in PWM mode. To check reverse
+wiring with the buttons, open JP1 (see [Configuration](configuration.md)), or run the
+motor in reverse from the host.
 
 ## LEDs
 

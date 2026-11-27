@@ -69,7 +69,8 @@ Arduino `analogWrite()` on either pin). With gpiozero's `Motor` class, pass `for
 J3 pin 3 (IN1) and `backward=` J3 pin 4 (IN2), so its directions match the table above.
 
 **Test buttons:** not supported in PWM mode. FWD drives IN1 and IN2 high, which brakes
-the motor, and REV drives IN1 only, which runs it forward.
+the motor, and REV drives IN1 only, which runs it forward. See
+[Buttons in PWM mode](buttons-leds.md#buttons-in-pwm-mode-jp1-bridged).
 
 ## Speed control
 

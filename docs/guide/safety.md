@@ -10,7 +10,7 @@ Read these before connecting power.
   measure higher: check it with a meter, or use a lower voltage. The surge suppressor
   starts conducting at about 33 V and is not meant to carry continuous current. A higher
   supply, such as a 36 V battery, destroys the surge suppressor (D2) and then blows the
-  fuse (F1). Both must then be replaced.
+  fuse (F1).
 - **Connect GND between the board and the host.** J3 pin 1 must go to a host GND pin.
 - **Wire with the power off.** Connect and disconnect motors only while the supply is off.
 - **The drivers get hot.** At high currents the chips and the board around them can exceed
@@ -20,5 +20,10 @@ Read these before connecting power.
 - **Only connect one power source at a time to J1 and J2.** J1 and J2 are connected
   together. For example, never connect a battery to J1 and a separate power supply to J2
   at the same time. See [Powering the board](power.md).
-- **Use a fused or current-limited supply.** The on-board fuse is not resettable and protects the board, not your
+- **Use a fused or current-limited supply.** The on-board fuse protects the board, not your
   wiring or batteries.
+- **The fuse (F1) is not user-serviceable.** F1 is a surface-mount fuse soldered to the board.
+  It is not resettable, and it opens only after a fault such as an over-voltage supply or
+  a failed component. Replacing it requires surface-mount rework and a check of the parts
+  that caused it to open. A board with an open fuse should be returned for repair or
+  replaced.
