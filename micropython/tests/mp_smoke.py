@@ -41,8 +41,8 @@ try:
 except pm.MotorFaultError:
     pass
 sa.amps = 0
-a.clear_fault()
-a.forward(10)
+board.pause(2.1)          # fault_retry_time; the fault was raised once above
+a.forward(10)             # runs again without clear_fault()
 assert a.is_running
 
 # asyncio monitor

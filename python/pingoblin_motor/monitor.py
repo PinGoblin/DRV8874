@@ -24,8 +24,6 @@ DRIVER_FAULT_DEBOUNCE = 0.2
 """Seconds nFAULT must stay low, with no motor driven, before `DRIVER_FAULT`."""
 OVERLOAD_DEBOUNCE = 1.0
 """Seconds a board or chain must stay over its limit before `BOARD_OVERLOAD` / `CHAIN_OVERLOAD`."""
-CURRENT_LIMIT_REPEAT = 5.0     # seconds between repeated CURRENT_LIMIT warnings
-"""Minimum seconds between repeated `CURRENT_LIMIT` warnings for one motor."""
 OPEN_LOAD_MIN_DUTY = 0.2
 """Open-load checks run only at or above this PWM duty (0–1)."""
 
@@ -35,7 +33,6 @@ class _Track:
     stall_since: Optional[float] = None
     open_since: Optional[float] = None
     over_since: Optional[float] = None
-    limit_reported: float = -1e9
     sensor_failed: bool = False
 
 
@@ -68,6 +65,7 @@ class FaultMonitor:
         self._handlers: List[Callable[[Fault], None]] = []
         self._tracks: Dict[int, _Track] = {}
         self._board_since: Dict[int, Optional[float]] = {}
+        self._board_reported: set = set()
         self._board_over_since: Dict[int, Optional[float]] = {}
         self._chain_since: Optional[float] = None
         self._stop = threading.Event()
@@ -160,26 +158,28 @@ class FaultMonitor:
             for m in board.motors.values():
                 self._tracks[id(m)] = _Track()
             self._board_since[key] = None
+            self._board_reported.discard(key)
             return 0.0, True
 
         nfault = board.fault_active                    # None if not wired
-        driving = [m for m in board.motors.values() if m.is_running and m.duty > 0]
 
-        # -- DRIVER_FAULT: nFAULT low with nothing driven (short / overtemp shutdown)
-        if nfault and not driving:
+        # -- DRIVER_FAULT: nFAULT low (short, overheating or motor supply low)
+        if nfault and key not in self._board_reported:
             since = self._board_since.get(key)
             if since is None:
                 self._board_since[key] = now
             elif now - since >= DRIVER_FAULT_DEBOUNCE:
                 f = Fault(FaultType.DRIVER_FAULT,
-                          "nFAULT low with no motor driven: driver shut down (output short, "
-                          "overcurrent or over-temperature) or motor supply below about 4.5 V "
-                          "(supply off, flat battery or fuse blown)", board.name, None, None, now)
+                          "driver shut down: motor output shorted, driver overheated, or motor "
+                          "supply below 4.5 V. Check the motor wiring, let the board cool, or "
+                          "charge the battery", board.name, None, None, now)
                 self._record(f, found)
                 board._report_board_fault(f)
                 self._board_since[key] = None
-        else:
+                self._board_reported.add(key)       # once per event, until nFAULT goes high
+        elif not nfault:
             self._board_since[key] = None
+            self._board_reported.discard(key)
 
         total, known = 0.0, True
         for m in board.motors.values():
@@ -203,35 +203,22 @@ class FaultMonitor:
                 continue
             in_grace = now - m.running_since < m.start_grace
 
-            # -- CURRENT_LIMIT (warning)
-            if nfault and now - tr.limit_reported >= CURRENT_LIMIT_REPEAT:
-                tr.limit_reported = now
-                who = m.name if len(driving) == 1 or amps is not None else "a motor"
-                self._emit(Fault(FaultType.CURRENT_LIMIT, f"driver current-limiting ({who})",
-                                 board.name, m.name, amps, now), m, found)
+            if amps is None:
+                continue
 
             # -- STALL
-            if amps is not None:
-                stalled = amps >= m.stall_current
-            else:
-                stalled = bool(nfault)        # current limiting = load at the limit
-            if stalled and not in_grace:
+            if amps >= m.stall_current and not in_grace:
                 if tr.stall_since is None:
                     tr.stall_since = now
                 elif now - tr.stall_since >= m.stall_time:
-                    detail = (f"{amps:.2f} A for {m.stall_time:.1f} s" if amps is not None
-                              else f"driver current-limiting for {m.stall_time:.1f} s")
-                    if amps is None and len(driving) > 1:
-                        detail += " (both motors running; cannot tell which one, stopping both)"
-                    self._emit(Fault(FaultType.STALL, f"motor stalled: {detail}", board.name, m.name, amps, now),
+                    self._emit(Fault(FaultType.STALL,
+                                     f"motor stalled ({amps:.2f} A for {m.stall_time:.1f} s): check "
+                                     "for a jam or too much load", board.name, m.name, amps, now),
                                m, found)
                     tr.stall_since = None
                     continue
             else:
                 tr.stall_since = None
-
-            if amps is None:
-                continue
 
             # -- OPEN_LOAD
             if not in_grace and m.duty >= OPEN_LOAD_MIN_DUTY and amps < m.open_load_current:
@@ -239,8 +226,8 @@ class FaultMonitor:
                     tr.open_since = now
                 elif now - tr.open_since >= m.open_load_time:
                     self._emit(Fault(FaultType.OPEN_LOAD,
-                                     f"no motor current ({amps * 1000:.0f} mA): motor disconnected, "
-                                     "broken wire, motor supply off or board fuse blown",
+                                     f"no motor current ({amps * 1000:.0f} mA): check the motor wires "
+                                     "and the motor supply",
                                      board.name, m.name, amps, now), m, found)
                     tr.open_since = None
                     continue
@@ -254,7 +241,7 @@ class FaultMonitor:
                 elif now - tr.over_since >= m.overload_time:
                     self._emit(Fault(FaultType.OVERLOAD,
                                      f"{amps:.2f} A above the {m.continuous_current:.1f} A continuous "
-                                     f"rating for {m.overload_time:.0f} s", board.name, m.name, amps, now),
+                                     f"rating for {m.overload_time:.0f} s: reduce the load", board.name, m.name, amps, now),
                                m, found)
                     tr.over_since = None
             else:

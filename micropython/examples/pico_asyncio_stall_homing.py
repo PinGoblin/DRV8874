@@ -1,12 +1,12 @@
 # Raspberry Pi Pico: home an actuator against its end stop using stall detection,
 # with the fault monitor running as an asyncio task. No limit switch needed.
-# Without a current sensor, a stall is detected from nFAULT (the driver current-limiting).
+# Stall detection needs current sensing: A_ISENSE (J3 pin 7) to GP26 (ADC0).
 import asyncio
-from pingoblin_motor import FaultAction, FaultPolicy, FaultType, MotorBoard
+from pingoblin_motor import ADCChannel, FaultAction, FaultPolicy, FaultType, MotorBoard
 
 policy = FaultPolicy({FaultType.STALL: FaultAction.BRAKE}, latch=False)   # stall is expected here
-board = MotorBoard(a_en=2, a_ph=3, sleep_pin=6, fault_pin=7,
-                   a_options=dict(policy=policy, stall_time=0.3))
+board = MotorBoard(a_en=2, a_ph=3, sleep_pin=6, fault_pin=7, a_sensor=ADCChannel(26, vref=3.3),
+                   a_options=dict(policy=policy, stall_time=0.3, stall_current=1.0))
 stalled = asyncio.Event()
 board.motor_a.add_fault_handler(lambda f: f.type == FaultType.STALL and stalled.set())
 board.enable_monitor(interval=0.02)

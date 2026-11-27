@@ -208,15 +208,47 @@ def test_stall_with_sensor_latches():
     b.close()
 
 
-def test_stall_from_nfault_without_sensor():
+def test_no_stall_from_nfault_without_sensor():
     b, pins, *_ = make_board()
     m = mon(b)
     b.motor_a.forward(100)
-    P(pins)[19].level = False
-    adv(400)
-    assert FaultType.CURRENT_LIMIT in [f.type for f in m.check_once()]
-    adv(600)
-    assert [f.type for f in m.check_once()] == [FaultType.STALL]
+    adv(1500)
+    assert m.check_once() == []
+    assert b.motor_a.is_running
+    b.close()
+
+
+def test_fault_raises_once_then_clears_after_retry_time():
+    b, pins, sa, _ = make_board(sensors=True)
+    m = mon(b)
+    b.motor_a.forward(100)
+    sa.amps = 3.9
+    adv(400); m.check_once(); adv(600); m.check_once()
+    with pytest.raises(MotorFaultError, match="check for a jam"):
+        b.motor_a.forward(10)
+    with pytest.raises(MotorFaultError):    # retried too soon
+        b.motor_a.forward(10)
+    adv(2100)
+    sa.amps = 1.0
+    b.motor_a.forward(10)                    # no clear_fault() needed
+    assert b.motor_a.is_running
+    b.close()
+
+
+def test_driver_fault_clears_when_nfault_high():
+    b, pins, *_ = make_board()
+    m = mon(b)
+    b.motor_a.forward(50)
+    P(pins)[19].level = False                # e.g. flat battery
+    m.check_once(); adv(250)
+    assert [f.type for f in m.check_once()] == [FaultType.DRIVER_FAULT]
+    adv(500)
+    assert m.check_once() == []              # once per event
+    with pytest.raises(MotorFaultError, match="charge the battery"):
+        b.motor_a.forward(50)
+    P(pins)[19].level = True
+    b.motor_a.forward(50)
+    assert b.motor_a.is_running
     b.close()
 
 

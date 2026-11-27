@@ -14,7 +14,7 @@ Check two figures on the motor's datasheet before buying: Its **stall current** 
 | --- | --- |
 | Up to 4.2 A | Full performance. The current limit never acts, even at stall |
 | 4.2–9 A | Good. The current limit acts only near stall, and the motor's efficient operating range is fully available |
-| 9–35 A | Light loads only. The motor reaches its no-load speed, but torque is limited to roughly 13–50 % of its stall torque and the fault LED flickers under load |
+| 9–35 A | Light loads only. The motor reaches its no-load speed, but torque is limited to roughly 13–50 % of its stall torque under load |
 | Above 35 A, or no-load current above 2.5 A | Not suitable. The motor spends most of its time at the current limit, the driver runs hot, and start-up may be reported as a stall |
 
 Where only the no-load current and the stall current are given, estimate the share of
@@ -66,13 +66,11 @@ board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6,
 The test buttons always drive the motor at 100 % duty. Do not use them with a motor rated
 below the supply voltage.
 
-## Stall detection for small motors
+## Stall detection
 
-Without a current sensor, the library detects a stall from the driver's current-limit
-signal (nFAULT). A motor whose stall current is below 4.2 A never reaches the current
-limit, so a stall is not detected and the motor carries its full stall current until it is
-stopped. Small gearmotors can overheat within seconds in this condition. To protect them,
-fit a current sensor and set `stall_current`
+Stall detection needs a current sensor. Without one, a stalled motor carries its stall
+current, up to the 4.6 A limit, until it is stopped. Small gearmotors can overheat within
+seconds in this condition. To protect them, fit a current sensor and set `stall_current`
 (see [Current sensing and current limit](current-sensing.md)), or stop the motor in your
 own code with a time-out or an end-stop switch.
 

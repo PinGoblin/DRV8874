@@ -39,13 +39,14 @@ class MotorState(enum.Enum):
         STOPPED: Braked: both outputs low. Stops quickly and resists turning.
         COASTING: Outputs open. Spins down freely.
         RUNNING: Driven.
-        FAULT: A latched fault. Call `clear_fault()`.
+        FAULT: A latched fault. The next run command raises `MotorFaultError`; once the cause
+            has gone, the command after that runs the motor.
     """
 
     STOPPED = "stopped"      #: braked (outputs shorted low): stops quickly, holds lightly
     COASTING = "coasting"    #: outputs open: spins down freely
     RUNNING = "running"
-    FAULT = "fault"          #: latched fault; call clear_fault()
+    FAULT = "fault"          #: latched fault (see MotorFaultError)
 
 
 class ControlMode(enum.Enum):
@@ -89,7 +90,7 @@ class Motor:
                  start_grace: float = 0.3, open_load_current: float = 0.03,
                  open_load_time: float = 1.0, continuous_current: float = 1.5,
                  overload_time: float = 5.0, policy: Optional[FaultPolicy] = None,
-                 motor_voltage: Optional[float] = None):
+                 motor_voltage: Optional[float] = None, fault_retry_time: float = 2.0):
         """
         Args:
             name: Motor name within its board, for example `"a"` or `"left"`.
@@ -120,6 +121,8 @@ class Motor:
                 board's `supply_voltage`, 100 % speed is scaled to a PWM duty of
                 `motor_voltage / supply_voltage`, so the motor never receives more than its
                 rated average voltage. Requires `supply_voltage` on the board.
+            fault_retry_time: Seconds after a `STALL`, `OPEN_LOAD` or `OVERLOAD` before a
+                run command may restart the motor (after the fault has been raised once).
 
         Raises:
             ConfigError: An option is out of range.
@@ -152,6 +155,9 @@ class Motor:
         self.continuous_current = continuous_current
         self.overload_time = overload_time
         self.policy = policy or FaultPolicy()
+        self.fault_retry_time = float(fault_retry_time)
+        self._fault_raised = False
+        self._fault_time = 0.0
 
         self._backend = backend
         self._en_pin, self._ph_pin = en_pin, ph_pin
@@ -269,7 +275,7 @@ class Motor:
 
         Raises:
             ValueError: Speed outside 0–100, or `duration` not positive.
-            MotorFaultError: The motor has a latched fault.
+            MotorFaultError: The motor has a latched fault (raised once per fault; see `MotorFaultError`).
         """
         self._run(Direction.FORWARD, speed_pc, duration, wait)
 
@@ -283,7 +289,7 @@ class Motor:
 
         Raises:
             ValueError: Speed outside 0–100, or `duration` not positive.
-            MotorFaultError: The motor has a latched fault.
+            MotorFaultError: The motor has a latched fault (raised once per fault; see `MotorFaultError`).
         """
         self._run(Direction.REVERSE, speed_pc, duration, wait)
 
@@ -297,7 +303,7 @@ class Motor:
 
         Raises:
             ValueError: Speed outside -100 to 100, or `duration` not positive.
-            MotorFaultError: The motor has a latched fault.
+            MotorFaultError: The motor has a latched fault (raised once per fault; see `MotorFaultError`).
         """
         if speed_pc == 0:
             self.stop()
@@ -312,7 +318,7 @@ class Motor:
             wait: With `duration`, block until the run ends.
 
         Raises:
-            MotorFaultError: The motor has a latched fault.
+            MotorFaultError: The motor has a latched fault (raised once per fault; see `MotorFaultError`).
         """
         direction = self._direction or Direction.FORWARD
         speed = self._speed_pc or 100.0
@@ -407,9 +413,14 @@ class Motor:
         self._handlers.append(handler)
 
     def clear_fault(self) -> None:
-        """Clear a latched fault so the motor can run again. The motor stays stopped."""
+        """Clear a latched fault at once. The motor stays stopped.
+
+        Not normally needed: a latched fault clears by itself once it has been raised and
+        its cause has gone.
+        """
         with self._lock:
             self._fault = None
+            self._fault_raised = False
             if self._state is MotorState.FAULT:
                 self._state = MotorState.STOPPED
 
@@ -427,6 +438,8 @@ class Motor:
                     self.board.sleep()
             if self.policy.latches(fault.type):
                 self._fault = fault
+                self._fault_raised = False
+                self._fault_time = time.monotonic()
                 self._state = MotorState.FAULT
         _log.warning("%s", fault)
         for h in list(self._handlers):
@@ -436,6 +449,25 @@ class Motor:
                 _log.exception("fault handler failed")
 
     # ------------------------------------------------------------ internals
+    def _check_fault(self) -> None:
+        """Raise a latched fault once; clear it on a later command if its cause has gone."""
+        fault = self._fault
+        if fault is None:
+            return
+        if self._fault_raised and self._fault_cause_gone(fault):
+            self._fault, self._fault_raised = None, False
+            if self._state is MotorState.FAULT:
+                self._state = MotorState.STOPPED
+            _log.info("%s.%s: fault cleared, running again", self.board.name, self.name)
+            return
+        self._fault_raised = True
+        raise MotorFaultError(fault)
+
+    def _fault_cause_gone(self, fault: Fault) -> bool:
+        if fault.type is FaultType.DRIVER_FAULT:
+            return not self.board.fault_active        # nFAULT high again (or not wired)
+        return time.monotonic() - self._fault_time >= self.fault_retry_time
+
     def _check_speed(self, value: float) -> float:
         value = float(value)
         if not 0 <= value <= 100:
@@ -453,8 +485,7 @@ class Motor:
         if duration is not None and duration <= 0:
             raise ValueError("duration must be > 0")
         with self._lock:
-            if self._fault is not None:
-                raise MotorFaultError(self._fault)
+            self._check_fault()
             self._cancel_timer()
             if speed_pc == 0:
                 self._speed_pc = 0.0

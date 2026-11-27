@@ -11,7 +11,7 @@
     - **IN1 / IN2 (input 1 / input 2):** In PWM mode, the same two pins become two direct
       inputs, each controlling one side of the motor (OUT1 and OUT2).
     - **nSLEEP / nFAULT:** The leading *n* means the signal is active when low: nSLEEP low
-      puts the drivers to sleep, and nFAULT goes low on a fault or current limiting.
+      puts the drivers to sleep, and nFAULT goes low on a driver fault.
 
     The [Glossary](glossary.md) lists every abbreviation used in this manual.
 
@@ -111,15 +111,7 @@ little until the duty is well below 50%. Slow decay gives finer control.
   gives smooth current. Lower frequencies (1–5 kHz, such as the Raspberry Pi's software
   PWM) work the same way but make the motor whine.
 - **Full speed.** 100% duty applies the full supply to the motor. The test buttons drive
-  EN high, so they always run at 100%.
-
-!!! warning "100% duty and the current limit"
-    The drivers limit current on every PWM cycle and restart on the next PWM edge. At
-    exactly 100% duty there are no edges, so if a motor stalls and reaches the current
-    limit, the driver holds it in brake (and lights the fault LED) until the input
-    changes. To recover, change the speed, stop and restart, or release and press the test
-    button again. If a stall is likely at full speed, run at 99% instead: The motor runs
-    at effectively full speed, and the current limit then recovers automatically.
+  EN high, so they always run at 100%. The current limit works at any duty, including 100%.
 
 ## Direction
 

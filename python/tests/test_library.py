@@ -205,38 +205,82 @@ def test_stall_ignored_during_start_grace():
     board, be, sa, _ = make_board(sensors=True)
     mon, clk = monitor_for(board)
     board.motor_a.forward(100)
-    sa.amps = 2.6
+    sa.amps = 3.9
     mon.check_once()
     clk.advance(0.2)
     assert mon.check_once() == []       # still in the 0.3 s grace
     board.close()
 
 
-def test_stall_without_sensor_from_nfault():
+def test_no_stall_from_nfault_without_sensor():
     board, be, *_ = make_board()
     mon, clk = monitor_for(board)
     board.motor_a.forward(100)
-    pins(be)[19].level = False          # nFAULT low: current limiting
     clk.advance(0.4)
-    types = [f.type for f in mon.check_once()]
-    assert FaultType.CURRENT_LIMIT in types
-    clk.advance(0.6)
-    assert [f.type for f in mon.check_once()] == [FaultType.STALL]
-    assert board.motor_a.state is MotorState.FAULT
+    assert mon.check_once() == []       # current limiting no longer pulls nFAULT low
+    clk.advance(1.0)
+    assert mon.check_once() == []
+    assert board.motor_a.is_running
     board.close()
 
 
-def test_stall_without_sensor_both_running_stops_both():
+def test_driver_fault_while_driving_reported_once():
     board, be, *_ = make_board()
     mon, clk = monitor_for(board)
     board.motor_a.forward(100)
-    board.motor_b.forward(100)
-    pins(be)[19].level = False
-    clk.advance(0.4); mon.check_once()
-    clk.advance(0.6)
-    stalls = [f for f in mon.check_once() if f.type is FaultType.STALL]
-    assert {f.motor for f in stalls} == {"a", "b"}
-    assert "cannot tell which" in stalls[0].message
+    pins(be)[19].level = False          # nFAULT low: short, overheating or supply low
+    mon.check_once(); clk.advance(0.25)
+    faults = mon.check_once()
+    assert [f.type for f in faults] == [FaultType.DRIVER_FAULT]   # one board-level record
+    assert "charge the battery" in faults[0].message
+    clk.advance(0.5)
+    assert mon.check_once() == []       # asleep now; reported once per event
+    board.close()
+
+
+def test_latched_fault_raises_once_then_clears_when_cause_gone():
+    board, be, sa, _ = make_board(sensors=True, motor_options=dict(reverse_delay=0, fault_retry_time=0.05))
+    mon, clk = monitor_for(board)
+    a = board.motor_a
+    a.forward(100)
+    sa.amps = 3.9
+    clk.advance(0.4); mon.check_once(); clk.advance(0.6); mon.check_once()
+    assert a.state is MotorState.FAULT
+    with pytest.raises(MotorFaultError, match="check for a jam"):
+        a.forward(50)                   # raised once, with the cause
+    time.sleep(0.06)                    # fault_retry_time elapsed
+    sa.amps = 1.0
+    a.forward(50)                       # cause gone: runs without clear_fault()
+    assert a.is_running and a.fault is None
+    board.close()
+
+
+def test_latched_fault_raises_again_if_retried_too_soon():
+    board, be, sa, _ = make_board(sensors=True)
+    mon, clk = monitor_for(board)
+    a = board.motor_a
+    a.forward(100); sa.amps = 3.9
+    clk.advance(0.4); mon.check_once(); clk.advance(0.6); mon.check_once()
+    with pytest.raises(MotorFaultError):
+        a.forward(50)
+    with pytest.raises(MotorFaultError):  # within the 2 s retry time
+        a.forward(50)
+    board.close()
+
+
+def test_driver_fault_clears_when_nfault_high():
+    be = MockBackend()
+    board = MotorBoard(a_en=12, a_ph=5, fault_pin=19, backend=be, motor_options=dict(reverse_delay=0))
+    mon, clk = monitor_for(board)
+    be.pins[19].level = False           # e.g. flat battery (UVLO)
+    mon.check_once(); clk.advance(0.25); mon.check_once()
+    with pytest.raises(MotorFaultError, match="charge the battery"):
+        board.motor_a.forward(50)
+    with pytest.raises(MotorFaultError):  # still low: battery not yet replaced
+        board.motor_a.forward(50)
+    be.pins[19].level = True            # battery replaced
+    board.motor_a.forward(50)
+    assert board.motor_a.is_running
     board.close()
 
 

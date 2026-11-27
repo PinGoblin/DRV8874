@@ -15,7 +15,7 @@ name applies in PH/EN mode, the second in PWM mode.](../images/j3-pinout.svg)
 
 | Pin | Signal | Connection | Direction | PH/EN mode (default) | PWM mode |
 | --- | --- | --- | --- | --- | --- |
-| 10 | nFAULT | (Optional) | Output | Low = fault or current limiting. One GPIO per board | Same |
+| 10 | nFAULT | (Optional) | Output | Low = driver fault. One GPIO per board | Same |
 | 9 | nSLEEP | (Optional) | Input | Low = sleep, both motors coast. Pulled high on the board | Same |
 | 8 | B_ISENSE | (Optional) | Output | Motor B current, 0.45 V/A | Same |
 | 7 | A_ISENSE | (Optional) | Output | Motor A current, 0.45 V/A | Same |

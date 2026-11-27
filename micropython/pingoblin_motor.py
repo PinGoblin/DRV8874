@@ -127,9 +127,8 @@ class FaultType:
 
     | Constant | Detected when | Needs sensor |
     |---|---|---|
-    | `STALL` | Current at or above `stall_current` for `stall_time` while driven, or nFAULT low for `stall_time` without a sensor | No |
-    | `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | No |
-    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: short, overcurrent or over-temperature, or motor supply below about 4.5 V | No |
+    | `STALL` | Current at or above `stall_current` for `stall_time` while driven | Yes |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s: output short, driver overheated, or motor supply below about 4.5 V | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % or more | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
     | `BOARD_OVERLOAD` | Board supply current above `fuse_rating` (5 A continuous board rating) for 1 s | Yes |
@@ -138,7 +137,6 @@ class FaultType:
     """
 
     STALL = "stall"
-    CURRENT_LIMIT = "current_limit"
     DRIVER_FAULT = "driver_fault"
     OPEN_LOAD = "open_load"
     OVERLOAD = "overload"
@@ -165,7 +163,6 @@ class FaultAction:
 
 DEFAULT_ACTIONS = {
     FaultType.STALL: FaultAction.BRAKE,
-    FaultType.CURRENT_LIMIT: FaultAction.NONE,
     FaultType.DRIVER_FAULT: FaultAction.SLEEP,
     FaultType.OPEN_LOAD: FaultAction.BRAKE,
     FaultType.OVERLOAD: FaultAction.BRAKE,
@@ -175,7 +172,9 @@ DEFAULT_ACTIONS = {
 }
 """Default `FaultAction` for each `FaultType`."""
 LATCHING = (FaultType.STALL, FaultType.DRIVER_FAULT, FaultType.OPEN_LOAD, FaultType.OVERLOAD)
-"""Fault types that latch until `clear_fault()`."""
+"""Fault types that latch. The next run command raises `MotorFaultError` once; the latch then
+clears by itself when the cause has gone (nFAULT high for `DRIVER_FAULT`, otherwise after the
+motor's `fault_retry_time`)."""
 
 # ---------------------------------------------------------------- faults and errors
 
@@ -199,7 +198,8 @@ class SensorError(MotorError):
 
 
 class MotorFaultError(MotorError):
-    """Raised when you command a motor that has a latched fault. Call `clear_fault()` first.
+    """Raised once when you command a motor that has a latched fault. Fix the cause and run the
+    motor again: the latch clears by itself once the cause has gone.
 
     Attributes:
         fault (Fault): The latched fault.
@@ -210,7 +210,7 @@ class MotorFaultError(MotorError):
         Args:
             fault: The latched `Fault`.
         """
-        super().__init__("motor has a latched fault: %s. Call clear_fault() first." % fault)
+        super().__init__(str(fault))
         self.fault = fault
 
 
@@ -679,7 +679,7 @@ class Motor:
                  pwm_freq=20000, min_speed_pc=0, ramp_time=0.0, reverse_delay=0.1,
                  stall_current=None, stall_time=0.5, start_grace=0.3, open_load_current=0.03,
                  open_load_time=1.0, continuous_current=1.5, overload_time=5.0, policy=None,
-                 motor_voltage=None):
+                 motor_voltage=None, fault_retry_time=2.0):
         """
         Args:
             name: Motor name within its board.
@@ -703,6 +703,8 @@ class Motor:
             continuous_current: Current (A) the motor may carry continuously.
             overload_time: Seconds above `continuous_current` before an overload fault.
             policy: `FaultPolicy` for this motor.
+            fault_retry_time: Seconds after a `STALL`, `OPEN_LOAD` or `OVERLOAD` before a run
+                command may restart the motor (after the fault has been raised once).
             motor_voltage: The motor's rated voltage (V), or `None`. When it is below the
                 board's `supply_voltage`, 100 % speed is scaled to a PWM duty of
                 `motor_voltage / supply_voltage`, so the motor never receives more than its
@@ -739,6 +741,9 @@ class Motor:
         self.continuous_current = continuous_current
         self.overload_time = overload_time
         self.policy = policy or FaultPolicy()
+        self.fault_retry_time = float(fault_retry_time)
+        self._fault_raised = False
+        self._fault_time = 0
         self._pins = pins
         self._en_pin = en_pin
         self._ph_pin = ph_pin
@@ -973,8 +978,10 @@ class Motor:
         self._handlers.append(handler)
 
     def clear_fault(self):
-        """Clear a latched fault so the motor can run again. It stays stopped."""
+        """Clear a latched fault at once. It stays stopped. Not normally needed: a latched
+        fault clears by itself once it has been raised and its cause has gone."""
         self._fault = None
+        self._fault_raised = False
         if self._state == MotorState.FAULT:
             self._state = MotorState.STOPPED
 
@@ -1002,12 +1009,33 @@ class Motor:
                 self.board.sleep()
         if self.policy.latches(fault.type):
             self._fault = fault
+            self._fault_raised = False
+            self._fault_time = ticks_ms()
             self._state = MotorState.FAULT
+        print("pingoblin_motor:", fault)
         for h in self._handlers:
             try:
                 h(fault)
             except Exception as exc:  # a bad handler must not stop fault handling
                 print("pingoblin_motor: fault handler error:", exc)
+
+    def _check_fault(self):
+        fault = self._fault
+        if fault is None:
+            return
+        if self._fault_raised:
+            if fault.type == FaultType.DRIVER_FAULT:
+                gone = not self.board.fault_active
+            else:
+                gone = ticks_diff(ticks_ms(), self._fault_time) >= self.fault_retry_time * 1000
+            if gone:
+                self._fault = None
+                self._fault_raised = False
+                if self._state == MotorState.FAULT:
+                    self._state = MotorState.STOPPED
+                return
+        self._fault_raised = True
+        raise MotorFaultError(fault)
 
     def _speed_to_duty(self, speed_pc):
         if speed_pc <= 0:
@@ -1018,8 +1046,7 @@ class Motor:
         speed_pc = _check_speed(speed_pc)
         if duration is not None and duration <= 0:
             raise ValueError("duration must be > 0")
-        if self._fault is not None:
-            raise MotorFaultError(self._fault)
+        self._check_fault()
         self._stop_at = None
         if speed_pc == 0:
             self._speed_pc = 0.0
@@ -1634,8 +1661,6 @@ DRIVER_FAULT_DEBOUNCE_MS = 200
 """Milliseconds nFAULT must stay low, with no motor driven, before `DRIVER_FAULT`."""
 OVERLOAD_DEBOUNCE_MS = 1000
 """Milliseconds over the limit before `BOARD_OVERLOAD` / `CHAIN_OVERLOAD`."""
-CURRENT_LIMIT_REPEAT_MS = 5000
-"""Minimum milliseconds between repeated `CURRENT_LIMIT` warnings."""
 OPEN_LOAD_MIN_DUTY = 0.2
 """Open-load checks run only at or above this duty (0–1)."""
 
@@ -1645,15 +1670,14 @@ class _Track:
         self.stall = None
         self.open = None
         self.over = None
-        self.limit = None
         self.sensor_failed = False
 
 
 class FaultMonitor:
     """Detects every `FaultType`. Runs inside `update()`; you rarely create one yourself.
 
-    Without a current sensor, a stall is inferred from nFAULT staying low for `stall_time`.
-    If both motors on a board are running, both are stopped.
+    Stall, open-load and overload detection need a current sensor. nFAULT low for 0.2 s is
+    reported once as `DRIVER_FAULT`.
 
     Attributes:
         faults (list): Fault history, oldest first.
@@ -1677,6 +1701,7 @@ class FaultMonitor:
         self._handlers = []
         self._tracks = {}
         self._drv = {}
+        self._drv_reported = {}
         self._bover = {}
         self._chain_since = None
         self._last = None
@@ -1744,23 +1769,24 @@ class FaultMonitor:
             for m in board.motors.values():
                 self._tracks[id(m)] = _Track()
             self._drv[key] = None
+            self._drv_reported.pop(key, None)
             return 0.0, True
         nfault = board.fault_active
-        driving = [m for m in board.motors.values() if m.is_running and m.duty > 0]
-
-        if nfault and not driving:
+        if nfault and key not in self._drv_reported:
             since = self._drv.get(key)
             if since is None:
                 self._drv[key] = now
             elif ticks_diff(now, since) >= DRIVER_FAULT_DEBOUNCE_MS:
-                f = Fault(FaultType.DRIVER_FAULT, "nFAULT low with no motor driven: driver shut down "
-                          "(output short, overcurrent or over-temperature) or motor supply below "
-                          "about 4.5 V (supply off, flat battery or fuse blown)", board.name, None, None, now)
+                f = Fault(FaultType.DRIVER_FAULT, "driver shut down: motor output shorted, driver "
+                          "overheated, or motor supply below 4.5 V. Check the motor wiring, let the "
+                          "board cool, or charge the battery", board.name, None, None, now)
                 self._record(f, found)
                 board._report_board_fault(f)
                 self._drv[key] = None
-        else:
+                self._drv_reported[key] = True
+        elif not nfault:
             self._drv[key] = None
+            self._drv_reported.pop(key, None)
 
         total = 0.0
         known = True
@@ -1788,39 +1814,28 @@ class FaultMonitor:
                 continue
             in_grace = ticks_diff(now, m.running_since) < m.start_grace * 1000
 
-            if nfault and (tr.limit is None or ticks_diff(now, tr.limit) >= CURRENT_LIMIT_REPEAT_MS):
-                tr.limit = now
-                self._emit(Fault(FaultType.CURRENT_LIMIT, "driver current-limiting", board.name, m.name,
-                                 amps, now), m, found)
+            if amps is None:
+                continue
 
-            stalled = (amps >= m.stall_current) if amps is not None else bool(nfault)
-            if stalled and not in_grace:
+            if amps >= m.stall_current and not in_grace:
                 if tr.stall is None:
                     tr.stall = now
                 elif ticks_diff(now, tr.stall) >= m.stall_time * 1000:
-                    if amps is not None:
-                        detail = "%.2f A for %.1f s" % (amps, m.stall_time)
-                    else:
-                        detail = "driver current-limiting for %.1f s" % m.stall_time
-                        if len(driving) > 1:
-                            detail += " (both motors running; cannot tell which one, stopping both)"
-                    self._emit(Fault(FaultType.STALL, "motor stalled: " + detail, board.name, m.name, amps, now),
-                               m, found)
+                    self._emit(Fault(FaultType.STALL, "motor stalled (%.2f A for %.1f s): check for a "
+                                     "jam or too much load" % (amps, m.stall_time), board.name, m.name,
+                                     amps, now), m, found)
                     tr.stall = None
                     continue
             else:
                 tr.stall = None
-
-            if amps is None:
-                continue
 
             if not in_grace and m.duty >= OPEN_LOAD_MIN_DUTY and amps < m.open_load_current:
                 if tr.open is None:
                     tr.open = now
                 elif ticks_diff(now, tr.open) >= m.open_load_time * 1000:
                     self._emit(Fault(FaultType.OPEN_LOAD,
-                                     "no motor current (%d mA): motor disconnected, broken wire, "
-                                     "motor supply off or board fuse blown" % int(amps * 1000),
+                                     "no motor current (%d mA): check the motor wires and the "
+                                     "motor supply" % int(amps * 1000),
                                      board.name, m.name, amps, now), m, found)
                     tr.open = None
                     continue
@@ -1831,8 +1846,8 @@ class FaultMonitor:
                 if tr.over is None:
                     tr.over = now
                 elif ticks_diff(now, tr.over) >= m.overload_time * 1000:
-                    self._emit(Fault(FaultType.OVERLOAD, "%.2f A above the %.1f A continuous rating for %d s"
-                                     % (amps, m.continuous_current, int(m.overload_time)),
+                    self._emit(Fault(FaultType.OVERLOAD, "%.2f A above the %.1f A continuous rating "
+                                     "for %d s: reduce the load" % (amps, m.continuous_current, int(m.overload_time)),
                                      board.name, m.name, amps, now), m, found)
                     tr.over = None
             else:

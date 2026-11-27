@@ -3,8 +3,9 @@
 A fault is detected by the [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor] and
 delivered as a [`Fault`][pingoblin_motor.faults.Fault] record. Each motor then reacts
 according to its [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy]: brake, coast,
-sleep the board, or report only. Serious faults *latch*, so the motor refuses to run
-until you call [`Motor.clear_fault()`][pingoblin_motor.motor.Motor.clear_fault].
+sleep the board, or report only. Serious faults *latch*: the next run command raises
+[`MotorFaultError`][pingoblin_motor.faults.MotorFaultError] with the cause and what to do.
+Once the cause has gone, the motor runs again on the following command.
 """
 from __future__ import annotations
 
@@ -22,9 +23,8 @@ class FaultType(enum.Enum):
 
     | Member | Detected when | Needs sensor |
     |---|---|---|
-    | `STALL` | Motor current at or above `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` when there is no sensor | No |
-    | `CURRENT_LIMIT` | nFAULT low while a motor is driven. A warning, repeated at most every 5 s | No |
-    | `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown, or motor supply below about 4.5 V | No |
+    | `STALL` | Motor current at or above `stall_current` for `stall_time` while driven | Yes |
+    | `DRIVER_FAULT` | nFAULT low for 0.2 s: output short, driver overheated, or motor supply below about 4.5 V | No |
     | `OPEN_LOAD` | Under `open_load_current` for `open_load_time` while driven at 20 % duty or more: motor disconnected, broken wire, motor supply off or board fuse blown | Yes |
     | `OVERLOAD` | Above `continuous_current` for `overload_time` | Yes |
     | `BOARD_OVERLOAD` | Board supply current above the 5 A continuous board rating for 1 s | Yes |
@@ -33,13 +33,11 @@ class FaultType(enum.Enum):
     """
 
     #: Motor is driven but not turning: current at or near the limit for
-    #: longer than ``stall_time``. Detected from current, or from nFAULT if no sensor.
+    #: longer than ``stall_time``. Needs a sensor.
     STALL = "stall"
-    #: Driver is chopping at its current limit (short events). A warning only.
-    CURRENT_LIMIT = "current_limit"
-    #: nFAULT stays low while no motor on the board is driven: overcurrent
-    #: shutdown (shorted output), over-temperature shutdown, or a motor supply
-    #: below the driver's undervoltage threshold (about 4.5 V).
+    #: nFAULT stays low for 0.2 s: overcurrent shutdown (shorted output),
+    #: over-temperature shutdown, or a motor supply below the driver's
+    #: undervoltage threshold (about 4.5 V).
     DRIVER_FAULT = "driver_fault"
     #: Motor commanded to run but draws (almost) no current: motor disconnected,
     #: broken wire, motor supply off or board fuse blown. Needs a sensor.
@@ -77,7 +75,6 @@ class FaultAction(enum.Enum):
 #: Default response to each fault. Override per motor with ``FaultPolicy``.
 DEFAULT_ACTIONS = {
     FaultType.STALL: FaultAction.BRAKE,
-    FaultType.CURRENT_LIMIT: FaultAction.NONE,
     FaultType.DRIVER_FAULT: FaultAction.SLEEP,
     FaultType.OPEN_LOAD: FaultAction.BRAKE,
     FaultType.OVERLOAD: FaultAction.BRAKE,
@@ -87,9 +84,12 @@ DEFAULT_ACTIONS = {
 }
 """Default [`FaultAction`][pingoblin_motor.faults.FaultAction] for each [`FaultType`][pingoblin_motor.faults.FaultType]. Override per motor with a [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy]."""
 
-#: Faults that latch: the motor refuses to run until ``clear_fault()``.
+#: Faults that latch. The next run command raises ``MotorFaultError`` once; after
+#: that the latch clears by itself as soon as the cause has gone.
 LATCHING = {FaultType.STALL, FaultType.DRIVER_FAULT, FaultType.OPEN_LOAD, FaultType.OVERLOAD}
-"""Fault types that latch: the motor refuses to run until `clear_fault()` is called."""
+"""Fault types that latch. The next run command raises `MotorFaultError` once. After that,
+the latch clears by itself when the cause has gone: for `DRIVER_FAULT` when nFAULT is high
+again, for the others after the motor's `fault_retry_time`."""
 
 
 @dataclass
@@ -135,7 +135,7 @@ class FaultPolicy:
             fault_type: The [`FaultType`][pingoblin_motor.faults.FaultType] detected.
 
         Returns:
-            `True` if the motor must be cleared with `clear_fault()` before it runs again.
+            `True` if the fault latches (see `LATCHING`).
         """
         return self.latch and fault_type in LATCHING
 
@@ -180,7 +180,9 @@ class ConfigError(MotorError):
 class MotorFaultError(MotorError):
     """Raised when you command a motor that has a latched fault.
 
-    Call [`Motor.clear_fault()`][pingoblin_motor.motor.Motor.clear_fault] once the cause is fixed.
+    Raised once for each fault. Fix the cause and run the motor again: the latch clears by
+    itself once the cause has gone (see `LATCHING`). A motor that is still faulty raises
+    again. [`Motor.clear_fault()`][pingoblin_motor.motor.Motor.clear_fault] clears it at once.
 
     Attributes:
         fault (Fault): The latched fault.
@@ -191,7 +193,7 @@ class MotorFaultError(MotorError):
         Args:
             fault: The latched [`Fault`][pingoblin_motor.faults.Fault].
         """
-        super().__init__(f"motor has a latched fault: {fault}. Call clear_fault() first.")
+        super().__init__(f"{fault}")
         self.fault = fault
 
 

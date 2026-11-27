@@ -43,7 +43,7 @@ motor in reverse from the host.
 | LED | Colour | Meaning |
 | --- | --- | --- |
 | Power | Green | Motor supply present (after the reverse-polarity switch) |
-| Fault | Red | A driver is limiting current or has detected a fault (same signal as nFAULT) |
+| Fault | Red | A driver has shut down: Output short, overheating, or motor supply below 4.5 V (same signal as nFAULT) |
 | Motor A / B direction | Green | Motor running forward (OUT1 positive). Brightness follows PWM duty |
 | Motor A / B direction | Red | Motor running reverse (OUT2 positive). Brightness follows PWM duty |
 

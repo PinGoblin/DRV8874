@@ -9,7 +9,7 @@ import logging
 import sys
 import time
 
-from pingoblin_motor import MockBackend, MotorBoard
+from pingoblin_motor import MockBackend, MotorBoard, MotorFaultError
 
 logging.basicConfig(level=logging.INFO)
 backend = MockBackend() if "--mock" in sys.argv else None
@@ -18,17 +18,21 @@ with MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
                 backend=backend, motor_names=("left", "right"),
                 motor_options=dict(ramp_time=0.5, min_speed_pc=15)) as board:
     board.start_monitor(on_fault=lambda f: print("FAULT:", f))
-    left, right = board["left"], board["right"]
+    try:
+        left, right = board["left"], board["right"]
 
-    left.forward(60)
-    right.forward(60)
-    time.sleep(2)
+        left.forward(60)
+        right.forward(60)
+        time.sleep(2)
 
-    left.speed_pc = 30                    # gentle turn
-    time.sleep(1)
+        left.speed_pc = 30                    # gentle turn
+        time.sleep(1)
 
-    left.reverse(50, duration=1)          # spin on the spot for 1 s
-    right.forward(50, duration=1, wait=True)
+        left.reverse(50, duration=1)          # spin on the spot for 1 s
+        right.forward(50, duration=1, wait=True)
 
-    board.coast_all()                     # both idle, so the board sleeps and they coast
-    print(left, right)
+        board.coast_all()                     # both idle, so the board sleeps and they coast
+        print(left, right)
+    except MotorFaultError as exc:
+        print("Motor stopped:", exc)          # the message says what to check
+        board.stop_all()
