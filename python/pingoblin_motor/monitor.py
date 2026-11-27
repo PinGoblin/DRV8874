@@ -21,7 +21,7 @@ from .faults import Fault, FaultType, SensorError
 _log = logging.getLogger("pingoblin_motor")
 
 DRIVER_FAULT_DEBOUNCE = 0.2
-"""Seconds nFAULT must stay low, with no motor driven, before `DRIVER_FAULT`."""
+"""Seconds nFAULT must stay low before `DRIVER_FAULT`."""
 OVERLOAD_DEBOUNCE = 1.0
 """Seconds a board or chain must stay over its limit before `BOARD_OVERLOAD` / `CHAIN_OVERLOAD`."""
 OPEN_LOAD_MIN_DUTY = 0.2

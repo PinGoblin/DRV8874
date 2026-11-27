@@ -1658,7 +1658,7 @@ class MotorChain:
 # ---------------------------------------------------------------- fault monitor
 
 DRIVER_FAULT_DEBOUNCE_MS = 200
-"""Milliseconds nFAULT must stay low, with no motor driven, before `DRIVER_FAULT`."""
+"""Milliseconds nFAULT must stay low before `DRIVER_FAULT`."""
 OVERLOAD_DEBOUNCE_MS = 1000
 """Milliseconds over the limit before `BOARD_OVERLOAD` / `CHAIN_OVERLOAD`."""
 OPEN_LOAD_MIN_DUTY = 0.2
