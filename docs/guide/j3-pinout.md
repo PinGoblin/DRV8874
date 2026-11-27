@@ -4,8 +4,8 @@ J3 is a single row of 10 pins on the left edge of the board. Looking at the comp
 side, pin 10 (nFAULT) is at the top and pin 1 (GND, square pad) is at the bottom, nearest
 the test buttons.
 
-![J3 pinout. Pins 3 to 6 are A_EN, A_PH, B_EN and B_PH in PH/EN mode, and IN1/IN2 for each
-motor in PWM mode.](../images/j3-pinout.svg)
+![J3 pinout. Pins 3 to 6 are A_EN/A_IN1, A_PH/A_IN2, B_EN/B_IN1 and B_PH/B_IN2: the first
+name applies in PH/EN mode, the second in PWM mode.](../images/j3-pinout.svg)
 
 | Pin | Signal | Direction | PH/EN mode (default) | PWM mode |
 | --- | --- | --- | --- | --- |
@@ -13,10 +13,10 @@ motor in PWM mode.](../images/j3-pinout.svg)
 | 9 | nSLEEP | Input | Low = sleep, both motors coast. Pulled high on the board (optional) | Same |
 | 8 | B_ISENSE | Output | Motor B current, 0.45 V/A | Same |
 | 7 | A_ISENSE | Output | Motor A current, 0.45 V/A | Same |
-| 6 | B_PH | Input | Motor B direction | IN2, motor B |
-| 5 | B_EN | Input | Motor B on / speed (PWM) | IN1, motor B |
-| 4 | A_PH | Input | Motor A direction | IN2, motor A |
-| 3 | A_EN | Input | Motor A on / speed (PWM) | IN1, motor A |
+| 6 | B_PH / B_IN2 | Input | Motor B direction | IN2, motor B |
+| 5 | B_EN / B_IN1 | Input | Motor B on / speed (PWM) | IN1, motor B |
+| 4 | A_PH / A_IN2 | Input | Motor A direction | IN2, motor A |
+| 3 | A_EN / A_IN1 | Input | Motor A on / speed (PWM) | IN1, motor A |
 | 2 | VLOGIC | Power | Logic supply in, 3.0–5.25 V | Same |
 | 1 | GND | Power | Ground, common with the host | Same |
 
