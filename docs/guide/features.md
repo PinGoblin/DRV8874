@@ -43,8 +43,8 @@ controlled from a documented Python and MicroPython library.
 - **One 10-pin 2.54 mm header** for all logic signals, with 1 kΩ series resistors that
   protect the host's GPIO pins.
 - **Works with any 3.3 V or 5 V host**, such as a Raspberry Pi, ESP32, Raspberry Pi Pico or
-  Arduino. The logic supply (VLOGIC) comes from the host, so the board always matches the
-  host's logic level.
+  Arduino. The logic supply (VLOGIC) comes from the host's supply pin at its GPIO voltage
+  (3.3 V on a Raspberry Pi, ESP32 or Pico), so the board always matches the host's logic level.
 
 ## Feedback
 

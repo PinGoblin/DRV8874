@@ -11,6 +11,9 @@ Read these before connecting power.
   starts conducting at about 33 V and is not meant to carry continuous current. A higher
   supply, such as a 36 V battery, destroys the surge suppressor (D2) and then blows the
   fuse (F1).
+- **VLOGIC must equal the host's GPIO voltage.** Use the host's 3.3 V pin on a Raspberry Pi,
+  ESP32 or Pico, never its 5 V pin: 5 V on VLOGIC damages a 3.3 V host's GPIO pins. See
+  [Choosing VLOGIC](j3-pinout.md#choosing-vlogic).
 - **Connect GND between the board and the host.** J3 pin 1 must go to a host GND pin.
 - **Wire with the power off.** Connect and disconnect motors only while the supply is off.
 - **The drivers get hot.** At high currents the chips and the board around them can exceed

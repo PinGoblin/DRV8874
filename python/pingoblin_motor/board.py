@@ -71,8 +71,9 @@ class MotorBoard:
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection
                 without a current sensor. Must be a different GPIO for each board.
             mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
-            logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is
-                fixed at about 4.6 A whatever the logic voltage.
+            logic_voltage: VLOGIC (V). It must equal the host's GPIO voltage: 3.3 on a
+                Raspberry Pi (5.0 raises `ConfigError`), 5.0 only on a 5 V host. The current limit
+                is 4.6 A whatever the logic voltage.
             adc: A `pingoblin_ads1115.ADS1115` for current sensing, created with `rate=860`.
                 See [`ADS1115Channel`][pingoblin_motor.sensors.ADS1115Channel].
             a_sense_channel: ADS1115 input wired to A_ISENSE.
@@ -120,6 +121,10 @@ class MotorBoard:
         if "." in name:
             raise ConfigError("board name must not contain '.'")
         backend = backend or default_backend()
+        if logic_voltage > backend.max_logic_voltage:
+            raise ConfigError("VLOGIC above %.1f V would put that voltage on the host's 3.3 V GPIOs "
+                              "(nFAULT is pulled up to VLOGIC). Connect J3 pin 2 to a 3.3 V pin "
+                              "and set logic_voltage=3.3" % backend.max_logic_voltage)
         if fault_pin is not None:
             with MotorBoard._group_lock:
                 other = MotorBoard._fault_users.get((id(backend), fault_pin))

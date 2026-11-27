@@ -302,6 +302,8 @@ class PinFactory:
     `_make_output()`, `_make_pwm()` and `_make_input()`.
     """
 
+    max_logic_voltage = 5.5   # highest VLOGIC the host GPIOs tolerate (V)
+
     def __init__(self):
         self._pins = {}
         self._kinds = {}
@@ -437,6 +439,8 @@ class _MIn:
 
 class MachinePins(PinFactory):
     """Real hardware through the `machine` module: `Pin`, and `PWM` with `duty_u16()`."""
+
+    max_logic_voltage = 3.6   # ESP32 and RP2040 GPIOs are 3.3 V only
 
     def _make_output(self, pin, initial):
         return _MOut(pin, initial)
@@ -1134,8 +1138,9 @@ class MotorBoard:
             fault_pin: GPIO for nFAULT (J3 pin 10), or `None`. Needed for stall detection without a
                 sensor. Must be a different GPIO for each board.
             mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
-            logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is fixed
-                at about 4.6 A.
+            logic_voltage: VLOGIC (V). It must equal the host's GPIO voltage: 3.3 on an ESP32
+                or Pico (5.0 raises `ConfigError`). The current limit is 4.6 A whatever the logic
+                voltage.
             adc: An `ADS1115` from the `ads1115` module, created with `rate=860`, for current
                 sensing.
             a_sense_channel: ADS1115 input wired to A_ISENSE.
@@ -1182,6 +1187,10 @@ class MotorBoard:
                 or "." in motor_names[0] or "." in motor_names[1]:
             raise ConfigError("names must be unique and must not contain '.'")
         pins = pins or MachinePins()
+        if logic_voltage > pins.max_logic_voltage:
+            raise ConfigError("VLOGIC above %.1f V would put that voltage on the host's 3.3 V GPIOs "
+                              "(nFAULT is pulled up to VLOGIC). Connect J3 pin 2 to a 3.3 V pin "
+                              "and set logic_voltage=3.3" % pins.max_logic_voltage)
         if fault_pin is not None and (id(pins), fault_pin) in _fault_users:
             raise ConfigError("fault_pin %s is already used by board '%s': give each board its own "
                               "nFAULT line" % (fault_pin, _fault_users[(id(pins), fault_pin)].name))

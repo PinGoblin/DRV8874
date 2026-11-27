@@ -94,6 +94,9 @@ class Backend(abc.ABC):
     Subclasses implement `_make_output()`, `_make_pwm()` and `_make_input()`.
     """
 
+    #: Highest VLOGIC the host GPIOs tolerate (V). nFAULT is pulled up to VLOGIC.
+    max_logic_voltage: float = 5.5
+
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._pins: Dict[int, object] = {}
@@ -256,6 +259,9 @@ class GpiozeroBackend(Backend):
     pins. This needs the `rpi-hardware-pwm` package and `dtoverlay=pwm-2chan` in
     `/boot/firmware/config.txt`. The Pi has two hardware PWM channels, so it covers one board.
     """
+
+    #: Raspberry Pi GPIOs are 3.3 V only.
+    max_logic_voltage = 3.6
 
     def __init__(self, hardware_pwm: bool = False, pwm_chip: int = 0, pin_factory=None):
         """

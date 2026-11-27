@@ -452,3 +452,12 @@ def test_startup_relatches_pmode_with_sleep_pulse():
     front.motor_a.forward(50)
     MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, pins=pins, motor_options=dict(reverse_delay=0))
     assert log == [False, True]
+
+
+def test_mcu_rejects_5v_vlogic():
+    assert pm.MachinePins.max_logic_voltage == pytest.approx(3.6)
+
+    class McuLike(MockPins):
+        max_logic_voltage = 3.6
+    with pytest.raises(ConfigError, match="3.3 V GPIOs"):
+        MotorBoard("x", a_en=12, a_ph=5, logic_voltage=5.0, pins=McuLike())

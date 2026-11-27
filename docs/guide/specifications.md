@@ -3,7 +3,7 @@
 | Parameter | Value |
 | --- | --- |
 | Motor supply (VIN) | 6–30 V DC (30 V maximum, including supply tolerance), suits 12 V and 24 V systems |
-| Logic supply (VLOGIC) | 3.0–5.25 V, from the host (3.3 V or 5 V logic, including 5 V USB-powered boards) |
+| Logic supply (VLOGIC) | Equal to the host's GPIO voltage: 3.3 V (Raspberry Pi, ESP32, Pico) or 5 V (5 V Arduino). Range 3.0–5.25 V, 12 mA max |
 | Logic input high | 1.5 V min (3.3 V and 5 V logic both work) |
 | Default state | Drivers awake (nSLEEP pulled high); EN and PH pulled low, so motors are braked |
 | Motor channels | 2, bidirectional |

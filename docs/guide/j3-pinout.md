@@ -26,9 +26,29 @@ name applies in PH/EN mode, the second in PWM mode.](../images/j3-pinout.svg)
 | 2 | VLOGIC | **(Required)** | Power | Logic supply in, 3.0–5.25 V | Same |
 | 1 | GND | **(Required)** | Power | Ground, common with the host | Same |
 
-All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Take
-VLOGIC from the host's own 3.3 V or 5 V pin, so the logic supply and the host's GPIOs
-always power up and down together. EN and
+## Choosing VLOGIC
+
+!!! danger "VLOGIC must equal the host's GPIO voltage"
+    nFAULT and the board's other outputs are pulled up to VLOGIC. Feeding 5 V to VLOGIC
+    on a 3.3 V host puts 5 V on its GPIO pins and damages them.
+
+| Host | GPIO voltage | Connect VLOGIC (J3 pin 2) to |
+| --- | --- | --- |
+| Raspberry Pi (all models) | 3.3 V | **3V3** (header pin 1 or 17). **Never 5V** |
+| ESP32 DevKit | 3.3 V | **3V3**. **Never 5V or VIN** |
+| Raspberry Pi Pico | 3.3 V | **3V3(OUT)** (pin 36). **Never VBUS or VSYS** |
+| 5 V Arduino (Uno, Mega, Nano) | 5 V | **5V** |
+| 3.3 V Arduino-type boards (Nano 33, Due) | 3.3 V | **3.3V** |
+
+Take VLOGIC from the host's own supply pin, so the logic supply and the host's GPIOs
+always power up and down together. The board draws at most 12 mA from VLOGIC, which any
+of these supply pins can provide. Each GPIO carries at most 0.5 mA, or 4.7 mA while a
+test button is pressed against a pin the host is holding low. Both are within the GPIO
+ratings of all the hosts listed.
+
+## Pull resistors
+
+EN and
 PH have 10 kΩ pull-downs and nSLEEP has a 10 kΩ pull-up on the board, so unused inputs
 can be left open.
 

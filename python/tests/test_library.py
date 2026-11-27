@@ -502,3 +502,14 @@ def test_startup_relatches_pmode_with_sleep_pulse(monkeypatch):
     MotorBoard("rear", a_en=20, a_ph=21, sleep_pin=26, backend=be)
     assert all(v for p, v in log if p == 26)
     assert be.pins[12].duty == 0.5
+
+
+def test_pi_rejects_5v_vlogic():
+    from pingoblin_motor.backends import GpiozeroBackend
+    assert GpiozeroBackend.max_logic_voltage == pytest.approx(3.6)
+
+    class PiLike(MockBackend):
+        max_logic_voltage = 3.6
+    with pytest.raises(ConfigError, match="3.3 V GPIOs"):
+        MotorBoard(a_en=12, a_ph=5, logic_voltage=5.0, backend=PiLike())
+    MotorBoard(a_en=12, a_ph=5, logic_voltage=3.3, backend=PiLike()).close()

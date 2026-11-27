@@ -29,6 +29,9 @@ Wire J3 to the host first, then the motors, then the motor supply last.
 | 9 | nSLEEP | (Optional) | GPIO26 | GPIO32 | GP6 |
 | 10 | nFAULT | (Optional) | GPIO19 | GPIO39 (input only) | GP7 |
 
+VLOGIC must match the host's GPIO voltage: **3.3 V on a Raspberry Pi, ESP32 or Pico, never
+5 V.** See [Choosing VLOGIC](j3-pinout.md#choosing-vlogic).
+
 nSLEEP is pulled high on the board, so it can be left unconnected if sleep and coast
 control are not needed. Pins 5 and 6 are needed only for motor B, pins 7 and 8 only for
 current sensing, and pin 10 only for fault detection.
