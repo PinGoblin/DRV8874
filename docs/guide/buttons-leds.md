@@ -19,8 +19,8 @@ Each motor has a FWD and a REV button that runs it at full speed while held, in 
   high, REV runs the motor forward.
 - They always drive the motor at 100 % duty, that is, at the full supply voltage. Do not
   use them with a motor rated below the supply voltage.
-- They work as described above only in PH/EN mode (the default jumper setting). In PWM
-  mode they behave differently: See the next section.
+- The table applies to PH/EN mode (the default jumper setting) only. For PWM mode, see
+  the next section.
 
 ## Buttons in PWM mode (JP1 bridged)
 

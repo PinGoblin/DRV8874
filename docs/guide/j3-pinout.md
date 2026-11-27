@@ -1,8 +1,7 @@
 # J3 pinout
 
-J3 is a single row of 10 pins on the left edge of the board. Looking at the component
-side, pin 10 (nFAULT) is at the top and pin 1 (GND, square pad) is at the bottom, nearest
-the test buttons.
+J3 is a single row of 10 pins on the left edge of the board. Pin 10 (nFAULT) is at the
+top and pin 1 (GND, square pad) is at the bottom, nearest the test buttons.
 
 !!! tip "Minimum wiring for one motor"
     - **J3:** 4 wires: GND, VLOGIC, A_EN and A_PH (pins 1–4).

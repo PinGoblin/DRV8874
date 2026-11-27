@@ -7,7 +7,7 @@ package.
 !!! warning "Status"
     Tested off-target (CPython with mock pins, plus a static check for MicroPython-only
     syntax and modules, and CI runs under the MicroPython Unix port). It has not yet been
-    run on a real ESP32 or Pico. Please report problems as GitHub issues.
+    run on a real ESP32 or Pico. Report problems as GitHub issues.
 
 ## How timing works (no threads)
 
