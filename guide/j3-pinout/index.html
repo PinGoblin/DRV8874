@@ -1619,8 +1619,8 @@
 <p>J3 is a single row of 10 pins on the left edge of the board. Looking at the component
 side, pin 10 (nFAULT) is at the top and pin 1 (GND, square pad) is at the bottom, nearest
 the test buttons.</p>
-<p><img alt="J3 pinout. Pins 3 to 6 are A_EN, A_PH, B_EN and B_PH in PH/EN mode, and IN1/IN2 for each
-motor in PWM mode." src="../../images/j3-pinout.svg" /></p>
+<p><img alt="J3 pinout. Pins 3 to 6 are A_EN/A_IN1, A_PH/A_IN2, B_EN/B_IN1 and B_PH/B_IN2: the first
+name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout.svg" /></p>
 <table>
 <thead>
 <tr>
@@ -1662,28 +1662,28 @@ motor in PWM mode." src="../../images/j3-pinout.svg" /></p>
 </tr>
 <tr>
 <td>6</td>
-<td>B_PH</td>
+<td>B_PH / B_IN2</td>
 <td>Input</td>
 <td>Motor B direction</td>
 <td>IN2, motor B</td>
 </tr>
 <tr>
 <td>5</td>
-<td>B_EN</td>
+<td>B_EN / B_IN1</td>
 <td>Input</td>
 <td>Motor B on / speed (PWM)</td>
 <td>IN1, motor B</td>
 </tr>
 <tr>
 <td>4</td>
-<td>A_PH</td>
+<td>A_PH / A_IN2</td>
 <td>Input</td>
 <td>Motor A direction</td>
 <td>IN2, motor A</td>
 </tr>
 <tr>
 <td>3</td>
-<td>A_EN</td>
+<td>A_EN / A_IN1</td>
 <td>Input</td>
 <td>Motor A on / speed (PWM)</td>
 <td>IN1, motor A</td>
