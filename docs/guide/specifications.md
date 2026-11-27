@@ -8,7 +8,7 @@
 | Default state | Drivers awake (nSLEEP pulled high); EN and PH pulled low, so motors are braked |
 | Motor channels | 2, bidirectional |
 | Continuous current per motor | 2.1 A at 25 °C (final figure after prototype testing) |
-| Total board current | 5 A continuous, both motors combined (7 A fuse, not resettable) |
+| Total board current | 5 A continuous, both motors combined (12 A fuse, not resettable) |
 | Current limit per motor | 4.6 A (peak), fixed |
 | Current-sense output | 0.45 V per amp |
 | PWM frequency | Up to 100 kHz (20 kHz recommended, which is above human hearing) |

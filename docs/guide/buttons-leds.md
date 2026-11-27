@@ -10,10 +10,11 @@ Each motor has a FWD and a REV button that runs it at full speed while held, in 
 | SW3 B FWD | Motor B forward |
 | SW4 B REV | Motor B reverse |
 
-- The buttons need VLOGIC (J3 pin 2). With no host connected, feed 3.3–5 V to VLOGIC
-  from any source, such as a USB 5 V lead, and connect GND to J3 pin 1. With a host
-  connected, use the host's own VLOGIC pin instead (3.3 V on a Raspberry Pi, ESP32 or Pico). They do nothing
-  while nSLEEP (J3 pin 9) is held low.
+- The buttons need only the motor supply. No host and no VLOGIC are required: The board
+  powers itself from the motor supply while a button is pressed.
+- Without a host, the motor coasts to a stop when the button is released. With a host
+  connected, it brakes.
+- They do nothing while the host holds nSLEEP (J3 pin 9) low.
 - They are safe to press while a host is connected, even if the host is driving the pins
   low: 1 kΩ resistors protect the host's GPIOs. A pressed button drives its inputs high
   whatever the host does, but cannot drive them low. For example, if the host holds PH

@@ -26,7 +26,7 @@ controlled from a documented Python and MicroPython library.
   no voltage loss in normal use.
 - **Surge suppressor (TVS diode)** on the motor supply, to absorb voltage spikes from long
   supply leads and from the motors.
-- **7 A fuse** on the motor supply, to protect the supply wiring if a component fails.
+- **12 A fuse** on the motor supply, to protect the supply wiring if a component fails.
 - **Driver protection** built into each DRV8874: Overcurrent, over-temperature and
   undervoltage shutdown, with automatic recovery.
 - **Safe start-up.** The drive inputs are pulled low, so both motors are held in brake
@@ -56,7 +56,7 @@ controlled from a documented Python and MicroPython library.
 
 ## Testing without code
 
-- **Forward and reverse test buttons for each motor.** With only power and VLOGIC
+- **Forward and reverse test buttons for each motor.** With only the motor supply
   connected, each motor can be checked before any software is written. See
   [Test buttons and LEDs](buttons-leds.md).
 - **Direction LEDs for each motor**, plus a power LED and a fault LED.

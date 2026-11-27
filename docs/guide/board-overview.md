@@ -41,8 +41,9 @@ See [Test buttons and LEDs](buttons-leds.md) for how the buttons behave with a h
 | Ref | Part | Role |
 | --- | --- | --- |
 | U1, U2 | TI DRV8874 | H-bridge drivers for motors A and B |
-| F1 | 7 A fast-acting fuse (high I²t, tolerates inrush) | Disconnects the board if an internal fault or an over-voltage supply makes it draw excessive current. Not resettable |
+| F1 | 12 A fast-acting fuse | Disconnects the board if an internal fault or an over-voltage supply makes it draw excessive current. Normal motor stalls do not open it. Not resettable |
+| U4 | 3.3 V regulator | Powers the test buttons and the board logic from the motor supply while a button is pressed |
 | Q1 | P-channel MOSFET | Reverse-polarity protection |
 | D2 | SMBJ30A | Surge suppressor on the motor supply |
-| C13, C1 | 220 µF (×2) | Bulk capacitors, one beside each driver (U1, U2) |
+| C13, C1 | 100 µF 50 V (×2) | Bulk capacitors, one beside each driver (U1, U2) |
 | H1–H4 | M2.5 holes | Mounting |

@@ -27,8 +27,8 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
   the red fault LED and pulls nFAULT low. The driver restarts by itself once the cause
   clears.
 - Both motors share a 5 A continuous board rating. Two motors held at the 4.6 A current
-  limit (for example, both stalled) draw 9.2 A, which can blow the board's 7 A fuse,
-  and the fuse is not resettable. Detect stalls and stop the motors, as the library does.
+  limit (for example, both stalled) draw 9.2 A until the drivers overheat and shut down.
+  Detect stalls and stop the motors, as the library does.
 
 ## ISENSE and motor speed
 

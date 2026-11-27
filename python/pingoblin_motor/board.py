@@ -90,7 +90,7 @@ class MotorBoard:
             a_options: Keyword arguments for motor A only (override `motor_options`).
             b_options: Keyword arguments for motor B only.
             fuse_rating: The board's continuous current rating (A), for `BOARD_OVERLOAD`.
-                The on-board 7 A fast-acting (high I2t) fuse allows 5 A continuously.
+                The board is rated 5 A continuous (12 A fuse).
             supply_voltage: Motor supply voltage (V), 6–30, or `None`. Required when a motor
                 is given `motor_voltage`: the library then limits that motor's PWM duty so the
                 average voltage across it does not exceed its rating.

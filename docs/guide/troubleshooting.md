@@ -2,8 +2,9 @@
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| Power LED off | No supply, supply reversed, or fuse blown | Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring (reverse polarity does not blow the fuse). A blown fuse (F1) is not resettable: It means a supply above 30 V or an internal fault, and F1 must be replaced. A supply above 30 V also destroys the surge suppressor D2, which must be replaced with F1 |
-| Power LED on, motors do nothing, buttons do nothing | VLOGIC missing, or nSLEEP held low | Connect J3 pin 2 to the host's 3.3 V pin (5 V only on a 5 V host) and GND to pin 1. Disconnect nSLEEP (pin 9) or drive it high |
+| Power LED off | No supply, supply reversed, or fuse blown | Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring (reverse polarity does not blow the fuse). A blown fuse (F1) means a supply above 30 V or an internal fault. F1 is not user-serviceable: Return the board for repair |
+| Power LED on, buttons do nothing | nSLEEP held low by the host | Disconnect nSLEEP (pin 9) or drive it high |
+| Buttons work, host code does nothing, fault LED never lights | VLOGIC missing | Connect J3 pin 2 to the host's 3.3 V pin (5 V only on a 5 V host) and GND to pin 1 |
 | Buttons work, host code does nothing | Wrong GPIO numbers, no common GND, or EN never goes high | Check the pin mapping and the GND link. Measure EN (pin 3/5) while the code runs |
 | Buttons do nothing but host code works | JP1 bridged (PWM mode) | The buttons run motors only in PH/EN mode (JP1 open). In PWM mode FWD brakes and REV runs forward |
 | A fault on one board stops motors on every board, or the library says the `fault_pin` is already used | Boards share an nFAULT line | Give each board its own nFAULT GPIO: See [Daisy-chaining boards](daisy-chain.md) |

@@ -46,7 +46,7 @@ class FaultType(enum.Enum):
     #: ``overload_time``. Risk of overheating. Needs a sensor.
     OVERLOAD = "overload"
     #: Total current on one board is above its 5 A continuous rating.
-    #: Sustained, this will blow the board's 7 A fuse. Needs sensors.
+    #: Sustained, this overheats the board. Needs sensors.
     BOARD_OVERLOAD = "board_overload"
     #: Total current through a daisy chain is above the chain limit (6 A).
     #: Needs sensors.
