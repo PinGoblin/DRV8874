@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="User guide and Python / MicroPython library for the PinGoblin Board A dual DC motor driver (2 × DRV8874)">
+        <meta name="description" content="User guide and Python / MicroPython library for the PinGoblin DRV8874 dual DC motor driver">
       
       
       
@@ -27,7 +27,7 @@
     
     
       
-        <title>MotorBoard - PinGoblin Dual DC Motor Board</title>
+        <title>MotorBoard - PinGoblin DRV8874</title>
       
     
     
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="PinGoblin Dual DC Motor Board" class="md-header__button md-logo" aria-label="PinGoblin Dual DC Motor Board" data-md-component="logo">
+    <a href="../../.." title="PinGoblin DRV8874" class="md-header__button md-logo" aria-label="PinGoblin DRV8874" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +108,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            PinGoblin Dual DC Motor Board
+            PinGoblin DRV8874
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -306,13 +306,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="PinGoblin Dual DC Motor Board" class="md-nav__button md-logo" aria-label="PinGoblin Dual DC Motor Board" data-md-component="logo">
+    <a href="../../.." title="PinGoblin DRV8874" class="md-nav__button md-logo" aria-label="PinGoblin DRV8874" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    PinGoblin Dual DC Motor Board
+    PinGoblin DRV8874
   </label>
   
     <div class="md-nav__source">
@@ -2064,7 +2064,7 @@
 
     <div class="doc doc-contents first">
 
-        <p><a class="autorefs autorefs-internal" title="            MotorBoard" href="#pingoblin_motor.board.MotorBoard"><code>MotorBoard</code></a>: one Board A (two DRV8874 channels) and its shared lines.</p>
+        <p><a class="autorefs autorefs-internal" title="            MotorBoard" href="#pingoblin_motor.board.MotorBoard"><code>MotorBoard</code></a>: one PinGoblin DRV8874 board (two motor channels) and its shared lines.</p>
 
 
 
@@ -2101,7 +2101,7 @@
 
     <div class="doc doc-contents ">
 
-        <p>Board A ISENSE gain: 0.675 V per amp.</p>
+        <p>PinGoblin DRV8874 ISENSE gain: 0.675 V per amp.</p>
 
     </div>
 
@@ -2125,7 +2125,7 @@
 
     <div class="doc doc-contents ">
 
-        <p>Board A current-limit reference: a TLV431 set to about 2.07 V, independent of VLOGIC.</p>
+        <p>PinGoblin DRV8874 current-limit reference: a TLV431 set to about 2.07 V, independent of VLOGIC.</p>
 
     </div>
 
@@ -2173,7 +2173,7 @@
 
 
 
-        <p>One Board A dual DC motor driver.</p>
+        <p>One PinGoblin DRV8874 dual DC motor driver board.</p>
 <p>Pins are BCM GPIO numbers. Motor B is optional. Boards work as context managers and
 close on exit.</p>
 <p>Several boards can share one <code>sleep_pin</code> (one e-stop line). Each board needs its

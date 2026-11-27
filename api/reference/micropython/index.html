@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="User guide and Python / MicroPython library for the PinGoblin Board A dual DC motor driver (2 × DRV8874)">
+        <meta name="description" content="User guide and Python / MicroPython library for the PinGoblin DRV8874 dual DC motor driver">
       
       
       
@@ -25,7 +25,7 @@
     
     
       
-        <title>MicroPython reference - PinGoblin Dual DC Motor Board</title>
+        <title>MicroPython reference - PinGoblin DRV8874</title>
       
     
     
@@ -92,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="PinGoblin Dual DC Motor Board" class="md-header__button md-logo" aria-label="PinGoblin Dual DC Motor Board" data-md-component="logo">
+    <a href="../../.." title="PinGoblin DRV8874" class="md-header__button md-logo" aria-label="PinGoblin DRV8874" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -106,7 +106,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            PinGoblin Dual DC Motor Board
+            PinGoblin DRV8874
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -304,13 +304,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="PinGoblin Dual DC Motor Board" class="md-nav__button md-logo" aria-label="PinGoblin Dual DC Motor Board" data-md-component="logo">
+    <a href="../../.." title="PinGoblin DRV8874" class="md-nav__button md-logo" aria-label="PinGoblin DRV8874" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    PinGoblin Dual DC Motor Board
+    PinGoblin DRV8874
   </label>
   
     <div class="md-nav__source">
@@ -4052,7 +4052,7 @@ here as <code>pingoblin_motor_mp</code> so it doesn't clash with the Raspberry P
 
     <div class="doc doc-contents first">
 
-        <p><code>pingoblin_motor</code> for MicroPython: the PinGoblin Board A (2 × DRV8874) motor library in one file.</p>
+        <p><code>pingoblin_motor</code> for MicroPython: the PinGoblin DRV8874 dual DC motor driver library in one file.</p>
 <p>Runs on ESP32 and Raspberry Pi Pico / Pico 2 with MicroPython 1.20 or later, and has the
 same class and method names as the Raspberry Pi library: <code>MotorBoard</code>, <code>Motor</code>,
 <code>MotorChain</code>, <code>forward()</code>, <code>reverse()</code>, <code>run()</code>, <code>start()</code>, <code>stop()</code> / <code>brake()</code>,
@@ -4114,7 +4114,7 @@ compilation, which can run out of RAM on an ESP32 without PSRAM.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Board A ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A).</p>
+        <p>PinGoblin DRV8874 ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A).</p>
 
     </div>
 
@@ -6559,7 +6559,7 @@ On the ESP32 the input range is set to about 0–3.1 V (11 dB attenuation).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>ISENSE gain (V/A): 0.675 on Board A.</p>
+                <p>ISENSE gain (V/A): 0.675 on the PinGoblin DRV8874.</p>
               </div>
             </td>
             <td>
@@ -8138,7 +8138,7 @@ only when every other motor on that line is idle; otherwise the motor brakes.</p
 
 
 
-        <p>One Board A dual DC motor driver. Pins are GPIO numbers.</p>
+        <p>One PinGoblin DRV8874 dual DC motor driver board. Pins are GPIO numbers.</p>
 <p>Several boards can share one <code>sleep_pin</code> (one e-stop line). Each board needs its
 <strong>own</strong> <code>fault_pin</code>: a <code>fault_pin</code> already used by another open board is rejected.</p>
 
