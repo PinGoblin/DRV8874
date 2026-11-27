@@ -1735,7 +1735,8 @@
 </table>
 <ul>
 <li>The buttons need VLOGIC (J3 pin 2). With no host connected, feed 3.3–5 V to VLOGIC
-  from any source, such as a USB 5 V lead, and connect GND to J3 pin 1. They do nothing
+  from any source, such as a USB 5 V lead, and connect GND to J3 pin 1. With a host
+  connected, use the host's own VLOGIC pin instead (3.3 V on a Raspberry Pi, ESP32 or Pico). They do nothing
   while nSLEEP (J3 pin 9) is held low.</li>
 <li>They are safe to press while a host is connected, even if the host is driving the pins
   low: 1 kΩ resistors protect the host's GPIOs. A pressed button drives its inputs high

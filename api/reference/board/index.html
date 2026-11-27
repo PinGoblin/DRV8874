@@ -2344,8 +2344,9 @@ without a current sensor. Must be a different GPIO for each board.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is
-fixed at about 4.6 A whatever the logic voltage.</p>
+                <p>VLOGIC (V). It must equal the host's GPIO voltage: 3.3 on a
+Raspberry Pi (5.0 raises <code>ConfigError</code>), 5.0 only on a 5 V host. The current limit
+is 4.6 A whatever the logic voltage.</p>
               </div>
             </td>
             <td>

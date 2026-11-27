@@ -644,6 +644,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    J3 pinout
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -660,6 +678,47 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-vlogic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing VLOGIC
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-resistors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull resistors
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1597,6 +1656,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-vlogic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing VLOGIC
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-resistors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull resistors
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1723,9 +1812,55 @@ name applies in PH/EN mode, the second in PWM mode." src="../../images/j3-pinout
 </tr>
 </tbody>
 </table>
-<p>All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Take
-VLOGIC from the host's own 3.3 V or 5 V pin, so the logic supply and the host's GPIOs
-always power up and down together. EN and
+<h2 id="choosing-vlogic">Choosing VLOGIC<a class="headerlink" href="#choosing-vlogic" title="Permanent link">&para;</a></h2>
+<div class="admonition danger">
+<p class="admonition-title">VLOGIC must equal the host's GPIO voltage</p>
+<p>nFAULT and the board's other outputs are pulled up to VLOGIC. Feeding 5 V to VLOGIC
+on a 3.3 V host puts 5 V on its GPIO pins and damages them.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Host</th>
+<th>GPIO voltage</th>
+<th>Connect VLOGIC (J3 pin 2) to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raspberry Pi (all models)</td>
+<td>3.3 V</td>
+<td><strong>3V3</strong> (header pin 1 or 17). <strong>Never 5V</strong></td>
+</tr>
+<tr>
+<td>ESP32 DevKit</td>
+<td>3.3 V</td>
+<td><strong>3V3</strong>. <strong>Never 5V or VIN</strong></td>
+</tr>
+<tr>
+<td>Raspberry Pi Pico</td>
+<td>3.3 V</td>
+<td><strong>3V3(OUT)</strong> (pin 36). <strong>Never VBUS or VSYS</strong></td>
+</tr>
+<tr>
+<td>5 V Arduino (Uno, Mega, Nano)</td>
+<td>5 V</td>
+<td><strong>5V</strong></td>
+</tr>
+<tr>
+<td>3.3 V Arduino-type boards (Nano 33, Due)</td>
+<td>3.3 V</td>
+<td><strong>3.3V</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Take VLOGIC from the host's own supply pin, so the logic supply and the host's GPIOs
+always power up and down together. The board draws at most 12 mA from VLOGIC, which any
+of these supply pins can provide. Each GPIO carries at most 0.5 mA, or 4.7 mA while a
+test button is pressed against a pin the host is holding low. Both are within the GPIO
+ratings of all the hosts listed.</p>
+<h2 id="pull-resistors">Pull resistors<a class="headerlink" href="#pull-resistors" title="Permanent link">&para;</a></h2>
+<p>EN and
 PH have 10 kΩ pull-downs and nSLEEP has a 10 kΩ pull-up on the board, so unused inputs
 can be left open.</p>
 <p>nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give

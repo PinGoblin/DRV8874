@@ -8296,8 +8296,9 @@ sensor. Must be a different GPIO for each board.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is fixed
-at about 4.6 A.</p>
+                <p>VLOGIC (V). It must equal the host's GPIO voltage: 3.3 on an ESP32
+or Pico (5.0 raises <code>ConfigError</code>). The current limit is 4.6 A whatever the logic
+voltage.</p>
               </div>
             </td>
             <td>

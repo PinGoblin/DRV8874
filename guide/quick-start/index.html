@@ -1814,6 +1814,8 @@
 </tr>
 </tbody>
 </table>
+<p>VLOGIC must match the host's GPIO voltage: <strong>3.3 V on a Raspberry Pi, ESP32 or Pico, never
+5 V.</strong> See <a href="../j3-pinout/#choosing-vlogic">Choosing VLOGIC</a>.</p>
 <p>nSLEEP is pulled high on the board, so it can be left unconnected if sleep and coast
 control are not needed. Pins 5 and 6 are needed only for motor B, pins 7 and 8 only for
 current sensing, and pin 10 only for fault detection.</p>
