@@ -1696,8 +1696,9 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 <li>A stalled motor shows as a reading that sits at the current limit while the shaft is not
   turning. A typical approach: If the reading stays above about 80% of the limit for more
   than 200 ms, stop the motor. The library's stall detection works this way.</li>
-<li>Each driver limits motor current on every PWM cycle (cycle-by-cycle chopping). The limit
-  is set from VLOGIC:</li>
+<li>Each driver limits motor current by itself: When the current reaches the limit, the
+  driver brakes for 25 µs, then drives again. This works at any duty, including 100%. The
+  limit is fixed:</li>
 </ul>
 <table>
 <thead>
@@ -1714,12 +1715,10 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 </tbody>
 </table>
 <ul>
-<li>While limiting, the red fault LED lights and nFAULT goes low. Normal operation resumes
-  on the next PWM cycle once the load drops. At exactly 100% duty there is no next cycle,
-  so the motor stays braked until the input changes: See
-  <a href="../controlling-motors/#practical-limits">100% duty and the current limit</a>.</li>
-<li>A short circuit or overheating shuts the driver down. It retries automatically once the
-  fault clears.</li>
+<li>Current limiting is normal operation: The fault LED stays off and nFAULT stays high.</li>
+<li>A short circuit, overheating or a motor supply below 4.5 V shuts the driver down, lights
+  the red fault LED and pulls nFAULT low. The driver restarts by itself once the cause
+  clears.</li>
 <li>Both motors share a 5 A continuous board rating. Two motors held at the 4.6 A current
   limit (for example, both stalled) draw 9.2 A, which can blow the board's 7 A fuse,
   and the fuse is not resettable. Detect stalls and stop the motors, as the library does.</li>

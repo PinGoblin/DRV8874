@@ -2433,7 +2433,8 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A latched fault. Call <code>clear_fault()</code>.</p>
+                <p>A latched fault. The next run command raises <code>MotorFaultError</code>; once the cause
+has gone, the command after that runs the motor.</p>
               </div>
             </td>
           </tr>
@@ -2565,7 +2566,7 @@ turns depends on the wiring; use <code>invert=True</code> to swap.</p>
 
   
       dataclass
-   (pingoblin_motor.faults.FaultPolicy)" href="../faults/#pingoblin_motor.faults.FaultPolicy">FaultPolicy</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">motor_voltage</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+   (pingoblin_motor.faults.FaultPolicy)" href="../faults/#pingoblin_motor.faults.FaultPolicy">FaultPolicy</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">motor_voltage</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fault_retry_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2953,6 +2954,23 @@ rated average voltage. Requires <code>supply_voltage</code> on the board.</p>
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fault_retry_time</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Seconds after a <code>STALL</code>, <code>OPEN_LOAD</code> or <code>OVERLOAD</code> before a
+run command may restart the motor (after the fault has been raised once).</p>
+              </div>
+            </td>
+            <td>
+                  <code>2.0</code>
             </td>
           </tr>
       </tbody>
@@ -3411,7 +3429,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The motor has a latched fault.</p>
+                <p>The motor has a latched fault (raised once per fault; see <code>MotorFaultError</code>).</p>
               </div>
             </td>
           </tr>
@@ -3527,7 +3545,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The motor has a latched fault.</p>
+                <p>The motor has a latched fault (raised once per fault; see <code>MotorFaultError</code>).</p>
               </div>
             </td>
           </tr>
@@ -3643,7 +3661,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The motor has a latched fault.</p>
+                <p>The motor has a latched fault (raised once per fault; see <code>MotorFaultError</code>).</p>
               </div>
             </td>
           </tr>
@@ -3733,7 +3751,7 @@ Setting 0 stops the motor. Setting it while stopped stores the speed for
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The motor has a latched fault.</p>
+                <p>The motor has a latched fault (raised once per fault; see <code>MotorFaultError</code>).</p>
               </div>
             </td>
           </tr>
@@ -4046,7 +4064,9 @@ logged and ignored.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Clear a latched fault so the motor can run again. The motor stays stopped.</p>
+        <p>Clear a latched fault at once. The motor stays stopped.</p>
+<p>Not normally needed: a latched fault clears by itself once it has been raised and
+its cause has gone.</p>
 
 
     </div>

@@ -1661,19 +1661,14 @@
 <td>Swap the wires at J4/J5, or set the library's <code>invert=True</code> option</td>
 </tr>
 <tr>
-<td>Motor stutters, fault LED flickers</td>
-<td>Current limit active (load near 4.6 A)</td>
+<td>Motor is weak or slow under heavy load</td>
+<td>Current limit active (load at 4.6 A)</td>
 <td>Reduce the load or speed. A larger motor needs a larger driver</td>
 </tr>
 <tr>
-<td>Motor stops at 100% duty and the fault LED stays on</td>
-<td>Current limit reached at 100% duty, which has no PWM edge to restart it</td>
-<td>Change the speed or stop and restart. Run at 99% if stalls are likely: See <a href="../controlling-motors/#practical-limits">100% duty and the current limit</a></td>
-</tr>
-<tr>
-<td>Fault LED on, or library reports <code>DRIVER_FAULT</code>, while no motor is running</td>
-<td>Motor supply off, low or disconnected while VLOGIC is present. Below about 4.5 V the drivers shut down and pull nFAULT low</td>
-<td>Check the motor supply, battery charge and fuse. After the supply returns, call <code>clear_fault()</code></td>
+<td>Fault LED on, or library reports <code>DRIVER_FAULT</code></td>
+<td>Output short, driver overheated, or motor supply below 4.5 V (flat battery)</td>
+<td>Check the motor wiring, let the board cool, or charge the battery. The motor runs again on the next command once the cause has gone</td>
 </tr>
 <tr>
 <td>Motor starts, stops and restarts repeatedly on a battery</td>
@@ -1681,9 +1676,9 @@
 <td>Charge or replace the battery, use a higher-voltage battery, or set <code>ramp_time</code> for a soft start</td>
 </tr>
 <tr>
-<td>Small motor stalls and gets hot, but no <code>STALL</code> is reported</td>
-<td>Stall current below the 4.6 A current limit, so nFAULT never goes low</td>
-<td>Fit a current sensor and set <code>stall_current</code>, or stop the motor with a time-out. See <a href="../choosing-a-motor/#stall-detection-for-small-motors">Choosing a motor</a></td>
+<td>Motor stalls but no <code>STALL</code> is reported</td>
+<td>Stall detection needs a current sensor</td>
+<td>Fit a current sensor and set <code>stall_current</code>, or stop the motor with a time-out. See <a href="../choosing-a-motor/#stall-detection">Choosing a motor</a></td>
 </tr>
 <tr>
 <td>Large motor is slow, weak or reports <code>STALL</code> under load</td>
@@ -1712,8 +1707,8 @@
 </tr>
 <tr>
 <td>Library raises <code>MotorFaultError</code></td>
-<td>A latched fault (stall, overload, open load, driver fault)</td>
-<td>Fix the cause, then call <code>motor.clear_fault()</code>. See <a href="../../api/guide/faults/">Faults</a></td>
+<td>A fault stopped the motor. The message says what to check</td>
+<td>Fix the cause and run the motor again. See <a href="../../api/guide/faults/">Faults</a></td>
 </tr>
 <tr>
 <td>Library reports <code>STALL</code> on every start</td>

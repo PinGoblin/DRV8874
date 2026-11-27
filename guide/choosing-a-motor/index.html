@@ -790,10 +790,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#stall-detection-for-small-motors" class="md-nav__link">
+  <a href="#stall-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stall detection for small motors
+        Stall detection
       
     </span>
   </a>
@@ -1741,10 +1741,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#stall-detection-for-small-motors" class="md-nav__link">
+  <a href="#stall-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stall detection for small motors
+        Stall detection
       
     </span>
   </a>
@@ -1808,7 +1808,7 @@ still runs, but only with reduced torque.</p>
 </tr>
 <tr>
 <td>9–35 A</td>
-<td>Light loads only. The motor reaches its no-load speed, but torque is limited to roughly 13–50 % of its stall torque and the fault LED flickers under load</td>
+<td>Light loads only. The motor reaches its no-load speed, but torque is limited to roughly 13–50 % of its stall torque under load</td>
 </tr>
 <tr>
 <td>Above 35 A, or no-load current above 2.5 A</td>
@@ -1920,12 +1920,10 @@ voltage, and 100 % speed is scaled to the safe duty:</p>
 </code></pre></div>
 <p>The test buttons always drive the motor at 100 % duty. Do not use them with a motor rated
 below the supply voltage.</p>
-<h2 id="stall-detection-for-small-motors">Stall detection for small motors<a class="headerlink" href="#stall-detection-for-small-motors" title="Permanent link">&para;</a></h2>
-<p>Without a current sensor, the library detects a stall from the driver's current-limit
-signal (nFAULT). A motor whose stall current is below 4.2 A never reaches the current
-limit, so a stall is not detected and the motor carries its full stall current until it is
-stopped. Small gearmotors can overheat within seconds in this condition. To protect them,
-fit a current sensor and set <code>stall_current</code>
+<h2 id="stall-detection">Stall detection<a class="headerlink" href="#stall-detection" title="Permanent link">&para;</a></h2>
+<p>Stall detection needs a current sensor. Without one, a stalled motor carries its stall
+current, up to the 4.6 A limit, until it is stopped. Small gearmotors can overheat within
+seconds in this condition. To protect them, fit a current sensor and set <code>stall_current</code>
 (see <a href="../current-sensing/">Current sensing and current limit</a>), or stop the motor in your
 own code with a time-out or an end-stop switch.</p>
 <h2 id="large-motors-and-start-up">Large motors and start-up<a class="headerlink" href="#large-motors-and-start-up" title="Permanent link">&para;</a></h2>

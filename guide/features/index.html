@@ -1865,8 +1865,8 @@ controlled from a documented Python and MicroPython library.</p>
 <li><strong>Current-sense output per motor</strong> (0.45 V per amp), for reading motor current with an
   ADC to measure load or detect a stall. See
   <a href="../current-sensing/">Current sensing and current limit</a>.</li>
-<li><strong>Fault output</strong> (nFAULT), shared by both drivers on the board, which signals current
-  limiting, overcurrent, over-temperature and a low motor supply.</li>
+<li><strong>Fault output</strong> (nFAULT), shared by both drivers on the board, which signals a short
+  circuit, overheating or a low motor supply. Normal current limiting does not trigger it.</li>
 </ul>
 <h2 id="testing-without-code">Testing without code<a class="headerlink" href="#testing-without-code" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1882,9 +1882,9 @@ controlled from a documented Python and MicroPython library.</p>
 <li><strong>Speed control</strong> in percent, with optional soft start (ramping), a minimum speed for
   the motor's deadband, and a delay before reversing.</li>
 <li><strong>Motor voltage limiting.</strong> A motor rated below the supply voltage can be used safely:
-  the library limits the PWM duty so that the motor never receives more than its rated
+  The library limits the PWM duty so that the motor never receives more than its rated
   voltage. See <a href="../choosing-a-motor/">Choosing a motor</a>.</li>
-<li><strong>Fault detection and handling</strong>: Stall, current limiting, driver shutdown, open load and
+<li><strong>Fault detection and handling</strong>: Stall, driver shutdown, open load and
   overload, each with a configurable response (report, brake, coast or sleep).</li>
 <li><strong>Several boards from one host</strong>, with shared sleep control and a separate fault line for
   each board.</li>

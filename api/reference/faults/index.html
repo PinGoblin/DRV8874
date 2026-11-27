@@ -1968,8 +1968,9 @@ according to its <a class="autorefs autorefs-internal" title="            FaultP
   
       dataclass
   " href="#pingoblin_motor.faults.FaultPolicy"><code>FaultPolicy</code></a>: brake, coast,
-sleep the board, or report only. Serious faults <em>latch</em>, so the motor refuses to run
-until you call <a class="autorefs autorefs-internal" title="            clear_fault" href="../motor/#pingoblin_motor.motor.Motor.clear_fault"><code>Motor.clear_fault()</code></a>.</p>
+sleep the board, or report only. Serious faults <em>latch</em>: the next run command raises
+<a class="autorefs autorefs-internal" title="            MotorFaultError" href="#pingoblin_motor.faults.MotorFaultError"><code>MotorFaultError</code></a> with the cause and what to do.
+Once the cause has gone, the motor runs again on the following command.</p>
 
 
 
@@ -2001,7 +2002,7 @@ until you call <a class="autorefs autorefs-internal" title="            clear_fa
   </span>
 
 <a href="#pingoblin_motor.faults.DEFAULT_ACTIONS" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">DEFAULT_ACTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.STALL">STALL</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.CURRENT_LIMIT">CURRENT_LIMIT</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.NONE">NONE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.DRIVER_FAULT">DRIVER_FAULT</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.SLEEP">SLEEP</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.OPEN_LOAD">OPEN_LOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.OVERLOAD">OVERLOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.BOARD_OVERLOAD">BOARD_OVERLOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.CHAIN_OVERLOAD">CHAIN_OVERLOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.SENSOR_ERROR">SENSOR_ERROR</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.NONE">NONE</span></span><span class="p">}</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">DEFAULT_ACTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.STALL">STALL</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.DRIVER_FAULT">DRIVER_FAULT</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.SLEEP">SLEEP</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.OPEN_LOAD">OPEN_LOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.OVERLOAD">OVERLOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.BOARD_OVERLOAD">BOARD_OVERLOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.CHAIN_OVERLOAD">CHAIN_OVERLOAD</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.BRAKE">BRAKE</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultType (pingoblin_motor.faults.FaultType)" href="#pingoblin_motor.faults.FaultType">FaultType</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultType.SENSOR_ERROR">SENSOR_ERROR</span></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FaultAction (pingoblin_motor.faults.FaultAction)" href="#pingoblin_motor.faults.FaultAction">FaultAction</a></span><span class="o">.</span><span class="n"><span title="pingoblin_motor.faults.FaultAction.NONE">NONE</span></span><span class="p">}</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2035,7 +2036,9 @@ until you call <a class="autorefs autorefs-internal" title="            clear_fa
 
     <div class="doc doc-contents ">
 
-        <p>Fault types that latch: the motor refuses to run until <code>clear_fault()</code> is called.</p>
+        <p>Fault types that latch. The next run command raises <code>MotorFaultError</code> once. After that,
+the latch clears by itself when the cause has gone: for <code>DRIVER_FAULT</code> when nFAULT is high
+again, for the others after the motor's <code>fault_retry_time</code>.</p>
 
     </div>
 
@@ -2074,17 +2077,12 @@ until you call <a class="autorefs autorefs-internal" title="            clear_fa
 <tbody>
 <tr>
 <td><code>STALL</code></td>
-<td>Motor current at or above <code>stall_current</code> for <code>stall_time</code> while driven, or nFAULT low (current limiting) for <code>stall_time</code> when there is no sensor</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>CURRENT_LIMIT</code></td>
-<td>nFAULT low while a motor is driven. A warning, repeated at most every 5 s</td>
-<td>No</td>
+<td>Motor current at or above <code>stall_current</code> for <code>stall_time</code> while driven</td>
+<td>Yes</td>
 </tr>
 <tr>
 <td><code>DRIVER_FAULT</code></td>
-<td>nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown, or motor supply below about 4.5 V</td>
+<td>nFAULT low for 0.2 s: output short, driver overheated, or motor supply below about 4.5 V</td>
 <td>No</td>
 </tr>
 <tr>
@@ -2446,7 +2444,7 @@ until you call <a class="autorefs autorefs-internal" title="            clear_fa
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if the motor must be cleared with <code>clear_fault()</code> before it runs again.</p>
+                <p><code>True</code> if the fault latches (see <code>LATCHING</code>).</p>
               </div>
             </td>
           </tr>
@@ -2685,7 +2683,9 @@ until you call <a class="autorefs autorefs-internal" title="            clear_fa
 
 
         <p>Raised when you command a motor that has a latched fault.</p>
-<p>Call <a class="autorefs autorefs-internal" title="            clear_fault" href="../motor/#pingoblin_motor.motor.Motor.clear_fault"><code>Motor.clear_fault()</code></a> once the cause is fixed.</p>
+<p>Raised once for each fault. Fix the cause and run the motor again: the latch clears by
+itself once the cause has gone (see <code>LATCHING</code>). A motor that is still faulty raises
+again. <a class="autorefs autorefs-internal" title="            clear_fault" href="../motor/#pingoblin_motor.motor.Motor.clear_fault"><code>Motor.clear_fault()</code></a> clears it at once.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>

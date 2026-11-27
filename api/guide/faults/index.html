@@ -1750,28 +1750,21 @@
 <tbody>
 <tr>
 <td><code>STALL</code></td>
-<td>Current ≥ <code>stall_current</code> for <code>stall_time</code> while driven, or nFAULT low (current limiting) for <code>stall_time</code> without a sensor</td>
-<td>✗</td>
+<td>Current ≥ <code>stall_current</code> for <code>stall_time</code> while driven</td>
+<td>✓</td>
 <td>Brake</td>
 <td>✓</td>
 </tr>
 <tr>
-<td><code>CURRENT_LIMIT</code></td>
-<td>nFAULT low while driven (warning, at most every 5 s)</td>
-<td>✗</td>
-<td>None</td>
-<td>✗</td>
-</tr>
-<tr>
 <td><code>DRIVER_FAULT</code></td>
-<td>nFAULT low for 0.2 s with no motor driven: Output short, overcurrent or over-temperature shutdown</td>
+<td>nFAULT low for 0.2 s: Output short, driver overheated, or motor supply below 4.5 V</td>
 <td>✗</td>
 <td>Sleep board (brake if no sleep pin)</td>
 <td>✓</td>
 </tr>
 <tr>
 <td><code>OPEN_LOAD</code></td>
-<td>Under 30 mA for 1 s while driven at ≥ 20 %: Motor disconnected, broken wire, motor supply off or fuse blown</td>
+<td>Under 30 mA for 1 s while driven at ≥ 20 %: Motor disconnected, broken wire or motor supply off</td>
 <td>✓</td>
 <td>Brake</td>
 <td>✓</td>
@@ -1806,8 +1799,9 @@
 </tr>
 </tbody>
 </table>
-<p>Without a sensor, a stall is inferred from nFAULT. If both motors on a board are running,
-the board cannot tell which one stalled, so both are stopped.</p>
+<p>nFAULT goes low only for real driver faults, not for normal current limiting. Stall,
+open-load and overload detection therefore need a current sensor. Without one, the driver
+still limits each motor to 4.6 A and shuts down if it overheats (<code>DRIVER_FAULT</code>).</p>
 <h2 id="tuning-detection">Tuning detection<a class="headerlink" href="#tuning-detection" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1844,6 +1838,11 @@ the board cannot tell which one stalled, so both are stopped.</p>
 <td>Overload detection</td>
 </tr>
 <tr>
+<td><code>fault_retry_time</code></td>
+<td><code>2.0</code></td>
+<td>Seconds after a stall, open load or overload before the motor may run again</td>
+</tr>
+<tr>
 <td><code>policy</code></td>
 <td>defaults</td>
 <td>A <a class="autorefs autorefs-internal" title="            FaultPolicy
@@ -1859,7 +1858,7 @@ the board cannot tell which one stalled, so both are stopped.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaultAction</span><span class="p">,</span> <span class="n">FaultPolicy</span><span class="p">,</span> <span class="n">FaultType</span><span class="p">,</span> <span class="n">MotorBoard</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">on_fault</span><span class="p">(</span><span class="n">fault</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">fault</span><span class="p">)</span>              <span class="c1"># [stall] front.a: motor stalled: 2.61 A for 0.5 s</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fault</span><span class="p">)</span>   <span class="c1"># [stall] front.a: motor stalled (3.90 A for 0.5 s): check for a jam or too much load</span>
 
 <span class="c1"># Per-motor policy: coast on stall, and don't latch</span>
 <span class="n">policy</span> <span class="o">=</span> <span class="n">FaultPolicy</span><span class="p">({</span><span class="n">FaultType</span><span class="o">.</span><span class="n">STALL</span><span class="p">:</span> <span class="n">FaultAction</span><span class="o">.</span><span class="n">COAST</span><span class="p">},</span> <span class="n">latch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1868,17 +1867,45 @@ the board cannot tell which one stalled, so both are stopped.</p>
 
 <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">add_fault_handler</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">"motor A:"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
 </code></pre></div>
-<p>A latched fault stops the motor and blocks it: Commanding it raises
-<a class="autorefs autorefs-internal" title="            MotorFaultError" href="../../reference/faults/#pingoblin_motor.faults.MotorFaultError"><code>MotorFaultError</code></a> until you clear it.</p>
-<div class="highlight"><pre><span></span><code><span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">clear_fault</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="stall-homing">Stall homing<a class="headerlink" href="#stall-homing" title="Permanent link">&para;</a></h2>
-<p>Driving into an end stop and stopping on the stall is a low-cost way to home an axis without a limit switch:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaultAction</span><span class="p">,</span> <span class="n">FaultPolicy</span><span class="p">,</span> <span class="n">FaultType</span><span class="p">,</span> <span class="n">MotorBoard</span>
+<p>A latched fault stops the motor. The next command to that motor raises
+<a class="autorefs autorefs-internal" title="            MotorFaultError" href="../../reference/faults/#pingoblin_motor.faults.MotorFaultError"><code>MotorFaultError</code></a> once, with the cause and what to
+do. Errors are never silent: catch the exception to handle it.</p>
+<table>
+<thead>
+<tr>
+<th>Fault</th>
+<th>The motor runs again on the next command once</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DRIVER_FAULT</code></td>
+<td>nFAULT is high again (short removed, driver cooled, battery charged)</td>
+</tr>
+<tr>
+<td><code>STALL</code>, <code>OPEN_LOAD</code>, <code>OVERLOAD</code></td>
+<td><code>fault_retry_time</code> (2 s) has passed. If the cause is still there, it is detected again</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MotorFaultError</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">MotorFaultError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Motor stopped:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>   <span class="c1"># for example: check for a jam or too much load</span>
+</code></pre></div>
+<p><code>motor.clear_fault()</code> clears a latched fault at once, without waiting.</p>
+<h2 id="stall-homing">Stall homing<a class="headerlink" href="#stall-homing" title="Permanent link">&para;</a></h2>
+<p>Driving into an end stop and stopping on the stall is a low-cost way to home an axis without a
+limit switch. It needs current sensing on that motor:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_ads1115</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADS1115</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaultAction</span><span class="p">,</span> <span class="n">FaultPolicy</span><span class="p">,</span> <span class="n">FaultType</span><span class="p">,</span> <span class="n">MotorBoard</span>
+
+<span class="n">adc</span> <span class="o">=</span> <span class="n">ADS1115</span><span class="p">(</span><span class="n">bus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="mh">0x48</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mi">860</span><span class="p">)</span>      <span class="c1"># A_ISENSE (J3 pin 7) on AIN0</span>
 <span class="n">policy</span> <span class="o">=</span> <span class="n">FaultPolicy</span><span class="p">({</span><span class="n">FaultType</span><span class="o">.</span><span class="n">STALL</span><span class="p">:</span> <span class="n">FaultAction</span><span class="o">.</span><span class="n">BRAKE</span><span class="p">},</span> <span class="n">latch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
-                   <span class="n">a_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span> <span class="n">stall_time</span><span class="o">=</span><span class="mf">0.2</span><span class="p">))</span>
+<span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span> <span class="n">adc</span><span class="o">=</span><span class="n">adc</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                   <span class="n">a_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span> <span class="n">stall_time</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">stall_current</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
 <span class="n">board</span><span class="o">.</span><span class="n">start_monitor</span><span class="p">()</span>
 <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
 <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>       <span class="c1"># returns when the stall brakes the motor</span>
