@@ -32,7 +32,7 @@ assert not b.is_running, b
 
 # Stall from the current sensor
 a.forward(80)
-sa.amps = 2.6
+sa.amps = 3.9
 board.pause(1.2)
 assert a.fault is not None and a.fault.type == pm.FaultType.STALL, a.fault
 try:
