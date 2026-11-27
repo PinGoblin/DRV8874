@@ -1,4 +1,4 @@
-"""`pingoblin_motor`: control library for the PinGoblin Board A dual DC motor driver (2 × DRV8874) on a Raspberry Pi.
+"""`pingoblin_motor`: control library for the PinGoblin DRV8874 dual DC motor driver on a Raspberry Pi.
 
 The main classes are importable from the package:
 

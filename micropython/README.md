@@ -1,6 +1,6 @@
 # pingoblin_motor for MicroPython
 
-Single-file MicroPython library for the **PinGoblin Board A** dual DC motor driver (2 × DRV8874), for **ESP32** and **Raspberry Pi Pico / Pico 2**. It has the same classes and method names as the [Raspberry Pi library](../python/).
+Single-file MicroPython library for the **PinGoblin DRV8874** dual DC motor driver, for **ESP32** and **Raspberry Pi Pico / Pico 2**. It has the same classes and method names as the [Raspberry Pi library](../python/).
 
 **Documentation: <https://pingoblin.github.io/DRV8874/>**: see *API → Guide → MicroPython notes* and the *MicroPython reference*.
 

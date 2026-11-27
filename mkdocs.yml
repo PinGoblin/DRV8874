@@ -1,5 +1,5 @@
-site_name: PinGoblin Dual DC Motor Board
-site_description: User guide and Python / MicroPython library for the PinGoblin Board A dual DC motor driver (2 × DRV8874)
+site_name: PinGoblin DRV8874
+site_description: User guide and Python / MicroPython library for the PinGoblin DRV8874 dual DC motor driver
 site_url: https://pingoblin.github.io/DRV8874/
 repo_url: https://github.com/PinGoblin/DRV8874
 repo_name: PinGoblin/DRV8874

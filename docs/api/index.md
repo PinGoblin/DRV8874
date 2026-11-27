@@ -1,6 +1,6 @@
 # API
 
-`pingoblin_motor` controls PinGoblin Board A from Python. There are two versions with
+`pingoblin_motor` controls the PinGoblin DRV8874 from Python. There are two versions with
 the same classes and method names, so code moves between them with little change:
 
 | Version | Runs on | Install |

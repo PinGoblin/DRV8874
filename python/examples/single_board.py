@@ -1,4 +1,4 @@
-"""One Board A: run both motors, react to faults.
+"""One PinGoblin DRV8874 board: run both motors, react to faults.
 
 Wiring (Raspberry Pi BCM -> J3): GPIO12->3 A_EN, GPIO5->4 A_PH, GPIO13->5 B_EN,
 GPIO6->6 B_PH, GPIO26->9 nSLEEP, GPIO19->10 nFAULT, 3V3->2, GND->1.

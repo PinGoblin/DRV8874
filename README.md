@@ -1,4 +1,4 @@
-# PinGoblin Board A – DRV8874 dual DC motor driver
+# PinGoblin DRV8874 – dual DC motor driver
 
 A breakout board that drives two brushed DC motors from a Raspberry Pi, ESP32 or other 3.3 V / 5 V microcontroller. It uses two TI DRV8874 H-bridges, runs from a 6–30 V motor supply, and includes current sensing, protection and test buttons.
 

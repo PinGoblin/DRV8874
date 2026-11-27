@@ -1,6 +1,6 @@
 # Board overview
 
-![Board A top view with labelled connectors, controls and indicators](../images/board-a-top-labelled.png)
+![PinGoblin DRV8874 top view with labelled connectors, controls and indicators](../images/pingoblin-drv8874-top-labelled.png)
 
 ## Inputs
 

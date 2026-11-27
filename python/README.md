@@ -1,6 +1,6 @@
 # pingoblin_motor
 
-Python library for the **PinGoblin Board A** dual DC motor driver (2 × DRV8874) on a Raspberry Pi. It handles one board or many daisy-chained boards, optional current sensing through a PinGoblin ADS1115 board, and fault detection that includes stalled motors.
+Python library for the **PinGoblin DRV8874** dual DC motor driver on a Raspberry Pi. It handles one board or many daisy-chained boards, optional current sensing through a PinGoblin ADS1115 board, and fault detection that includes stalled motors.
 
 **Documentation: <https://pingoblin.github.io/DRV8874/>**: the user guide for the board and the full API reference.
 

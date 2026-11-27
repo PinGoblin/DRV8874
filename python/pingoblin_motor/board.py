@@ -1,4 +1,4 @@
-"""[`MotorBoard`][pingoblin_motor.board.MotorBoard]: one Board A (two DRV8874 channels) and its shared lines."""
+"""[`MotorBoard`][pingoblin_motor.board.MotorBoard]: one PinGoblin DRV8874 board (two motor channels) and its shared lines."""
 from __future__ import annotations
 
 import logging
@@ -14,15 +14,15 @@ from .sensors import CurrentSensor, MotorCurrentSensor, make_sensor
 _log = logging.getLogger("pingoblin_motor")
 
 ISENSE_V_PER_A = 0.675
-"""Board A ISENSE gain: 0.675 V per amp."""
+"""PinGoblin DRV8874 ISENSE gain: 0.675 V per amp."""
 VREF_V = 1.24 * (1 + 10.0 / 15.0)
-"""Board A current-limit reference: a TLV431 set to about 2.07 V, independent of VLOGIC."""
+"""PinGoblin DRV8874 current-limit reference: a TLV431 set to about 2.07 V, independent of VLOGIC."""
 WAKE_TIME_S = 0.0015           # DRV8874 wake-up time from sleep is about 1 ms
 """Seconds to wait after waking the drivers (the DRV8874 needs about 1 ms)."""
 
 
 class MotorBoard:
-    """One Board A dual DC motor driver.
+    """One PinGoblin DRV8874 dual DC motor driver board.
 
     Pins are BCM GPIO numbers. Motor B is optional. Boards work as context managers and
     close on exit.

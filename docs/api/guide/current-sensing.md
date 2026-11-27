@@ -1,6 +1,6 @@
 # Current sensing
 
-Board A's ISENSE outputs give 0.675 V per amp (see the
+The PinGoblin DRV8874's ISENSE outputs give 0.675 V per amp (see the
 [User Guide](../../guide/current-sensing.md)). The library turns that into amps on
 `motor.current`, and uses it for stall, overload and open-load detection.
 

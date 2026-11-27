@@ -4,7 +4,7 @@
 
 | Class | What it is |
 | --- | --- |
-| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One Board A: two motors plus its nSLEEP and nFAULT lines |
+| [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One PinGoblin DRV8874 board: two motors plus its nSLEEP and nFAULT lines |
 | [`Motor`][pingoblin_motor.motor.Motor] | One motor channel (`board.motor_a`, `board.motor_b`, or `board["a"]`) |
 | [`MotorChain`][pingoblin_motor.chain.MotorChain] | Several daisy-chained boards managed as one system, with one fault monitor |
 | [`ADS1115Channel`][pingoblin_motor.sensors.ADS1115Channel] | Connects one input of a PinGoblin ADS1115 board, read with its own [`pingoblin_ads1115`](https://pingoblin.github.io/ADS1115/) library, to a motor for current sensing |

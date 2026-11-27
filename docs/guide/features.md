@@ -1,6 +1,6 @@
 # Features
 
-Board A is a dual brushed DC motor driver for 3.3 V and 5 V microcontrollers. It is
+The PinGoblin DRV8874 is a dual brushed DC motor driver for 3.3 V and 5 V microcontrollers. It is
 designed to be connected, tested and protected without additional parts, and to be
 controlled from a documented Python and MicroPython library.
 
@@ -76,12 +76,12 @@ controlled from a documented Python and MicroPython library.
   each board.
 - **Test without hardware**, using the library's mock backend.
 
-## What sets Board A apart
+## What sets the PinGoblin DRV8874 apart
 
-Compared with typical hobby motor-driver boards, Board A combines the following in one
+Compared with typical hobby motor-driver boards, the PinGoblin DRV8874 combines the following in one
 board:
 
-| Feature | Board A | Typical hobby motor-driver boards |
+| Feature | PinGoblin DRV8874 | Typical hobby motor-driver boards |
 | --- | --- | --- |
 | Motor channels | 2 | Often 1 |
 | Motor supply | 6–30 V | Often limited to 10–16 V, or starting at 9 V |

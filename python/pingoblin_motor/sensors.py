@@ -1,6 +1,6 @@
 """Current sensing: current-sensor classes and the adapter for an ADS1115 board.
 
-Board A outputs 0.675 V per amp on A_ISENSE and B_ISENSE (J3 pins 7 and 8). The Raspberry
+The PinGoblin DRV8874 outputs 0.675 V per amp on A_ISENSE and B_ISENSE (J3 pins 7 and 8). The Raspberry
 Pi has no ADC, so read ISENSE with a PinGoblin ADS1115 board and its library,
 [`pingoblin_ads1115`](https://pingoblin.github.io/ADS1115/). One ADS1115 has four inputs,
 so it reads two boards (four motors). Up to four ADS1115 boards share one I²C bus
@@ -20,7 +20,7 @@ from typing import Optional
 from .faults import ConfigError, SensorError
 
 ISENSE_V_PER_A = 0.675   # 1.5 kOhm x 450 uA/A (DRV8874 IPROPI gain)
-"""Board A ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A, the DRV8874 IPROPI gain)."""
+"""PinGoblin DRV8874 ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A, the DRV8874 IPROPI gain)."""
 
 class CurrentSensor(abc.ABC):
     """Interface for anything that returns a voltage proportional to motor current.
@@ -93,7 +93,7 @@ class MotorCurrentSensor:
         Args:
             source: A [`CurrentSensor`][pingoblin_motor.sensors.CurrentSensor].
             samples: Readings averaged per measurement (smooths PWM and brush noise).
-            v_per_a: ISENSE gain (V/A): 0.675 on Board A.
+            v_per_a: ISENSE gain (V/A): 0.675 on the PinGoblin DRV8874.
         """
         self.source, self.samples, self.v_per_a = source, max(1, samples), v_per_a
 

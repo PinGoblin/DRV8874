@@ -1,4 +1,4 @@
-"""`pingoblin_motor` for MicroPython: the PinGoblin Board A (2 × DRV8874) motor library in one file.
+"""`pingoblin_motor` for MicroPython: the PinGoblin DRV8874 dual DC motor driver library in one file.
 
 Runs on ESP32 and Raspberry Pi Pico / Pico 2 with MicroPython 1.20 or later, and has the
 same class and method names as the Raspberry Pi library: `MotorBoard`, `Motor`,
@@ -74,7 +74,7 @@ def _advance_clock(ms):
 
 VREF_V = 1.24 * (1 + 10 / 15)   # on-board TLV431 reference: ITRIP about 3 A, fixed
 ISENSE_V_PER_A = 0.675     # 1.5 kOhm x 450 uA/A (DRV8874 IPROPI)
-"""Board A ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A)."""
+"""PinGoblin DRV8874 ISENSE gain: 0.675 V per amp (1.5 kΩ × 450 µA/A)."""
 WAKE_MS = 2                # DRV8874 wake-up from sleep is about 1 ms
 """Milliseconds to wait after waking the drivers (the DRV8874 needs about 1 ms)."""
 
@@ -425,7 +425,7 @@ class _MPwm:
 class _MIn:
     def __init__(self, pin):
         import machine
-        self._p = machine.Pin(pin, machine.Pin.IN)   # Board A has its own pull-up on nFAULT
+        self._p = machine.Pin(pin, machine.Pin.IN)   # the board has its own pull-up on nFAULT
 
     def read(self):
         return bool(self._p.value())
@@ -621,7 +621,7 @@ class MotorCurrentSensor:
         Args:
             source: Any object with `read_voltage()` (`ADS1115Channel`, `ADCChannel`, `MockSensor`).
             samples: Samples averaged per reading.
-            v_per_a: ISENSE gain (V/A): 0.675 on Board A.
+            v_per_a: ISENSE gain (V/A): 0.675 on the PinGoblin DRV8874.
         """
         self.source = source
         self.samples = samples if samples > 0 else 1
@@ -1099,7 +1099,7 @@ _fault_users = {}
 
 
 class MotorBoard:
-    """One Board A dual DC motor driver. Pins are GPIO numbers.
+    """One PinGoblin DRV8874 dual DC motor driver board. Pins are GPIO numbers.
 
     Several boards can share one `sleep_pin` (one e-stop line). Each board needs its
     **own** `fault_pin`: a `fault_pin` already used by another open board is rejected.

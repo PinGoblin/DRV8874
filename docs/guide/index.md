@@ -1,8 +1,8 @@
 # User Guide
 
-![Board A, angled view of the top side](../images/board-a-3d.png)
+![PinGoblin DRV8874, angled view of the top side](../images/pingoblin-drv8874-3d.png)
 
-Board A drives two brushed DC motors in both directions from any 3.3 V or 5 V
+The PinGoblin DRV8874 drives two brushed DC motors in both directions from any 3.3 V or 5 V
 microcontroller, such as a Raspberry Pi, ESP32, Raspberry Pi Pico or Arduino. Each motor
 has its own TI DRV8874 H-bridge, with speed set by PWM, direction set by one pin, and a
 current-sense output that can be read with an ADC.
