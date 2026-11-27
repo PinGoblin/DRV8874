@@ -7,8 +7,8 @@
 | Ref | Name | What it does |
 | --- | --- | --- |
 | J1 | Power in (XT30) | Battery or supply with an XT30 plug, 6–30 V. See [Powering the board](power.md) |
-| J2 | Power in / through | Screw terminal in parallel with J1: a wired supply in, or power out to the next board |
-| J3 | Logic header | Connects to the host: power, direction and speed inputs, current sense, sleep and fault. See [J3 pinout](j3-pinout.md) |
+| J2 | Power in / through | Screw terminal in parallel with J1: A wired supply in, or power out to the next board |
+| J3 | Logic header | Connects to the host: Power, direction and speed inputs, current sense, sleep and fault. See [J3 pinout](j3-pinout.md) |
 
 ## Outputs
 
@@ -31,8 +31,8 @@ See [Test buttons and LEDs](buttons-leds.md) for how the buttons behave with a h
 
 | Ref | Colour | Meaning |
 | --- | --- | --- |
-| D3 | Green | PWR: motor supply present |
-| D4 | Red | FAULT: a driver is limiting current or has a fault |
+| D3 | Green | PWR: Motor supply present |
+| D4 | Red | FAULT: A driver is limiting current or has a fault |
 | D8 / D13 | Green | Motor A / B running forward (OUT1 positive) |
 | D9 / D14 | Red | Motor A / B running reverse (OUT2 positive) |
 

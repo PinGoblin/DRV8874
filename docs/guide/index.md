@@ -16,7 +16,7 @@ current-sense output that can be read with an ADC.
 - Push buttons to test each motor without writing code (PH/EN mode, the default)
 - Direction LEDs per motor, plus power and fault LEDs
 - Power through-terminal for daisy-chaining several boards from one supply
-- Safe start-up: motors are held in brake while the host boots
+- Safe start-up: Motors are held in brake while the host boots
 
 See [Features](features.md) for the full list.
 

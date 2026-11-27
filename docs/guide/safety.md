@@ -7,7 +7,7 @@ Read these before connecting power.
     the drivers.
 
 - **Do not exceed 30 V on the motor supply, including supply tolerance.** A supply labelled 30 V can
-  measure higher: check it with a meter, or use a lower voltage. The surge suppressor
+  measure higher: Check it with a meter, or use a lower voltage. The surge suppressor
   starts conducting at about 33 V and is not meant to carry continuous current. A higher
   supply, such as a 36 V battery, destroys the surge suppressor (D2) and then blows the
   fuse (F1).
@@ -15,7 +15,7 @@ Read these before connecting power.
 - **Wire with the power off.** Connect and disconnect motors only while the supply is off.
 - **The drivers get hot.** At high currents the chips and the board around them can exceed
   60 °C. Allow airflow and do not touch them while running.
-- **Daisy-chaining:** the power through-terminal (J2) shares one supply between boards. Keep
+- **Daisy-chaining:** The power through-terminal (J2) shares one supply between boards. Keep
   the total current through a board's terminals at or below 6 A.
 - **Only connect one power source at a time to J1 and J2.** J1 and J2 are connected
   together. For example, never connect a battery to J1 and a separate power supply to J2

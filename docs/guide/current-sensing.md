@@ -12,7 +12,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
   drops to zero, so average several samples, or sample in the PWM on-time. The library
   does this for you (see [Current sensing in the API](../api/guide/current-sensing.md)).
 - A stalled motor shows as a reading that sits at the current limit while the shaft is not
-  turning. A typical approach: if the reading stays above about 80% of the limit for more
+  turning. A typical approach: If the reading stays above about 80% of the limit for more
   than 200 ms, stop the motor. The library's stall detection works this way.
 - Each driver limits motor current on every PWM cycle (cycle-by-cycle chopping). The limit
   is set from VLOGIC:
@@ -23,7 +23,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 
 - While limiting, the red fault LED lights and nFAULT goes low. Normal operation resumes
   on the next PWM cycle once the load drops. At exactly 100% duty there is no next cycle,
-  so the motor stays braked until the input changes: see
+  so the motor stays braked until the input changes: See
   [100% duty and the current limit](controlling-motors.md#practical-limits).
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
@@ -35,7 +35,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 
 ISENSE does not measure motor speed. It measures current, and in a brushed DC motor
 current follows the **load torque**, not the speed. At a fixed supply voltage and PWM duty, current and speed
-are linearly related but in opposite directions: as load slows the motor, its back-EMF
+are linearly related but in opposite directions: As load slows the motor, its back-EMF
 falls and the current rises.
 
 \[
@@ -48,11 +48,11 @@ resistance and \(K_e\) its back-EMF constant.
 
 What this means in practice:
 
-- **Fixed duty and supply:** speed and current fall on a straight line. Speed is highest
+- **Fixed duty and supply:** Speed and current fall on a straight line. Speed is highest
   at the no-load current and zero at the stall current.
-- **Change the duty or the supply:** the line shifts, so the same current can mean very
+- **Change the duty or the supply:** The line shifts, so the same current can mean very
   different speeds. ISENSE alone cannot give the RPM.
-- **No load:** a free-running motor draws almost the same small current at any speed,
+- **No load:** A free-running motor draws almost the same small current at any speed,
   because only friction loads it. ISENSE barely changes with RPM.
 
 For a rough speed estimate at one fixed duty, calibrate two points. Measure the no-load

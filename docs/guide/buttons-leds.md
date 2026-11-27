@@ -20,7 +20,7 @@ Each motor has a FWD and a REV button that runs it at full speed while held, in 
 - They always drive the motor at 100 % duty, that is, at the full supply voltage. Do not
   use them with a motor rated below the supply voltage.
 - They work as described above only in PH/EN mode (the default jumper setting). In PWM
-  mode they behave differently: see the next section.
+  mode they behave differently: See the next section.
 
 ## Buttons in PWM mode (JP1 bridged)
 
@@ -47,4 +47,4 @@ motor in reverse from the host.
 | Motor A / B direction | Red | Motor running reverse (OUT2 positive). Brightness follows PWM duty |
 
 A direction LED may glow faintly when an unpowered motor is turned by hand. This is
-normal: the motor is acting as a generator.
+normal: The motor is acting as a generator.

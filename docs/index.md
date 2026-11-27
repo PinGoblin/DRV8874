@@ -18,7 +18,7 @@ This site is the reference for the board and its software. It has two parts:
 
     ---
 
-    Setting up and using the board: specifications, safety, wiring, the J3 pinout,
+    Setting up and using the board: Specifications, safety, wiring, the J3 pinout,
     current sensing, the PMODE jumper and troubleshooting.
 
 -   **[API](api/index.md)**
@@ -26,7 +26,7 @@ This site is the reference for the board and its software. It has two parts:
     ---
 
     The `pingoblin_motor` library for the Raspberry Pi, and the single-file version for
-    MicroPython (ESP32 and Pico): stall and fault detection, current sensing and
+    MicroPython (ESP32 and Pico): Stall and fault detection, current sensing and
     daisy-chained boards.
 
 </div>

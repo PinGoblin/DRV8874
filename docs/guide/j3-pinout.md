@@ -11,7 +11,7 @@ the test buttons.
 
     Every other J3 pin is optional and can be left unconnected.
 
-![J3 pinout. Pins 3 to 6 are A_EN/A_IN1, A_PH/A_IN2, B_EN/B_IN1 and B_PH/B_IN2: the first
+![J3 pinout. Pins 3 to 6 are A_EN/A_IN1, A_PH/A_IN2, B_EN/B_IN1 and B_PH/B_IN2: The first
 name applies in PH/EN mode, the second in PWM mode.](../images/j3-pinout.svg)
 
 | Pin | Signal | Connection | Direction | PH/EN mode (default) | PWM mode |
@@ -34,7 +34,7 @@ PH have 10 kΩ pull-downs and nSLEEP has a 10 kΩ pull-up on the board, so unuse
 can be left open.
 
 nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give
-each board its own nFAULT GPIO: see [Daisy-chaining boards](daisy-chain.md).
+each board its own nFAULT GPIO: See [Daisy-chaining boards](daisy-chain.md).
 
 The 4.6 A current limit keeps ISENSE at or below about 2.1 V, within the range of any
 3.3 V or 5 V ADC.

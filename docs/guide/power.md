@@ -12,7 +12,7 @@ The board draws up to 5 A continuously in total (both motors), and briefly up to
 !!! danger "Only connect one power source at a time to J1 and J2"
     J1 and J2 are connected together, and so is every board in a daisy chain. For example,
     never connect a battery to J1 and a separate power supply to J2 at the same time, on
-    this board or on any other board in the chain: the supply would push current into the
+    this board or on any other board in the chain: The supply would push current into the
     battery with no charge control.
 
 ## PinGoblin battery packs
@@ -24,7 +24,7 @@ normally, but motors rated for 12 V run at roughly two-thirds of their 12 V spee
 
 ### Two packs in series (12.0–16.8 V)
 
-Two packs in series give 14.4 V nominal: the right supply for 12 V motors, solenoids and
+Two packs in series give 14.4 V nominal: The right supply for 12 V motors, solenoids and
 steppers. Join them with an XT30 series lead:
 
 | Lead connector | Type | Connects to |
@@ -44,7 +44,7 @@ Rules for two packs:
 - Use two packs of the same type (both QUAD or both DUAL), fully charged on the UPS HAT+
   before use, and switch both on.
 - Charge each pack on its own on the UPS HAT+. Never charge through the series lead.
-- If either pack's protection switches off, the whole string stops. This is safe: recharge
+- If either pack's protection switches off, the whole string stops. This is safe: Recharge
   both packs.
 
 !!! danger "Never plug the series lead into a UPS HAT+"
@@ -53,7 +53,7 @@ Rules for two packs:
 
 ### Low battery
 
-The board has no low-voltage cut-off: it keeps running until the packs' own protection
+The board has no low-voltage cut-off: It keeps running until the packs' own protection
 switches off at 2.8 V per cell (5.6 V for one pack, 11.2 V for two). This is safe, but
 regularly discharging that far shortens cell life. For the longest life, stop at 3.1 V per
 cell, where the UPS HAT+ software stops:
@@ -87,7 +87,7 @@ of 30 V or less:
 
 ## Wired supplies
 
-Connect plug-packs and bench supplies to J2: positive to pin 1 (VIN+), negative to pin 2
-(GND). Keep the supply at or below 30 V, including its tolerance: a supply labelled 30 V can
+Connect plug-packs and bench supplies to J2: Positive to pin 1 (VIN+), negative to pin 2
+(GND). Keep the supply at or below 30 V, including its tolerance: A supply labelled 30 V can
 measure higher. A 12 V supply suits most hobby motors, and a 24 V supply suits industrial
 pumps, valves and actuators.

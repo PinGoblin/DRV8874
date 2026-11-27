@@ -1,6 +1,6 @@
 # Daisy-chained boards
 
-Each board has its own EN/PH pins and its **own nFAULT pin**. nSLEEP can be shared: wire
+Each board has its own EN/PH pins and its **own nFAULT pin**. nSLEEP can be shared: Wire
 it to every board and pass the same GPIO, which gives one e-stop line.
 [`MotorBoard`][pingoblin_motor.board.MotorBoard] raises
 [`ConfigError`][pingoblin_motor.faults.ConfigError] if a `fault_pin` is already used by

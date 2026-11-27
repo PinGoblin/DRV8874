@@ -7,11 +7,11 @@ Wire J3 to the host first, then the motors, then the motor supply last.
    motor.
 2. Connect each motor to J4 (A) or J5 (B). For less electrical noise, solder a 100 nF
    capacitor across each motor's terminals and twist its leads (see [Connectors](connectors.md)).
-3. Connect power: a battery to J1 (XT30), or a 6–30 V supply to J2 (positive to VIN+,
+3. Connect power: A battery to J1 (XT30), or a 6–30 V supply to J2 (positive to VIN+,
    negative to GND). See [Powering the board](power.md). The green power LED
    lights.
 4. Power the host. Motors stay stopped (braked) until the host drives an EN pin high.
-5. Optional: check each motor turns with the FWD and REV [test buttons](buttons-leds.md)
+5. Optional: Check each motor turns with the FWD and REV [test buttons](buttons-leds.md)
    before writing any code.
 
 ## Wiring
@@ -34,8 +34,8 @@ control are not needed. Pins 5 and 6 are needed only for motor B, pins 7 and 8 o
 current sensing, and pin 10 only for fault detection.
 
 EN and PH have 10 kΩ pull-downs, so the motors stay braked while the host boots,
-whichever GPIOs you use. On a Raspberry Pi, do not use GPIO2 and GPIO3: they carry I2C for
-the ADS1115 board. On an ESP32, avoid the boot-strapping pins (GPIO0, 2, 12, 15): the
+whichever GPIOs you use. On a Raspberry Pi, do not use GPIO2 and GPIO3: They carry I2C for
+the ADS1115 board. On an ESP32, avoid the boot-strapping pins (GPIO0, 2, 12, 15): The
 board's pull-downs can stop the ESP32 booting normally. Also avoid GPIO14, which toggles
 during boot. Use ADC1 pins for current sense, because ADC2 cannot be read while Wi-Fi is
 on. If you use more than one board, give each its own nFAULT GPIO (see
@@ -87,5 +87,5 @@ Install the library (see [Installation](../api/guide/install.md)), then:
 The MicroPython library uses 20 kHz hardware PWM by default. On a Raspberry Pi the library
 defaults to 1 kHz, because the Pi's standard GPIO PWM is generated in software and is
 unreliable at higher frequencies; at 1 kHz the motors whine audibly. For silent 20 kHz
-drive on a Pi, enable hardware PWM on GPIO12 and GPIO13: see
+drive on a Pi, enable hardware PWM on GPIO12 and GPIO13: See
 [PWM frequency](../api/guide/concepts.md#pwm-frequency).

@@ -27,11 +27,11 @@ board.close()
 ## Guide
 
 - [Installation](guide/install.md)
-- [Concepts](guide/concepts.md): boards, motors, speed, braking and coasting, PWM frequency
+- [Concepts](guide/concepts.md): Boards, motors, speed, braking and coasting, PWM frequency
 - [Faults and stall detection](guide/faults.md)
 - [Current sensing](guide/current-sensing.md)
 - [Daisy-chained boards](guide/daisy-chain.md)
-- [MicroPython notes](guide/micropython.md): timing without threads and the differences from the Pi package
+- [MicroPython notes](guide/micropython.md): Timing without threads and the differences from the Pi package
 - [Testing without hardware](guide/testing.md)
 
 ## Reference

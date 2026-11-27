@@ -22,7 +22,7 @@ Abbreviations and terms used in this manual, in alphabetical order.
 | FWD / REV | Forward / reverse | Test button labels. Forward means OUT1 positive (green LED) |
 | GND | Ground | The 0 V reference, common to the board, the motor supply and the host |
 | GPIO | General-purpose input/output | A microcontroller pin that software can set high or low, or read. On the Pico these are named GP0, GP1 and so on |
-| Half-bridge | — | One pair of switches on one output: one to the supply (high side) and one to ground (low side). An H-bridge is two half-bridges |
+| Half-bridge | — | One pair of switches on one output: One to the supply (high side) and one to ground (low side). An H-bridge is two half-bridges |
 | H-bridge | — | Four switches around the motor that can connect each terminal to the supply or to ground, so the motor can run in both directions. Each DRV8874 is one H-bridge |
 | HAT | Hardware attached on top | A Raspberry Pi add-on board that plugs onto the Pi's 40-pin header |
 | High side / low side | — | The switch from an output to the supply (high side), or to ground (low side) |
@@ -45,7 +45,7 @@ Abbreviations and terms used in this manual, in alphabetical order.
 | PWR | Power | Label of the power LED (D3) |
 | Reference designators | — | Part labels printed on the board: C = capacitor, D = diode or LED, F = fuse, H = mounting hole, J = connector, JP = jumper, Q = transistor, R = resistor, SW = switch, U = IC |
 | RPM | Revolutions per minute | Motor speed |
-| Slow decay / fast decay | — | What the motor does in the PWM off-time: slow decay brakes it (firm, linear speed control), fast decay lets it coast |
+| Slow decay / fast decay | — | What the motor does in the PWM off-time: Slow decay brakes it (firm, linear speed control), fast decay lets it coast |
 | TI | Texas Instruments | Maker of the DRV8874 motor driver |
 | TVS | Transient-voltage suppressor | A diode (D2) that clamps voltage spikes on the motor supply |
 | UPS | Uninterruptible power supply | As in the PinGoblin UPS HAT+. Its QUAD and DUAL battery packs can also power this board |

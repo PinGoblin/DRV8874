@@ -1,16 +1,16 @@
 # Controlling the motors
 
 !!! info "Terms used on this page"
-    - **PWM (pulse-width modulation):** the host switches a pin on and off rapidly, many
+    - **PWM (pulse-width modulation):** The host switches a pin on and off rapidly, many
       thousands of times a second. The **duty cycle** is the percentage of each cycle the pin
       is on, and it sets the average power, and so the speed, of the motor.
-    - **PH (phase):** the direction input. High runs the motor forward, low runs it in
+    - **PH (phase):** The direction input. High runs the motor forward, low runs it in
       reverse.
-    - **EN (enable):** the drive input. High drives the motor, low brakes it. Feeding it PWM
+    - **EN (enable):** The drive input. High drives the motor, low brakes it. Feeding it PWM
       sets the speed.
-    - **IN1 / IN2 (input 1 / input 2):** in PWM mode, the same two pins become two direct
+    - **IN1 / IN2 (input 1 / input 2):** In PWM mode, the same two pins become two direct
       inputs, each controlling one side of the motor (OUT1 and OUT2).
-    - **nSLEEP / nFAULT:** the leading *n* means the signal is active when low: nSLEEP low
+    - **nSLEEP / nFAULT:** The leading *n* means the signal is active when low: nSLEEP low
       puts the drivers to sleep, and nFAULT goes low on a fault or current limiting.
 
     The [Glossary](glossary.md) lists every abbreviation used in this manual.
@@ -35,11 +35,11 @@ except that gpiozero calls PH low "forward" (see [Direction](#direction)).
 | High | High / PWM | Low | Low | High | Reverse | Red |
 | Low | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
 
-**Speed:** drive EN with PWM. The duty cycle sets the speed. During the PWM off-time the
+**Speed:** Drive EN with PWM. The duty cycle sets the speed. During the PWM off-time the
 motor brakes, which gives a firm, close-to-linear response. The library's `speed_pc`
 (0–100) is the EN duty cycle.
 
-**Coast:** in PH/EN mode a motor can only coast by putting the drivers to sleep, and
+**Coast:** In PH/EN mode a motor can only coast by putting the drivers to sleep, and
 nSLEEP is shared by both motors. The library's `coast()` therefore sleeps the board only
 when the other motor is idle, and otherwise brakes.
 
@@ -60,7 +60,7 @@ sleeping the board, but needs PWM on both pins for full control.
 | High | High | High | Low | Low | Brake | Off |
 | Low | Any | Any | Open | Open | Coast (sleep, near-zero current) | Off |
 
-**Speed:** hold one input high and switch the other (slow decay), or hold one input low
+**Speed:** Hold one input high and switch the other (slow decay), or hold one input low
 and switch the other (fast decay). See [Speed control](#speed-control) below. In
 `mode="pwm"` the library uses slow decay, so the response matches PH/EN mode.
 
@@ -68,13 +68,13 @@ and switch the other (fast decay). See [Speed control](#speed-control) below. In
 Arduino `analogWrite()` on either pin). With gpiozero's `Motor` class, pass `forward=`
 J3 pin 3 (IN1) and `backward=` J3 pin 4 (IN2), so its directions match the table above.
 
-**Test buttons:** not supported in PWM mode. FWD drives IN1 and IN2 high, which brakes
+**Test buttons:** Not supported in PWM mode. FWD drives IN1 and IN2 high, which brakes
 the motor, and REV drives IN1 only, which runs it forward. See
 [Buttons in PWM mode](buttons-leds.md#buttons-in-pwm-mode-jp1-bridged).
 
 ## Speed control
 
-In every mode, speed comes from the **PWM duty cycle**: the fraction of each PWM period
+In every mode, speed comes from the **PWM duty cycle**: The fraction of each PWM period
 for which the motor is connected to the supply. A motor driven at 60% duty sees, on
 average, about 60% of VM, so it runs at roughly 60% of its full speed at that load. The
 modes differ in which pin is switched, and in what the motor does during the off-time.
@@ -91,7 +91,7 @@ closely, even at light load. PH/EN mode is the simplest to use and gives the bes
 low-speed control.
 
 **PWM mode, slow decay.** One input is held high and the other is switched. The motor is
-driven while the switched input is *low*, so the duty is inverted: for 30% speed forward,
+driven while the switched input is *low*, so the duty is inverted: For 30% speed forward,
 hold IN1 high and run IN2 at 70%. The off-time is a brake, so the response matches PH/EN
 mode.
 
@@ -99,7 +99,7 @@ mode.
 duty. This is how most two-input motor libraries work, including gpiozero's `Motor` class
 and Arduino code that calls `analogWrite()` on one pin. During the off-time both outputs
 turn off and the motor coasts, while its current flows back into the supply. Torque is
-lower and the response is less linear at low duty: a lightly loaded motor may slow very
+lower and the response is less linear at low duty: A lightly loaded motor may slow very
 little until the duty is well below 50%. Slow decay gives finer control.
 
 ### Practical limits
@@ -107,7 +107,7 @@ little until the duty is well below 50%. Slow decay gives finer control.
 - **Minimum speed.** Most small motors do not start turning until the duty cycle reaches
   about 10–30%, because of friction and gearbox losses. Below that they hum without
   turning. The library's `min_speed_pc` raises any non-zero speed to this value.
-- **PWM frequency.** Use 20 kHz where the host supports it: it is above human hearing and
+- **PWM frequency.** Use 20 kHz where the host supports it: It is above human hearing and
   gives smooth current. Lower frequencies (1–5 kHz, such as the Raspberry Pi's software
   PWM) work the same way but make the motor whine.
 - **Full speed.** 100% duty applies the full supply to the motor. The test buttons drive
@@ -118,14 +118,14 @@ little until the duty is well below 50%. Slow decay gives finer control.
     exactly 100% duty there are no edges, so if a motor stalls and reaches the current
     limit, the driver holds it in brake (and lights the fault LED) until the input
     changes. To recover, change the speed, stop and restart, or release and press the test
-    button again. If a stall is likely at full speed, run at 99% instead: the motor runs
+    button again. If a stall is likely at full speed, run at 99% instead: The motor runs
     at effectively full speed, and the current limit then recovers automatically.
 
 ## Direction
 
-"Forward" and "reverse" follow TI's convention for the DRV8874: forward is OUT1 positive
+"Forward" and "reverse" follow TI's convention for the DRV8874: Forward is OUT1 positive
 (green LED). In PH/EN mode that is PH high; in PWM mode, IN1 high and IN2 low. Which way
-the shaft turns depends on how the motor is wired: swap its two leads, or use
+the shaft turns depends on how the motor is wired: Swap its two leads, or use
 `invert=True` in the library, to change it.
 
 To protect gearboxes, slow down or stop briefly before reversing a heavily loaded motor.
@@ -134,7 +134,7 @@ motor.
 
 ## Sleep, emergency stop and start-up
 
-**Sleep / emergency stop:** pull nSLEEP low to put both drivers to sleep (outputs open,
+**Sleep / emergency stop:** Pull nSLEEP low to put both drivers to sleep (outputs open,
 motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-up to VLOGIC on the
 board, so the drivers are awake whenever VLOGIC is present and nSLEEP is not driven low.
 Connecting nSLEEP is optional.

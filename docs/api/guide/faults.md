@@ -7,8 +7,8 @@ Start the fault monitor with `board.start_monitor()` (Raspberry Pi), `board.enab
 | --- | --- | --- | --- | --- |
 | `STALL` | Current ≥ `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` without a sensor | ✗ | Brake | ✓ |
 | `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | ✗ | None | ✗ |
-| `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | ✗ | Sleep board (brake if no sleep pin) | ✓ |
-| `OPEN_LOAD` | Under 30 mA for 1 s while driven at ≥ 20 %: motor disconnected, broken wire, motor supply off or fuse blown | ✓ | Brake | ✓ |
+| `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: Output short, overcurrent or over-temperature shutdown | ✗ | Sleep board (brake if no sleep pin) | ✓ |
+| `OPEN_LOAD` | Under 30 mA for 1 s while driven at ≥ 20 %: Motor disconnected, broken wire, motor supply off or fuse blown | ✓ | Brake | ✓ |
 | `OVERLOAD` | Over `continuous_current` for `overload_time` | ✓ | Brake | ✓ |
 | `BOARD_OVERLOAD` | Board supply current over the 5 A continuous board rating for 1 s | ✓ | Brake | ✗ |
 | `CHAIN_OVERLOAD` | Daisy-chain supply current over 6 A for 1 s | ✓ | Brake | ✗ |
@@ -26,7 +26,7 @@ the board cannot tell which one stalled, so both are stopped.
 | `start_grace` | `0.3` | Ignore stall and open-load for this long after a start (start-up surge) |
 | `open_load_current` / `open_load_time` | `0.03` A / `1.0` s | Open-load detection |
 | `continuous_current` / `overload_time` | `1.5` A / `5` s | Overload detection |
-| `policy` | defaults | A [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy]: what to do on each fault, and whether faults latch |
+| `policy` | defaults | A [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy]: What to do on each fault, and whether faults latch |
 
 ## Reacting to faults
 
@@ -44,7 +44,7 @@ board.start_monitor(on_fault=on_fault)
 board.motor_a.add_fault_handler(lambda f: print("motor A:", f.message))
 ```
 
-A latched fault stops the motor and blocks it: commanding it raises
+A latched fault stops the motor and blocks it: Commanding it raises
 [`MotorFaultError`][pingoblin_motor.faults.MotorFaultError] until you clear it.
 
 ```python

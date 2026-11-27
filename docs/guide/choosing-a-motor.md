@@ -5,7 +5,7 @@ normal use. Each motor is limited to 4.6 A (peak), and the board is rated for 5 
 both motors combined. A motor that needs more current than this
 still runs, but only with reduced torque.
 
-Check two figures on the motor's datasheet before buying: its **stall current** and its
+Check two figures on the motor's datasheet before buying: Its **stall current** and its
 **rated voltage**.
 
 ## Current
