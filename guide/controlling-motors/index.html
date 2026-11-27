@@ -1983,7 +1983,8 @@ and switch the other (fast decay). See <a href="#speed-control">Speed control</a
 Arduino <code>analogWrite()</code> on either pin). With gpiozero's <code>Motor</code> class, pass <code>forward=</code>
 J3 pin 3 (IN1) and <code>backward=</code> J3 pin 4 (IN2), so its directions match the table above.</p>
 <p><strong>Test buttons:</strong> not supported in PWM mode. FWD drives IN1 and IN2 high, which brakes
-the motor, and REV drives IN1 only, which runs it forward.</p>
+the motor, and REV drives IN1 only, which runs it forward. See
+<a href="../buttons-leds/#buttons-in-pwm-mode-jp1-bridged">Buttons in PWM mode</a>.</p>
 <h2 id="speed-control">Speed control<a class="headerlink" href="#speed-control" title="Permanent link">&para;</a></h2>
 <p>In every mode, speed comes from the <strong>PWM duty cycle</strong>: the fraction of each PWM period
 for which the motor is connected to the supply. A motor driven at 60% duty sees, on

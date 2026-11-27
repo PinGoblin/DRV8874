@@ -70,7 +70,7 @@
 <text x="498" y="400" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="end">2</text>
 <text x="24" y="400" font-size="13" font-weight="600" fill="#1f1f1f" text-anchor="start">VLOGIC</text>
 <text x="104" y="400" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">power</text>
-<text x="150" y="400" font-size="13" font-weight="400" fill="#1f1f1f" text-anchor="start">Logic supply in, 3.3–5 V</text>
+<text x="150" y="400" font-size="13" font-weight="400" fill="#1f1f1f" text-anchor="start">Logic supply in, 3.0–5.25 V</text>
 <text x="336" y="400" font-size="11.5" font-weight="400" fill="#5f5f5f" text-anchor="start">same</text>
 <rect x="512" y="420" width="16" height="16" rx="0" fill="#2f6fd6" fill-opacity="0.25" stroke="#2f6fd6" stroke-width="1.5"/>
 <text x="498" y="432" font-size="11.5" font-weight="600" fill="#1f1f1f" text-anchor="end">1</text>

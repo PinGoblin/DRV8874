@@ -1692,7 +1692,7 @@ motor in PWM mode." src="../../images/j3-pinout.svg" /></p>
 <td>2</td>
 <td>VLOGIC</td>
 <td>Power</td>
-<td>Logic supply in, 3.3–5 V</td>
+<td>Logic supply in, 3.0–5.25 V</td>
 <td>Same</td>
 </tr>
 <tr>
@@ -1704,7 +1704,9 @@ motor in PWM mode." src="../../images/j3-pinout.svg" /></p>
 </tr>
 </tbody>
 </table>
-<p>All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. EN and
+<p>All signal pins work at 3.3 V or 5 V logic, matching whatever you feed to VLOGIC. Take
+VLOGIC from the host's own 3.3 V or 5 V pin, so the logic supply and the host's GPIOs
+always power up and down together. EN and
 PH have 10 kΩ pull-downs and nSLEEP has a 10 kΩ pull-up on the board, so unused inputs
 can be left open.</p>
 <p>nFAULT is open-drain with a 10 kΩ pull-up to VLOGIC, and also drives the fault LED. Give

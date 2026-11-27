@@ -807,6 +807,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#buttons-in-pwm-mode-jp1-bridged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Buttons in PWM mode (JP1 bridged)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1652,6 +1663,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#buttons-in-pwm-mode-jp1-bridged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Buttons in PWM mode (JP1 bridged)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1721,9 +1743,45 @@
   high, REV runs the motor forward.</li>
 <li>They always drive the motor at 100 % duty, that is, at the full supply voltage. Do not
   use them with a motor rated below the supply voltage.</li>
-<li>They work as described here only in PH/EN mode (the default jumper setting). In PWM
-  mode FWD brakes the motor and REV runs it forward.</li>
+<li>They work as described above only in PH/EN mode (the default jumper setting). In PWM
+  mode they behave differently: see the next section.</li>
 </ul>
+<h2 id="buttons-in-pwm-mode-jp1-bridged">Buttons in PWM mode (JP1 bridged)<a class="headerlink" href="#buttons-in-pwm-mode-jp1-bridged" title="Permanent link">&para;</a></h2>
+<p>In PWM mode the drivers read the EN and PH lines as IN1 and IN2. The buttons still drive
+the same lines, so their labels no longer match what the motor does:</p>
+<table>
+<thead>
+<tr>
+<th>Button held</th>
+<th>IN1 (EN line)</th>
+<th>IN2 (PH line)</th>
+<th>Motor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None, host absent</td>
+<td>Low</td>
+<td>Low</td>
+<td>Coasts (outputs off)</td>
+</tr>
+<tr>
+<td>FWD (SW1 / SW3)</td>
+<td>High</td>
+<td>High</td>
+<td>Brakes (both outputs low)</td>
+</tr>
+<tr>
+<td>REV (SW2 / SW4)</td>
+<td>High</td>
+<td>Low</td>
+<td>Runs forward (OUT1 positive, green LED)</td>
+</tr>
+</tbody>
+</table>
+<p>There is no button combination that runs a motor in reverse in PWM mode. To check reverse
+wiring with the buttons, open JP1 (see <a href="../configuration/">Configuration</a>), or run the
+motor in reverse from the host.</p>
 <h2 id="leds">LEDs<a class="headerlink" href="#leds" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
