@@ -1628,7 +1628,7 @@
 <tr>
 <td>Power LED off</td>
 <td>No supply, supply reversed, or fuse blown</td>
-<td>Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring (reverse polarity does not blow the fuse). A blown fuse (F1) is not resettable: it means a supply above 30 V or an internal fault, and F1 must be replaced. A supply above 30 V also destroys the surge suppressor D2, which must be replaced with F1</td>
+<td>Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring (reverse polarity does not blow the fuse). A blown fuse (F1) is not resettable: It means a supply above 30 V or an internal fault, and F1 must be replaced. A supply above 30 V also destroys the surge suppressor D2, which must be replaced with F1</td>
 </tr>
 <tr>
 <td>Power LED on, motors do nothing, buttons do nothing</td>
@@ -1648,7 +1648,7 @@
 <tr>
 <td>A fault on one board stops motors on every board, or the library says the <code>fault_pin</code> is already used</td>
 <td>Boards share an nFAULT line</td>
-<td>Give each board its own nFAULT GPIO: see <a href="../daisy-chain/">Daisy-chaining boards</a></td>
+<td>Give each board its own nFAULT GPIO: See <a href="../daisy-chain/">Daisy-chaining boards</a></td>
 </tr>
 <tr>
 <td>Motor runs only one direction</td>
@@ -1668,7 +1668,7 @@
 <tr>
 <td>Motor stops at 100% duty and the fault LED stays on</td>
 <td>Current limit reached at 100% duty, which has no PWM edge to restart it</td>
-<td>Change the speed or stop and restart. Run at 99% if stalls are likely: see <a href="../controlling-motors/#practical-limits">100% duty and the current limit</a></td>
+<td>Change the speed or stop and restart. Run at 99% if stalls are likely: See <a href="../controlling-motors/#practical-limits">100% duty and the current limit</a></td>
 </tr>
 <tr>
 <td>Fault LED on, or library reports <code>DRIVER_FAULT</code>, while no motor is running</td>
@@ -1698,7 +1698,7 @@
 <tr>
 <td>Motor whines</td>
 <td>PWM frequency in the audible range (the Raspberry Pi library defaults to 1 kHz)</td>
-<td>Use 20 kHz PWM: on a Pi, enable <a href="../../api/guide/concepts/#pwm-frequency">hardware PWM</a></td>
+<td>Use 20 kHz PWM: On a Pi, enable <a href="../../api/guide/concepts/#pwm-frequency">hardware PWM</a></td>
 </tr>
 <tr>
 <td>ISENSE always reads 0</td>

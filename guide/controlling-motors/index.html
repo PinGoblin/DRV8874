@@ -1830,16 +1830,16 @@
 <div class="admonition info">
 <p class="admonition-title">Terms used on this page</p>
 <ul>
-<li><strong>PWM (pulse-width modulation):</strong> the host switches a pin on and off rapidly, many
+<li><strong>PWM (pulse-width modulation):</strong> The host switches a pin on and off rapidly, many
   thousands of times a second. The <strong>duty cycle</strong> is the percentage of each cycle the pin
   is on, and it sets the average power, and so the speed, of the motor.</li>
-<li><strong>PH (phase):</strong> the direction input. High runs the motor forward, low runs it in
+<li><strong>PH (phase):</strong> The direction input. High runs the motor forward, low runs it in
   reverse.</li>
-<li><strong>EN (enable):</strong> the drive input. High drives the motor, low brakes it. Feeding it PWM
+<li><strong>EN (enable):</strong> The drive input. High drives the motor, low brakes it. Feeding it PWM
   sets the speed.</li>
-<li><strong>IN1 / IN2 (input 1 / input 2):</strong> in PWM mode, the same two pins become two direct
+<li><strong>IN1 / IN2 (input 1 / input 2):</strong> In PWM mode, the same two pins become two direct
   inputs, each controlling one side of the motor (OUT1 and OUT2).</li>
-<li><strong>nSLEEP / nFAULT:</strong> the leading <em>n</em> means the signal is active when low: nSLEEP low
+<li><strong>nSLEEP / nFAULT:</strong> The leading <em>n</em> means the signal is active when low: nSLEEP low
   puts the drivers to sleep, and nFAULT goes low on a fault or current limiting.</li>
 </ul>
 <p>The <a href="../glossary/">Glossary</a> lists every abbreviation used in this manual.</p>
@@ -1904,10 +1904,10 @@ except that gpiozero calls PH low "forward" (see <a href="#direction">Direction<
 </tr>
 </tbody>
 </table>
-<p><strong>Speed:</strong> drive EN with PWM. The duty cycle sets the speed. During the PWM off-time the
+<p><strong>Speed:</strong> Drive EN with PWM. The duty cycle sets the speed. During the PWM off-time the
 motor brakes, which gives a firm, close-to-linear response. The library's <code>speed_pc</code>
 (0–100) is the EN duty cycle.</p>
-<p><strong>Coast:</strong> in PH/EN mode a motor can only coast by putting the drivers to sleep, and
+<p><strong>Coast:</strong> In PH/EN mode a motor can only coast by putting the drivers to sleep, and
 nSLEEP is shared by both motors. The library's <code>coast()</code> therefore sleeps the board only
 when the other motor is idle, and otherwise brakes.</p>
 <p><strong>Test buttons:</strong> FWD runs the motor forward and REV runs it in reverse, at full speed
@@ -1976,17 +1976,17 @@ sleeping the board, but needs PWM on both pins for full control.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Speed:</strong> hold one input high and switch the other (slow decay), or hold one input low
+<p><strong>Speed:</strong> Hold one input high and switch the other (slow decay), or hold one input low
 and switch the other (fast decay). See <a href="#speed-control">Speed control</a> below. In
 <code>mode="pwm"</code> the library uses slow decay, so the response matches PH/EN mode.</p>
 <p><strong>Other libraries:</strong> PWM mode suits code written for two-input drivers (gpiozero <code>Motor</code>,
 Arduino <code>analogWrite()</code> on either pin). With gpiozero's <code>Motor</code> class, pass <code>forward=</code>
 J3 pin 3 (IN1) and <code>backward=</code> J3 pin 4 (IN2), so its directions match the table above.</p>
-<p><strong>Test buttons:</strong> not supported in PWM mode. FWD drives IN1 and IN2 high, which brakes
+<p><strong>Test buttons:</strong> Not supported in PWM mode. FWD drives IN1 and IN2 high, which brakes
 the motor, and REV drives IN1 only, which runs it forward. See
 <a href="../buttons-leds/#buttons-in-pwm-mode-jp1-bridged">Buttons in PWM mode</a>.</p>
 <h2 id="speed-control">Speed control<a class="headerlink" href="#speed-control" title="Permanent link">&para;</a></h2>
-<p>In every mode, speed comes from the <strong>PWM duty cycle</strong>: the fraction of each PWM period
+<p>In every mode, speed comes from the <strong>PWM duty cycle</strong>: The fraction of each PWM period
 for which the motor is connected to the supply. A motor driven at 60% duty sees, on
 average, about 60% of VM, so it runs at roughly 60% of its full speed at that load. The
 modes differ in which pin is switched, and in what the motor does during the off-time.</p>
@@ -2029,21 +2029,21 @@ decay), so the motor's current keeps circulating and the speed follows the duty 
 closely, even at light load. PH/EN mode is the simplest to use and gives the best
 low-speed control.</p>
 <p><strong>PWM mode, slow decay.</strong> One input is held high and the other is switched. The motor is
-driven while the switched input is <em>low</em>, so the duty is inverted: for 30% speed forward,
+driven while the switched input is <em>low</em>, so the duty is inverted: For 30% speed forward,
 hold IN1 high and run IN2 at 70%. The off-time is a brake, so the response matches PH/EN
 mode.</p>
 <p><strong>PWM mode, fast decay.</strong> One input is held low and the other is switched at the speed
 duty. This is how most two-input motor libraries work, including gpiozero's <code>Motor</code> class
 and Arduino code that calls <code>analogWrite()</code> on one pin. During the off-time both outputs
 turn off and the motor coasts, while its current flows back into the supply. Torque is
-lower and the response is less linear at low duty: a lightly loaded motor may slow very
+lower and the response is less linear at low duty: A lightly loaded motor may slow very
 little until the duty is well below 50%. Slow decay gives finer control.</p>
 <h3 id="practical-limits">Practical limits<a class="headerlink" href="#practical-limits" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Minimum speed.</strong> Most small motors do not start turning until the duty cycle reaches
   about 10–30%, because of friction and gearbox losses. Below that they hum without
   turning. The library's <code>min_speed_pc</code> raises any non-zero speed to this value.</li>
-<li><strong>PWM frequency.</strong> Use 20 kHz where the host supports it: it is above human hearing and
+<li><strong>PWM frequency.</strong> Use 20 kHz where the host supports it: It is above human hearing and
   gives smooth current. Lower frequencies (1–5 kHz, such as the Raspberry Pi's software
   PWM) work the same way but make the motor whine.</li>
 <li><strong>Full speed.</strong> 100% duty applies the full supply to the motor. The test buttons drive
@@ -2055,19 +2055,19 @@ little until the duty is well below 50%. Slow decay gives finer control.</p>
 exactly 100% duty there are no edges, so if a motor stalls and reaches the current
 limit, the driver holds it in brake (and lights the fault LED) until the input
 changes. To recover, change the speed, stop and restart, or release and press the test
-button again. If a stall is likely at full speed, run at 99% instead: the motor runs
+button again. If a stall is likely at full speed, run at 99% instead: The motor runs
 at effectively full speed, and the current limit then recovers automatically.</p>
 </div>
 <h2 id="direction">Direction<a class="headerlink" href="#direction" title="Permanent link">&para;</a></h2>
-<p>"Forward" and "reverse" follow TI's convention for the DRV8874: forward is OUT1 positive
+<p>"Forward" and "reverse" follow TI's convention for the DRV8874: Forward is OUT1 positive
 (green LED). In PH/EN mode that is PH high; in PWM mode, IN1 high and IN2 low. Which way
-the shaft turns depends on how the motor is wired: swap its two leads, or use
+the shaft turns depends on how the motor is wired: Swap its two leads, or use
 <code>invert=True</code> in the library, to change it.</p>
 <p>To protect gearboxes, slow down or stop briefly before reversing a heavily loaded motor.
 The library brakes for <code>reverse_delay</code> (0.1 s by default) before reversing a running
 motor.</p>
 <h2 id="sleep-emergency-stop-and-start-up">Sleep, emergency stop and start-up<a class="headerlink" href="#sleep-emergency-stop-and-start-up" title="Permanent link">&para;</a></h2>
-<p><strong>Sleep / emergency stop:</strong> pull nSLEEP low to put both drivers to sleep (outputs open,
+<p><strong>Sleep / emergency stop:</strong> Pull nSLEEP low to put both drivers to sleep (outputs open,
 motors coast). Wake-up takes about 1 ms. nSLEEP has a 10 kΩ pull-up to VLOGIC on the
 board, so the drivers are awake whenever VLOGIC is present and nSLEEP is not driven low.
 Connecting nSLEEP is optional.</p>

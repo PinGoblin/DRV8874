@@ -1841,7 +1841,7 @@ controlled from a documented Python and MicroPython library.</p>
 <li><strong>Surge suppressor (TVS diode)</strong> on the motor supply, to absorb voltage spikes from long
   supply leads and from the motors.</li>
 <li><strong>7 A fuse</strong> on the motor supply, to protect the supply wiring if a component fails.</li>
-<li><strong>Driver protection</strong> built into each DRV8874: overcurrent, over-temperature and
+<li><strong>Driver protection</strong> built into each DRV8874: Overcurrent, over-temperature and
   undervoltage shutdown, with automatic recovery.</li>
 <li><strong>Safe start-up.</strong> The drive inputs are pulled low, so both motors are held in brake
   while the host boots and before its pins are configured.</li>
@@ -1884,7 +1884,7 @@ controlled from a documented Python and MicroPython library.</p>
 <li><strong>Motor voltage limiting.</strong> A motor rated below the supply voltage can be used safely:
   the library limits the PWM duty so that the motor never receives more than its rated
   voltage. See <a href="../choosing-a-motor/">Choosing a motor</a>.</li>
-<li><strong>Fault detection and handling</strong>: stall, current limiting, driver shutdown, open load and
+<li><strong>Fault detection and handling</strong>: Stall, current limiting, driver shutdown, open load and
   overload, each with a configurable response (report, brake, coast or sleep).</li>
 <li><strong>Several boards from one host</strong>, with shared sleep control and a separate fault line for
   each board.</li>

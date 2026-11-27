@@ -1764,14 +1764,14 @@
 </tr>
 <tr>
 <td><code>DRIVER_FAULT</code></td>
-<td>nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown</td>
+<td>nFAULT low for 0.2 s with no motor driven: Output short, overcurrent or over-temperature shutdown</td>
 <td>✗</td>
 <td>Sleep board (brake if no sleep pin)</td>
 <td>✓</td>
 </tr>
 <tr>
 <td><code>OPEN_LOAD</code></td>
-<td>Under 30 mA for 1 s while driven at ≥ 20 %: motor disconnected, broken wire, motor supply off or fuse blown</td>
+<td>Under 30 mA for 1 s while driven at ≥ 20 %: Motor disconnected, broken wire, motor supply off or fuse blown</td>
 <td>✓</td>
 <td>Brake</td>
 <td>✓</td>
@@ -1851,7 +1851,7 @@ the board cannot tell which one stalled, so both are stopped.</p>
 
   
       dataclass
-  " href="../../reference/faults/#pingoblin_motor.faults.FaultPolicy"><code>FaultPolicy</code></a>: what to do on each fault, and whether faults latch</td>
+  " href="../../reference/faults/#pingoblin_motor.faults.FaultPolicy"><code>FaultPolicy</code></a>: What to do on each fault, and whether faults latch</td>
 </tr>
 </tbody>
 </table>
@@ -1868,7 +1868,7 @@ the board cannot tell which one stalled, so both are stopped.</p>
 
 <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">add_fault_handler</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">"motor A:"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
 </code></pre></div>
-<p>A latched fault stops the motor and blocks it: commanding it raises
+<p>A latched fault stops the motor and blocks it: Commanding it raises
 <a class="autorefs autorefs-internal" title="            MotorFaultError" href="../../reference/faults/#pingoblin_motor.faults.MotorFaultError"><code>MotorFaultError</code></a> until you clear it.</p>
 <div class="highlight"><pre><span></span><code><span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">clear_fault</span><span class="p">()</span>
 </code></pre></div>
