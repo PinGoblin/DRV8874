@@ -2,9 +2,9 @@ import time
 
 import pytest
 
-from pingoblin_motor import (ADS1115, ConfigError, Direction, FaultAction, FaultMonitor, FaultPolicy,
+from pingoblin_motor import (ADS1115Channel, ConfigError, Direction, FaultAction, FaultMonitor, FaultPolicy,
                              FaultType, MockBackend, MockCurrentSensor, MotorBoard, MotorChain,
-                             MotorFaultError, MotorState)
+                             MotorFaultError, MotorState, SensorError)
 
 
 class Clock:
@@ -376,29 +376,60 @@ def test_monitor_thread_runs():
 
 
 # ---------------------------------------------------------------- ADS1115
-class FakeBus:
-    def __init__(self, raw):
-        self.raw, self.writes = raw, []
+class FakeADC:
+    """Stands in for pingoblin_ads1115.ADS1115: read_voltage(channel) and rate."""
+    def __init__(self, volts=(0.0, 0.0, 0.0, 0.0), rate=860):
+        self.volts, self.rate, self.fail = list(volts), rate, False
 
-    def write_i2c_block_data(self, addr, reg, data):
-        self.writes.append((addr, reg, data))
-
-    def read_i2c_block_data(self, addr, reg, n):
-        if reg == 0x01:
-            return [0x80, 0x00]          # conversion done
-        return [(self.raw >> 8) & 0xFF, self.raw & 0xFF]
+    def read_voltage(self, channel):
+        if self.fail:
+            raise OSError(121, "Remote I/O error")
+        return self.volts[channel]
 
 
-def test_ads1115_config_and_conversion():
-    bus = FakeBus(raw=16384)             # half of +4.096 V full scale
-    adc = ADS1115(bus, address=0x49)
-    assert adc.config_word(2) == 0xE3E3  # OS | AIN2 | 4.096 V | single | 860 SPS | comp off
-    assert adc.read_voltage(2) == pytest.approx(2.048)
-    assert bus.writes[0] == (0x49, 0x01, [0xE3, 0xE3])
-    bus.raw = 0xFFFF                     # -1 LSB
-    assert adc.read_voltage(0) < 0
+def test_ads1115_channel_adapter():
+    adc = FakeADC([0.0, 0.675, 1.35, 0.0])
+    ch = ADS1115Channel(adc, 2)
+    assert ch.read_voltage() == pytest.approx(1.35)
+    adc.fail = True
+    with pytest.raises(SensorError):
+        ch.read_voltage()
     with pytest.raises(ConfigError):
-        ADS1115(bus, address=0x50)
+        ADS1115Channel(adc, 4)
+    with pytest.raises(ConfigError):
+        ADS1115Channel(object(), 0)
+    with pytest.warns(UserWarning, match="rate=860"):
+        ADS1115Channel(FakeADC(rate=128), 0)
+
+
+def test_board_reads_current_through_adc():
+    adc = FakeADC([0.675, 0.3375, 0.0, 0.0])          # 1 A and 0.5 A at ISENSE
+    be = MockBackend()
+    board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, backend=be,
+                       adc=adc, a_sense_channel=0, b_sense_channel=1)
+    assert board.motor_a.sensor.read_isense_amps() == pytest.approx(1.0)
+    assert board.motor_b.sensor.read_isense_amps() == pytest.approx(0.5)
+    board.close()
+
+
+def test_with_pingoblin_ads1115_package():
+    ads = pytest.importorskip("pingoblin_ads1115")
+
+    class Bus:                                            # simulated chip: 0.675 V on every input
+        def write_i2c_block_data(self, addr, reg, data):
+            pass
+
+        def read_i2c_block_data(self, addr, reg, n):
+            if reg == 0x01:
+                return [0x80, 0x00]                       # conversion done
+            raw = round(0.675 / 4.096 * 32768)
+            return [raw >> 8, raw & 0xFF]
+
+    adc = ads.ADS1115(Bus(), address=0x48, rate=860)
+    be = MockBackend()
+    board = MotorBoard(a_en=12, a_ph=5, backend=be, adc=adc, a_sense_channel=0)
+    assert board.motor_a.sensor.read_isense_amps() == pytest.approx(1.0, abs=0.001)
+    board.close()
 
 
 def test_driver_fault_without_sleep_pin_brakes():

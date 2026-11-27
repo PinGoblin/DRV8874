@@ -8,12 +8,14 @@ the repository:
 ```bash
 git clone https://github.com/PinGoblin/DRV8874.git
 cd DRV8874/python
-pip install ".[pi]"              # gpiozero and smbus2
+pip install ".[pi]"              # gpiozero
+pip install ".[ads1115]"         # optional: current sensing through a PinGoblin ADS1115 board
 pip install rpi-hardware-pwm     # optional: silent 20 kHz hardware PWM
 ```
 
-`smbus2` is only needed for current sensing through a PinGoblin ADS1115 board. Enable I2C
-with `sudo raspi-config` (Interface Options → I2C) if you use one.
+The `ads1115` option installs the ADS1115 board's own library,
+[`pingoblin_ads1115`](https://pingoblin.github.io/ADS1115/), from its repository. Enable
+I2C with `sudo raspi-config` (Interface Options → I2C) if you use an ADS1115 board.
 
 Pin numbers are BCM GPIO numbers.
 
@@ -31,6 +33,12 @@ Or copy the file:
 
 ```bash
 mpremote cp micropython/pingoblin_motor.py :
+```
+
+For current sensing through a PinGoblin ADS1115 board, also install its `ads1115` module:
+
+```bash
+mpremote mip install github:PinGoblin/ADS1115/micropython
 ```
 
 !!! tip "Precompile on ESP32"

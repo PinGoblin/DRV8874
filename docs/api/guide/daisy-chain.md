@@ -8,9 +8,10 @@ another open board.
 See [Daisy-chaining boards](../../guide/daisy-chain.md) for the wiring and current limits.
 
 ```python
-from pingoblin_motor import ADS1115, MotorBoard, MotorChain
+from pingoblin_ads1115 import ADS1115
+from pingoblin_motor import MotorBoard, MotorChain
 
-adc = ADS1115(address=0x48)
+adc = ADS1115(address=0x48, rate=860)
 front = MotorBoard("front", a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
                    adc=adc, a_sense_channel=0, b_sense_channel=1)
 rear = MotorBoard("rear", a_en=16, a_ph=20, b_en=21, b_ph=7, sleep_pin=26, fault_pin=24,

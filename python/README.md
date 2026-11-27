@@ -7,7 +7,8 @@ Python library for the **PinGoblin Board A** dual DC motor driver (2 × DRV8874)
 ## Install
 
 ```bash
-pip install ".[pi]"              # from this folder: gpiozero and smbus2
+pip install ".[pi]"              # from this folder: gpiozero
+pip install ".[ads1115]"         # optional: current sensing through a PinGoblin ADS1115 board
 pip install rpi-hardware-pwm     # optional: silent 20 kHz hardware PWM
 ```
 

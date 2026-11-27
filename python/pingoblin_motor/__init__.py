@@ -7,7 +7,7 @@ The main classes are importable from the package:
 | [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One board: two motors plus its nSLEEP / nFAULT lines |
 | [`Motor`][pingoblin_motor.motor.Motor] | One motor channel |
 | [`MotorChain`][pingoblin_motor.chain.MotorChain] | Several daisy-chained boards |
-| [`ADS1115`][pingoblin_motor.sensors.ADS1115] | Current sensing through a PinGoblin ADS1115 board |
+| [`ADS1115Channel`][pingoblin_motor.sensors.ADS1115Channel] | Current sensing through a PinGoblin ADS1115 board and its [`pingoblin_ads1115`](https://pingoblin.github.io/ADS1115/) library |
 | [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor] | Background fault detection |
 
 Example:
@@ -27,12 +27,12 @@ from .faults import (ConfigError, Fault, FaultAction, FaultPolicy, FaultType, Mo
                      MotorFaultError, SensorError)
 from .monitor import FaultMonitor
 from .motor import ControlMode, Direction, Motor, MotorState
-from .sensors import ADS1115, ADS1115Channel, MockCurrentSensor, MotorCurrentSensor
+from .sensors import ADS1115Channel, MockCurrentSensor, MotorCurrentSensor
 
 __version__ = "0.1.0"
 
 __all__ = [
-    "ADS1115", "ADS1115Channel", "Backend", "ConfigError", "ControlMode", "Direction", "Fault",
+    "ADS1115Channel", "Backend", "ConfigError", "ControlMode", "Direction", "Fault",
     "FaultAction", "FaultMonitor", "FaultPolicy", "FaultType", "GpiozeroBackend", "MockBackend",
     "MockCurrentSensor", "Motor", "MotorBoard", "MotorChain", "MotorCurrentSensor", "MotorError",
     "MotorFaultError", "MotorState", "SensorError",

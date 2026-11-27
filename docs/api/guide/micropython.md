@@ -50,7 +50,7 @@ asyncio.run(main())
 | Fault monitor | `board.start_monitor()` | `board.enable_monitor()` plus something calling `update()` |
 | PWM | Software 1 kHz by default; hardware 20 kHz optional | Hardware PWM on any pin, 20 kHz by default (`pwm_freq=`) |
 | Enum-like names | `FaultType.STALL` is an `Enum` | `FaultType.STALL` is a string (`"stall"`) |
-| Current sensing | ADS1115 | ADS1115 (`machine.I2C`) or the chip's own ADC (`ADCChannel`) |
+| Current sensing | ADS1115 board (`pingoblin_ads1115` library) | ADS1115 board (`ads1115` module) or the chip's own ADC (`ADCChannel`) |
 | Pin access | `backend=` (gpiozero or mock) | `pins=` (`MachinePins` or `MockPins`) |
 | Fault history | Last 1000 | Last 50 (`monitor.max_history`) |
 

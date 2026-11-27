@@ -12,7 +12,8 @@ license = { text = "MIT" }
 dependencies = []
 
 [project.optional-dependencies]
-pi = ["gpiozero>=2.0", "smbus2>=0.4"]
+pi = ["gpiozero>=2.0"]
+ads1115 = ["pingoblin-ads1115 @ git+https://github.com/PinGoblin/ADS1115#subdirectory=python"]
 hwpwm = ["rpi-hardware-pwm>=0.2"]
 test = ["pytest>=7"]
 

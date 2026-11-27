@@ -10,12 +10,22 @@ The Raspberry Pi has no ADC, so use a PinGoblin ADS1115 board. Wire A_ISENSE and
 (J3 pins 7, 8) to the ADS1115 inputs. One ADS1115 reads two boards, and up to four
 ADS1115 boards share the I2C bus (addresses 0x48–0x4B).
 
+The ADS1115 board has its own library, which this library uses to read it. Install it
+alongside this one (see [Installation](install.md)): `pingoblin_ads1115` on the Raspberry
+Pi, or `ads1115.py` on a MicroPython board. Its documentation is at
+[pingoblin.github.io/ADS1115](https://pingoblin.github.io/ADS1115/).
+
+Create the ADS1115 with `rate=860` (860 samples per second). Slower rates make each reading
+take longer, so stall and overload detection respond more slowly; the library warns if the
+rate is below 475.
+
 === "Raspberry Pi"
 
     ```python
-    from pingoblin_motor import ADS1115, MotorBoard
+    from pingoblin_ads1115 import ADS1115
+    from pingoblin_motor import MotorBoard
 
-    adc = ADS1115(bus=1, address=0x48)
+    adc = ADS1115(bus=1, address=0x48, rate=860)
     board = MotorBoard(a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
                        adc=adc, a_sense_channel=0, b_sense_channel=1)
     board.motor_a.forward(70)
@@ -26,10 +36,11 @@ ADS1115 boards share the I2C bus (addresses 0x48–0x4B).
 
     ```python
     from machine import I2C, Pin
-    from pingoblin_motor import ADS1115, MotorBoard
+    from ads1115 import ADS1115
+    from pingoblin_motor import MotorBoard
 
     i2c = I2C(0, sda=Pin(21), scl=Pin(22), freq=400000)   # Pico: I2C(0, sda=Pin(0), scl=Pin(1))
-    adc = ADS1115(i2c, address=0x48)
+    adc = ADS1115(i2c, address=0x48, rate=860)
     board = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, sleep_pin=32, fault_pin=39,
                        adc=adc, a_sense_channel=0, b_sense_channel=1)
     ```

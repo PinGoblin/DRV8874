@@ -7,7 +7,7 @@
 | [`MotorBoard`][pingoblin_motor.board.MotorBoard] | One Board A: two motors plus its nSLEEP and nFAULT lines |
 | [`Motor`][pingoblin_motor.motor.Motor] | One motor channel (`board.motor_a`, `board.motor_b`, or `board["a"]`) |
 | [`MotorChain`][pingoblin_motor.chain.MotorChain] | Several daisy-chained boards managed as one system, with one fault monitor |
-| [`ADS1115`][pingoblin_motor.sensors.ADS1115] | Driver for a PinGoblin ADS1115 board (or any ADS1115), used for current sensing |
+| [`ADS1115Channel`][pingoblin_motor.sensors.ADS1115Channel] | Connects one input of a PinGoblin ADS1115 board, read with its own [`pingoblin_ads1115`](https://pingoblin.github.io/ADS1115/) library, to a motor for current sensing |
 | [`FaultMonitor`][pingoblin_motor.monitor.FaultMonitor] | Detects faults. Started by `board.start_monitor()` or by `MotorChain` |
 | [`Fault`][pingoblin_motor.faults.Fault], [`FaultType`][pingoblin_motor.faults.FaultType], [`FaultPolicy`][pingoblin_motor.faults.FaultPolicy], [`FaultAction`][pingoblin_motor.faults.FaultAction] | Fault records and how each motor reacts to them |
 | [`GpiozeroBackend`][pingoblin_motor.backends.GpiozeroBackend], [`MockBackend`][pingoblin_motor.backends.MockBackend] | Hardware access. `MockBackend` runs without a Pi |

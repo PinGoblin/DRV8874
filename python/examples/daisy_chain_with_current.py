@@ -10,7 +10,7 @@ Run with --mock to try it without hardware (each motor reads about 0.5 A).
 import sys
 import time
 
-from pingoblin_motor import (ADS1115, FaultType, MockBackend, MockCurrentSensor, MotorBoard,
+from pingoblin_motor import (FaultType, MockBackend, MockCurrentSensor, MotorBoard,
                              MotorChain)
 
 mock = "--mock" in sys.argv
@@ -23,7 +23,11 @@ def sensing(channel_a, channel_b):
     return dict(adc=ADC, a_sense_channel=channel_a, b_sense_channel=channel_b)
 
 
-ADC = None if mock else ADS1115(bus=1, address=0x48)
+if mock:
+    ADC = None
+else:
+    from pingoblin_ads1115 import ADS1115   # the PinGoblin ADS1115 library
+    ADC = ADS1115(bus=1, address=0x48, rate=860)
 
 front = MotorBoard("front", a_en=12, a_ph=5, b_en=13, b_ph=6, sleep_pin=26, fault_pin=19,
                    backend=backend, **sensing(0, 1))

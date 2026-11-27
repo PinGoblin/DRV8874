@@ -21,11 +21,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install pytest
+      - name: PinGoblin ADS1115 library (for the current-sensing integration tests)
+        run: |
+          git clone --depth 1 https://github.com/PinGoblin/ADS1115.git ads1115-lib
+          pip install ./ads1115-lib/python
       - name: Raspberry Pi package tests (mock backend)
         working-directory: python
         run: python -m pytest -q
       - name: MicroPython module tests under CPython
         working-directory: micropython
+        env:
+          ADS1115_MICROPYTHON: ${{ github.workspace }}/ads1115-lib/micropython
         run: python -m pytest -q tests
 
   micropython:

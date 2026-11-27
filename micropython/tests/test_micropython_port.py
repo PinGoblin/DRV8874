@@ -15,9 +15,9 @@ SRC = os.path.join(HERE, "..", "pingoblin_motor.py")
 sys.path.insert(0, os.path.join(HERE, ".."))
 
 import pingoblin_motor as pm  # noqa: E402
-from pingoblin_motor import (ADS1115, ConfigError, Direction, FaultAction, FaultMonitor,  # noqa: E402
+from pingoblin_motor import (ADS1115Channel, ConfigError, Direction, FaultAction, FaultMonitor,  # noqa: E402
                              FaultPolicy, FaultType, MockPins, MockSensor, MotorBoard, MotorChain,
-                             MotorFaultError, MotorState)
+                             MotorFaultError, MotorState, SensorError)
 
 
 def adv(ms):
@@ -312,28 +312,65 @@ def test_chain_motor_wait_uses_chain_update():
 
 
 # ------------------------------------------------------------- ADS1115
-class FakeI2C:
-    def __init__(self, raw):
-        self.raw = raw
-        self.writes = []
+class FakeADC:
+    """Stands in for the ads1115 module's ADS1115: read_voltage(channel) and rate."""
+    def __init__(self, volts=(0.0, 0.0, 0.0, 0.0), rate=860):
+        self.volts, self.rate, self.fail = list(volts), rate, False
 
-    def writeto_mem(self, addr, reg, data):
-        self.writes.append((addr, reg, bytes(data)))
-
-    def readfrom_mem(self, addr, reg, n):
-        if reg == 1:
-            return bytes([0x80, 0])
-        return bytes([(self.raw >> 8) & 0xFF, self.raw & 0xFF])
+    def read_voltage(self, channel):
+        if self.fail:
+            raise OSError(19, "ENODEV")
+        return self.volts[channel]
 
 
-def test_ads1115():
-    i2c = FakeI2C(16384)
-    adc = ADS1115(i2c, address=0x49)
-    assert adc.config_word(2) == 0xE3E3
-    assert adc.read_voltage(2) == pytest.approx(2.048)
-    assert i2c.writes[0] == (0x49, 1, bytes([0xE3, 0xE3]))
+def test_ads1115_channel_adapter(capsys):
+    adc = FakeADC([0.0, 0.675, 1.35, 0.0])
+    ch = ADS1115Channel(adc, 2)
+    assert ch.read_voltage() == pytest.approx(1.35)
+    adc.fail = True
+    with pytest.raises(SensorError):
+        ch.read_voltage()
     with pytest.raises(ConfigError):
-        ADS1115(i2c, address=0x40)
+        ADS1115Channel(adc, 4)
+    with pytest.raises(ConfigError):
+        ADS1115Channel(object(), 0)
+    ADS1115Channel(FakeADC(rate=128), 0)
+    assert "rate=860" in capsys.readouterr().out
+
+
+def test_board_current_through_adc():
+    adc = FakeADC([0.675, 0.3375, 0.0, 0.0])
+    b = MotorBoard(a_en=25, a_ph=26, b_en=27, b_ph=33, pins=MockPins(),
+                   adc=adc, a_sense_channel=0, b_sense_channel=1)
+    assert b.motor_a.sensor.read_isense_amps() == pytest.approx(1.0)
+    assert b.motor_b.sensor.read_isense_amps() == pytest.approx(0.5)
+    b.close()
+
+
+def test_with_ads1115_module():
+    """Runs against the PinGoblin ADS1115 repository's ads1115.py when ADS1115_MICROPYTHON is set."""
+    import os
+    path = os.environ.get("ADS1115_MICROPYTHON")
+    if not path:
+        pytest.skip("ADS1115_MICROPYTHON not set")
+    import sys
+    import time as _t
+    _t.sleep_us = getattr(_t, "sleep_us", lambda us: None)
+    sys.path.insert(0, path)
+    from ads1115 import ADS1115
+
+    class I2C:                       # simulated chip: 0.675 V on every input
+        def writeto_mem(self, addr, reg, buf):
+            pass
+
+        def readfrom_mem_into(self, addr, reg, buf):
+            raw = 0x8000 if reg == 1 else round(0.675 / 4.096 * 32768)
+            buf[0], buf[1] = raw >> 8, raw & 0xFF
+
+    adc = ADS1115(I2C(), address=0x48, rate=860)
+    b = MotorBoard(a_en=25, a_ph=26, pins=MockPins(), adc=adc, a_sense_channel=0)
+    assert b.motor_a.sensor.read_isense_amps() == pytest.approx(1.0, abs=0.001)
+    b.close()
 
 
 def test_asyncio_run_monitor_task():

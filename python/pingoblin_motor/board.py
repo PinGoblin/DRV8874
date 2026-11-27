@@ -9,7 +9,7 @@ from typing import Dict, Iterator, Optional
 from .backends import Backend, default_backend
 from .faults import ConfigError, Fault, FaultType
 from .motor import ControlMode, Motor, MotorState
-from .sensors import ADS1115, CurrentSensor, MotorCurrentSensor, make_sensor
+from .sensors import CurrentSensor, MotorCurrentSensor, make_sensor
 
 _log = logging.getLogger("pingoblin_motor")
 
@@ -50,7 +50,7 @@ class MotorBoard:
                  b_en: Optional[int] = None, b_ph: Optional[int] = None,
                  sleep_pin: Optional[int] = None, fault_pin: Optional[int] = None,
                  mode: str = "ph_en", logic_voltage: float = 3.3,
-                 adc: Optional[ADS1115] = None, a_sense_channel: Optional[int] = None,
+                 adc: Optional[object] = None, a_sense_channel: Optional[int] = None,
                  b_sense_channel: Optional[int] = None, sense_samples: int = 4,
                  a_sensor: Optional[CurrentSensor] = None, b_sensor: Optional[CurrentSensor] = None,
                  backend: Optional[Backend] = None, pwm_frequency: float = 1000.0,
@@ -72,7 +72,8 @@ class MotorBoard:
             mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
             logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is
                 fixed at about 3 A whatever the logic voltage.
-            adc: An [`ADS1115`][pingoblin_motor.sensors.ADS1115] for current sensing.
+            adc: A `pingoblin_ads1115.ADS1115` for current sensing, created with `rate=860`.
+                See [`ADS1115Channel`][pingoblin_motor.sensors.ADS1115Channel].
             a_sense_channel: ADS1115 input wired to A_ISENSE.
             b_sense_channel: ADS1115 input wired to B_ISENSE.
             sense_samples: Readings averaged per current measurement.

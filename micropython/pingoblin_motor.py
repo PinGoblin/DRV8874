@@ -500,105 +500,33 @@ class MockPins(PinFactory):
 
 # ---------------------------------------------------------------- current sensing
 
-_PGA = {6.144: 0, 4.096: 1, 2.048: 2, 1.024: 3, 0.512: 4, 0.256: 5}
-_RATES = {8: 0, 16: 1, 32: 2, 64: 3, 128: 4, 250: 5, 475: 6, 860: 7}
+class ADS1115Channel:
+    """One ADS1115 input wired to an ISENSE pin.
 
-
-class ADS1115:
-    """PinGoblin ADS1115 board (or any ADS1115) on a `machine.I2C` bus.
-
-    Each conversion averages over about 1.2 ms (860 samples/s), so with PWM a reading is
-    roughly *duty × motor current*.
-
-    Example:
-        ```python
-        from machine import I2C, Pin
-        adc = ADS1115(I2C(0, sda=Pin(21), scl=Pin(22), freq=400000), address=0x48)
-        ```
+    Use it with the PinGoblin ADS1115 board's `ads1115` module
+    (https://pingoblin.github.io/ADS1115/): copy `ads1115.py` to the board next to
+    `pingoblin_motor.py`. Any ADC object with a `read_voltage(channel)` method also works.
     """
 
-    def __init__(self, i2c, address=0x48, full_scale=4.096, data_rate=860):
-        """
-        Args:
-            i2c: A `machine.I2C` (or any object with `writeto_mem()` and `readfrom_mem()`).
-            address: 0x48, 0x49, 0x4A or 0x4B.
-            full_scale: Input range (V). 4.096 covers ISENSE at 5 V logic.
-            data_rate: Samples per second.
-
-        Raises:
-            ConfigError: Invalid address, range or rate.
-        """
-        if address not in (0x48, 0x49, 0x4A, 0x4B):
-            raise ConfigError("invalid ADS1115 address 0x%02X" % address)
-        if full_scale not in _PGA:
-            raise ConfigError("full_scale must be one of %s" % sorted(_PGA))
-        if data_rate not in _RATES:
-            raise ConfigError("data_rate must be one of %s" % sorted(_RATES))
-        self.i2c = i2c
-        self.address = address
-        self.full_scale = full_scale
-        self.data_rate = data_rate
-        self._wait_ms = 1000 // data_rate + 1
-
-    def config_word(self, channel):
-        """Build the config-register value for a single-shot read.
-
-        Args:
-            channel: Input 0–3 (AINx against GND).
-
-        Returns:
-            The 16-bit config register value.
-
-        Raises:
-            ConfigError: Channel out of range.
-        """
-        if channel not in (0, 1, 2, 3):
-            raise ConfigError("ADS1115 channel must be 0-3")
-        return ((1 << 15) | ((4 | channel) << 12) | (_PGA[self.full_scale] << 9)
-                | (1 << 8) | (_RATES[self.data_rate] << 5) | 3)
-
-    def read_voltage(self, channel):
-        """Start a conversion, wait for it and return the voltage.
-
-        Args:
-            channel: Input 0–3.
-
-        Returns:
-            The input voltage (V).
-
-        Raises:
-            SensorError: The I²C transfer failed.
-        """
-        cfg = self.config_word(channel)
-        try:
-            self.i2c.writeto_mem(self.address, 1, bytes([cfg >> 8, cfg & 0xFF]))
-            sleep_ms(self._wait_ms)
-            for _ in range(10):
-                if self.i2c.readfrom_mem(self.address, 1, 2)[0] & 0x80:
-                    break
-                sleep_ms(1)
-            b = self.i2c.readfrom_mem(self.address, 0, 2)
-        except OSError as exc:
-            raise SensorError("ADS1115 0x%02X read failed: %s" % (self.address, exc))
-        raw = (b[0] << 8) | b[1]
-        if raw & 0x8000:
-            raw -= 65536
-        return raw * self.full_scale / 32768
-
-
-class ADS1115Channel:
-    """One ADS1115 input wired to an ISENSE pin."""
+    MIN_RATE = 475
 
     def __init__(self, adc, channel):
         """
         Args:
-            adc: The `ADS1115`.
+            adc: The ADS1115, for example `ADS1115(i2c, address=0x48, rate=860)`.
             channel: Input 0–3.
 
         Raises:
-            ConfigError: Channel out of range.
+            ConfigError: Channel out of range, or `adc` has no `read_voltage()` method.
         """
-        adc.config_word(channel)
+        if channel not in (0, 1, 2, 3):
+            raise ConfigError("ADS1115 channel must be 0-3")
+        if not hasattr(adc, "read_voltage"):
+            raise ConfigError("adc must have a read_voltage(channel) method")
+        rate = getattr(adc, "rate", None)
+        if isinstance(rate, int) and rate < self.MIN_RATE:
+            print("pingoblin_motor: ADS1115 rate is %d samples/s; create it with rate=860 so "
+                  "that stall and overload detection respond promptly" % rate)
         self.adc = adc
         self.channel = channel
 
@@ -611,7 +539,10 @@ class ADS1115Channel:
         Raises:
             SensorError: The I²C transfer failed.
         """
-        return self.adc.read_voltage(self.channel)
+        try:
+            return self.adc.read_voltage(self.channel)
+        except OSError as exc:
+            raise SensorError("ADS1115 read failed: %s" % exc)
 
 
 class ADCChannel:
@@ -1204,7 +1135,8 @@ class MotorBoard:
             mode: `"ph_en"` (JP1 open, default) or `"pwm"` (JP1 bridged).
             logic_voltage: VLOGIC (V), 3.0–5.5. Checked for range only: the current limit is fixed
                 at about 3 A.
-            adc: An `ADS1115` for current sensing.
+            adc: An `ADS1115` from the `ads1115` module, created with `rate=860`, for current
+                sensing.
             a_sense_channel: ADS1115 input wired to A_ISENSE.
             b_sense_channel: ADS1115 input wired to B_ISENSE.
             a_sensor: Any sensor with `read_voltage()` for motor A, such as `ADCChannel(34)`.
