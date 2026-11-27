@@ -1628,12 +1628,17 @@
 <tr>
 <td>Power LED off</td>
 <td>No supply, supply reversed, or fuse blown</td>
-<td>Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring (reverse polarity does not blow the fuse). A blown fuse (F1) is not resettable: It means a supply above 30 V or an internal fault, and F1 must be replaced. A supply above 30 V also destroys the surge suppressor D2, which must be replaced with F1</td>
+<td>Check the battery is switched on and charged, or that the supply's positive lead goes to J2 pin 1 (VIN+). If a wired supply was reversed, fix the wiring (reverse polarity does not blow the fuse). A blown fuse (F1) means a supply above 30 V or an internal fault. F1 is not user-serviceable: Return the board for repair</td>
 </tr>
 <tr>
-<td>Power LED on, motors do nothing, buttons do nothing</td>
-<td>VLOGIC missing, or nSLEEP held low</td>
-<td>Connect J3 pin 2 to the host's 3.3 V pin (5 V only on a 5 V host) and GND to pin 1. Disconnect nSLEEP (pin 9) or drive it high</td>
+<td>Power LED on, buttons do nothing</td>
+<td>nSLEEP held low by the host</td>
+<td>Disconnect nSLEEP (pin 9) or drive it high</td>
+</tr>
+<tr>
+<td>Buttons work, host code does nothing, fault LED never lights</td>
+<td>VLOGIC missing</td>
+<td>Connect J3 pin 2 to the host's 3.3 V pin (5 V only on a 5 V host) and GND to pin 1</td>
 </tr>
 <tr>
 <td>Buttons work, host code does nothing</td>

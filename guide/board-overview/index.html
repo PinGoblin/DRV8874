@@ -1898,8 +1898,13 @@
 </tr>
 <tr>
 <td>F1</td>
-<td>7 A fast-acting fuse (high I²t, tolerates inrush)</td>
-<td>Disconnects the board if an internal fault or an over-voltage supply makes it draw excessive current. Not resettable</td>
+<td>12 A fast-acting fuse</td>
+<td>Disconnects the board if an internal fault or an over-voltage supply makes it draw excessive current. Normal motor stalls do not open it. Not resettable</td>
+</tr>
+<tr>
+<td>U4</td>
+<td>3.3 V regulator</td>
+<td>Powers the test buttons and the board logic from the motor supply while a button is pressed</td>
 </tr>
 <tr>
 <td>Q1</td>
@@ -1913,7 +1918,7 @@
 </tr>
 <tr>
 <td>C13, C1</td>
-<td>220 µF (×2)</td>
+<td>100 µF 50 V (×2)</td>
 <td>Bulk capacitors, one beside each driver (U1, U2)</td>
 </tr>
 <tr>
