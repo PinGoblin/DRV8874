@@ -30,7 +30,7 @@ board = MotorBoard(
 ```
 
 Several boards can share one `sleep_pin`, but each needs its own `fault_pin`. The current
-limit is fixed at about 4.6 A per motor (`board.current_limit`).
+limit is 4.6 A per motor, peak (`board.current_limit`).
 
 Boards work as context managers (`with MotorBoard(...) as board:`), which brake the motors
 and release the pins on exit.

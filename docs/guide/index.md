@@ -11,7 +11,7 @@ current-sense output that can be read with an ADC.
 - Direction + speed control (PH/EN, phase/enable mode), with a jumper for two-input
   PWM (pulse-width modulation) mode
 - Analog current feedback per motor (0.45 V/A) for stall detection
-- Built-in 4.6 A current limit per motor, overcurrent and over-temperature protection
+- 4.6 A per motor (peak), 5 A continuous per board, with overcurrent and over-temperature protection
 - Reverse-polarity protection, surge suppressor (TVS) and a 7 A fuse on the motor supply
 - Push buttons to test each motor without writing code (PH/EN mode, the default)
 - Direction LEDs per motor, plus power and fault LEDs

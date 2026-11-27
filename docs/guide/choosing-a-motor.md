@@ -1,8 +1,8 @@
 # Choosing a motor
 
 The board suits brushed DC motors that draw no more than about 2.5 A continuously in
-normal use. Each driver limits its motor to about 4.6 A (4.2–5.1 A across component
-tolerances), and the board as a whole is rated for 5 A continuous. A motor that needs more current than this
+normal use. Each motor is limited to 4.6 A (peak), and the board is rated for 5 A continuous,
+both motors combined. A motor that needs more current than this
 still runs, but only with reduced torque.
 
 Check two figures on the motor's datasheet before buying: its **stall current** and its

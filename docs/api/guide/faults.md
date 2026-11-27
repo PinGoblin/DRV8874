@@ -5,14 +5,14 @@ Start the fault monitor with `board.start_monitor()` (Raspberry Pi), `board.enab
 
 | [`FaultType`][pingoblin_motor.faults.FaultType] | Detected when | Needs a current sensor? | Default action | Latches |
 | --- | --- | --- | --- | --- |
-| `STALL` | Current ≥ `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` without a sensor | No | Brake | Yes |
-| `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | No | None | No |
-| `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | No | Sleep board (brake if no sleep pin) | Yes |
-| `OPEN_LOAD` | Under 30 mA for 1 s while driven at ≥ 20 %: motor disconnected, broken wire, motor supply off or fuse blown | Yes | Brake | Yes |
-| `OVERLOAD` | Over `continuous_current` for `overload_time` | Yes | Brake | Yes |
-| `BOARD_OVERLOAD` | Board supply current over the 5 A continuous board rating for 1 s | Yes | Brake | No |
-| `CHAIN_OVERLOAD` | Daisy-chain supply current over 6 A for 1 s | Yes | Brake | No |
-| `SENSOR_ERROR` | Current-sensor read fails (reported once until it recovers) | Yes | None | No |
+| `STALL` | Current ≥ `stall_current` for `stall_time` while driven, or nFAULT low (current limiting) for `stall_time` without a sensor | ✗ | Brake | ✓ |
+| `CURRENT_LIMIT` | nFAULT low while driven (warning, at most every 5 s) | ✗ | None | ✗ |
+| `DRIVER_FAULT` | nFAULT low for 0.2 s with no motor driven: output short, overcurrent or over-temperature shutdown | ✗ | Sleep board (brake if no sleep pin) | ✓ |
+| `OPEN_LOAD` | Under 30 mA for 1 s while driven at ≥ 20 %: motor disconnected, broken wire, motor supply off or fuse blown | ✓ | Brake | ✓ |
+| `OVERLOAD` | Over `continuous_current` for `overload_time` | ✓ | Brake | ✓ |
+| `BOARD_OVERLOAD` | Board supply current over the 5 A continuous board rating for 1 s | ✓ | Brake | ✗ |
+| `CHAIN_OVERLOAD` | Daisy-chain supply current over 6 A for 1 s | ✓ | Brake | ✗ |
+| `SENSOR_ERROR` | Current-sensor read fails (reported once until it recovers) | ✓ | None | ✗ |
 
 Without a sensor, a stall is inferred from nFAULT. If both motors on a board are running,
 the board cannot tell which one stalled, so both are stopped.

@@ -7,7 +7,7 @@ The board runs from **6–30 V DC**, which covers 12 V and 24 V systems. It has 
 | J1 | XT30, right-angle male | Batteries and supplies with an XT30 plug |
 | J2 | 5.08 mm screw terminal (pin 1 VIN+, pin 2 GND) | Wired supplies, or power out to the next board |
 
-The board draws up to 5 A continuously in total (both motors), and briefly up to about 9 A when both motors are at the current limit. The supply or battery must be able to deliver that, plus the motors' start-up surge.
+The board draws up to 5 A continuously in total (both motors), and briefly up to 9.2 A when both motors are at the current limit. The supply or battery must be able to deliver that, plus the motors' start-up surge.
 
 !!! danger "Only connect one power source at a time to J1 and J2"
     J1 and J2 are connected together, and so is every board in a daisy chain. For example,
@@ -73,17 +73,17 @@ of 30 V or less:
 
 | Battery | Full charge | Suitable? |
 | --- | --- | --- |
-| 2S Li-ion / LiPo | 8.4 V | Yes |
-| 3S Li-ion / LiPo | 12.6 V | Yes |
-| 4S Li-ion / LiPo | 16.8 V | Yes |
-| 4S LiFePO4 | 14.6 V | Yes |
-| 12 V lead-acid / AGM | 13.8–14.7 V while charging | Yes |
-| 5S Li-ion / LiPo | 21.0 V | Yes |
-| 6S Li-ion / LiPo | 25.2 V | Yes |
-| 7S Li-ion / LiPo | 29.4 V | Yes |
-| 8S LiFePO4 (24 V) | 29.2 V | Yes |
-| 24 V lead-acid / AGM | 27.6–29.4 V while charging | Yes, if the charger stays at or below 30 V |
-| 8S Li-ion / LiPo or more | 33.6 V or more | **No** |
+| 2S Li-ion / LiPo | 8.4 V | ✓ |
+| 3S Li-ion / LiPo | 12.6 V | ✓ |
+| 4S Li-ion / LiPo | 16.8 V | ✓ |
+| 4S LiFePO4 | 14.6 V | ✓ |
+| 12 V lead-acid / AGM | 13.8–14.7 V while charging | ✓ |
+| 5S Li-ion / LiPo | 21.0 V | ✓ |
+| 6S Li-ion / LiPo | 25.2 V | ✓ |
+| 7S Li-ion / LiPo | 29.4 V | ✓ |
+| 8S LiFePO4 (24 V) | 29.2 V | ✓ |
+| 24 V lead-acid / AGM | 27.6–29.4 V while charging | ✓ if the charger stays at or below 30 V |
+| 8S Li-ion / LiPo or more | 33.6 V or more | ✗ |
 
 ## Wired supplies
 

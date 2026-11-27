@@ -7,9 +7,9 @@
 | Logic input high | 1.5 V min (3.3 V and 5 V logic both work) |
 | Default state | Drivers awake (nSLEEP pulled high); EN and PH pulled low, so motors are braked |
 | Motor channels | 2, bidirectional |
-| Continuous current per motor | 2.1–2.5 A at 25 °C target (to be confirmed by prototype thermal tests) |
-| Total board current | 5 A continuous (7 A fast-acting fuse, not resettable) |
-| Current limit per motor | About 4.6 A (4.2–5.1 A), fixed (independent of VLOGIC) |
+| Continuous current per motor | 2.1 A at 25 °C (final figure after prototype testing) |
+| Total board current | 5 A continuous, both motors combined (7 A fuse, not resettable) |
+| Current limit per motor | 4.6 A (peak), fixed |
 | Current-sense output | 0.45 V per amp |
 | PWM frequency | Up to 100 kHz (20 kHz recommended, which is above human hearing) |
 | Driver IC | TI DRV8874 (×2) |

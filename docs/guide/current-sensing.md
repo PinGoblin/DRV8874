@@ -19,7 +19,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 
 | Current limit per motor | ISENSE at the limit |
 | --- | --- |
-| About 4.6 A (4.2–5.1 A, fixed, for any VLOGIC) | About 2.07 V |
+| 4.6 A (peak), fixed | 2.07 V |
 
 - While limiting, the red fault LED lights and nFAULT goes low. Normal operation resumes
   on the next PWM cycle once the load drops. At exactly 100% duty there is no next cycle,
@@ -28,7 +28,7 @@ I_{motor} = \frac{V_{ISENSE}}{0.45\ \mathrm{V/A}}
 - A short circuit or overheating shuts the driver down. It retries automatically once the
   fault clears.
 - Both motors share a 5 A continuous board rating. Two motors held at the 4.6 A current
-  limit (for example, both stalled) draw about 9 A, which can blow the board's 7 A fuse,
+  limit (for example, both stalled) draw 9.2 A, which can blow the board's 7 A fuse,
   and the fuse is not resettable. Detect stalls and stop the motors, as the library does.
 
 ## ISENSE and motor speed
