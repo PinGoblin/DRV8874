@@ -1718,11 +1718,13 @@
 the repository:</p>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/PinGoblin/DRV8874.git
 <span class="nb">cd</span><span class="w"> </span>DRV8874/python
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[pi]"</span><span class="w">              </span><span class="c1"># gpiozero and smbus2</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[pi]"</span><span class="w">              </span><span class="c1"># gpiozero</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[ads1115]"</span><span class="w">         </span><span class="c1"># optional: current sensing through a PinGoblin ADS1115 board</span>
 pip<span class="w"> </span>install<span class="w"> </span>rpi-hardware-pwm<span class="w">     </span><span class="c1"># optional: silent 20 kHz hardware PWM</span>
 </code></pre></div>
-<p><code>smbus2</code> is only needed for current sensing through a PinGoblin ADS1115 board. Enable I2C
-with <code>sudo raspi-config</code> (Interface Options → I2C) if you use one.</p>
+<p>The <code>ads1115</code> option installs the ADS1115 board's own library,
+<a href="https://pingoblin.github.io/ADS1115/"><code>pingoblin_ads1115</code></a>, from its repository. Enable
+I2C with <code>sudo raspi-config</code> (Interface Options → I2C) if you use an ADS1115 board.</p>
 <p>Pin numbers are BCM GPIO numbers.</p>
 <h2 id="micropython-esp32-pico">MicroPython (ESP32, Pico)<a class="headerlink" href="#micropython-esp32-pico" title="Permanent link">&para;</a></h2>
 <p>Needs MicroPython 1.20 or later.</p>
@@ -1731,6 +1733,9 @@ with <code>sudo raspi-config</code> (Interface Options → I2C) if you use one.<
 </code></pre></div>
 <p>Or copy the file:</p>
 <div class="highlight"><pre><span></span><code>mpremote<span class="w"> </span>cp<span class="w"> </span>micropython/pingoblin_motor.py<span class="w"> </span>:
+</code></pre></div>
+<p>For current sensing through a PinGoblin ADS1115 board, also install its <code>ads1115</code> module:</p>
+<div class="highlight"><pre><span></span><code>mpremote<span class="w"> </span>mip<span class="w"> </span>install<span class="w"> </span>github:PinGoblin/ADS1115/micropython
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Precompile on ESP32</p>

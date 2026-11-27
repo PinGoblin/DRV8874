@@ -1554,56 +1554,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ADS1115
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" ADS1115">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115.config_word" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;config_word
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115.read_voltage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;read_voltage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;close
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#pingoblin_motor.sensors.CurrentSensor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1642,6 +1592,17 @@
   
     <nav class="md-nav" aria-label=" ADS1115Channel">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pingoblin_motor.sensors.ADS1115Channel.MIN_RATE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;MIN_RATE
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#pingoblin_motor.sensors.ADS1115Channel.read_voltage" class="md-nav__link">
@@ -1855,56 +1816,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ADS1115
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" ADS1115">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115.config_word" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;config_word
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115.read_voltage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;read_voltage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pingoblin_motor.sensors.ADS1115.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;close
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#pingoblin_motor.sensors.CurrentSensor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1943,6 +1854,17 @@
   
     <nav class="md-nav" aria-label=" ADS1115Channel">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pingoblin_motor.sensors.ADS1115Channel.MIN_RATE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;MIN_RATE
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#pingoblin_motor.sensors.ADS1115Channel.read_voltage" class="md-nav__link">
@@ -2068,10 +1990,12 @@
 
     <div class="doc doc-contents first">
 
-        <p>Current sensing: the ADS1115 driver and current-sensor classes.</p>
-<p>Board A outputs 0.675 V per amp on A_ISENSE and B_ISENSE (J3 pins 7 and 8). One
-ADS1115 has four inputs, so it reads two boards (four motors). Up to four ADS1115
-boards share one I²C bus (addresses 0x48 to 0x4B).</p>
+        <p>Current sensing: current-sensor classes and the adapter for an ADS1115 board.</p>
+<p>Board A outputs 0.675 V per amp on A_ISENSE and B_ISENSE (J3 pins 7 and 8). The Raspberry
+Pi has no ADC, so read ISENSE with a PinGoblin ADS1115 board and its library,
+<a href="https://pingoblin.github.io/ADS1115/"><code>pingoblin_ads1115</code></a>. One ADS1115 has four inputs,
+so it reads two boards (four motors). Up to four ADS1115 boards share one I²C bus
+(addresses 0x48 to 0x4B).</p>
 <p>ISENSE is zero during the PWM off-time. The ADS1115 is a delta-sigma converter that
 averages each reading over about 1.2 ms, so with PWM at 1 kHz or faster one reading is
 roughly <em>duty × motor current</em>. <a class="autorefs autorefs-internal" title="            read_current" href="../motor/#pingoblin_motor.motor.Motor.read_current"><code>Motor.read_current()</code></a>
@@ -2119,381 +2043,6 @@ divides by the duty to estimate the motor current.</p>
 </div>
 
 
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="pingoblin_motor.sensors.ADS1115" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ADS1115</span>
-
-
-<a href="#pingoblin_motor.sensors.ADS1115" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ADS1115</span><span class="p">(</span><span class="n">bus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">72</span><span class="p">,</span> <span class="n">full_scale</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">4.096</span><span class="p">,</span> <span class="n">data_rate</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">860</span><span class="p">)</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-
-
-        <p>Minimal, thread-safe ADS1115 driver (single-shot, single-ended inputs).</p>
-<p>Works with a PinGoblin ADS1115 board or any ADS1115 breakout.</p>
-
-
-<details class="example" open>
-  <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADS1115</span><span class="p">,</span> <span class="n">MotorBoard</span>
-
-<span class="n">adc</span> <span class="o">=</span> <span class="n">ADS1115</span><span class="p">(</span><span class="n">bus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="mh">0x48</span><span class="p">)</span>
-<span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
-                   <span class="n">adc</span><span class="o">=</span><span class="n">adc</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</code></pre></div>
-</details>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>bus</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>I²C bus number (1 on a Raspberry Pi), or an object with
-<code>write_i2c_block_data()</code> and <code>read_i2c_block_data()</code> such as <code>smbus2.SMBus</code>.</p>
-              </div>
-            </td>
-            <td>
-                  <code>1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>address</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>0x48 (ADDR to GND), 0x49 (VDD), 0x4A (SDA) or 0x4B (SCL).</p>
-              </div>
-            </td>
-            <td>
-                  <code>72</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>full_scale</code>
-            </td>
-            <td>
-                  <code><span title="float">float</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Input range (V). 4.096 covers ISENSE at 5 V logic.</p>
-              </div>
-            </td>
-            <td>
-                  <code>4.096</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>data_rate</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Samples per second.</p>
-              </div>
-            </td>
-            <td>
-                  <code>860</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ConfigError (pingoblin_motor.faults.ConfigError)" href="../faults/#pingoblin_motor.faults.ConfigError">ConfigError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Invalid address, range or rate, or <code>smbus2</code> is not installed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="pingoblin_motor.sensors.ADS1115.config_word" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">config_word</span>
-
-
-<a href="#pingoblin_motor.sensors.ADS1115.config_word" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">config_word</span><span class="p">(</span><span class="n">channel</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Build the config-register value for a single-shot read.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>channel</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Input 0–3 (AIN0 to AIN3, measured against GND).</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The 16-bit config register value.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ConfigError (pingoblin_motor.faults.ConfigError)" href="../faults/#pingoblin_motor.faults.ConfigError">ConfigError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Channel out of range.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="pingoblin_motor.sensors.ADS1115.read_voltage" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">read_voltage</span>
-
-
-<a href="#pingoblin_motor.sensors.ADS1115.read_voltage" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">read_voltage</span><span class="p">(</span><span class="n">channel</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="float">float</span></span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Start a conversion, wait for it and return the voltage.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>channel</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Input 0–3.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="float">float</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The input voltage (V).</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            SensorError (pingoblin_motor.faults.SensorError)" href="../faults/#pingoblin_motor.faults.SensorError">SensorError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The I²C transfer failed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="pingoblin_motor.sensors.ADS1115.close" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">close</span>
-
-
-<a href="#pingoblin_motor.sensors.ADS1115.close" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">close</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Close the I²C bus if this object opened it.</p>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-class">
 
@@ -2623,7 +2172,7 @@ divides by the duty to estimate the motor current.</p>
 
 
 <a href="#pingoblin_motor.sensors.ADS1115Channel" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ADS1115Channel</span><span class="p">(</span><span class="n">adc</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            ADS1115 (pingoblin_motor.sensors.ADS1115)" href="#pingoblin_motor.sensors.ADS1115">ADS1115</a></span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ADS1115Channel</span><span class="p">(</span><span class="n">adc</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2633,6 +2182,9 @@ divides by the duty to estimate the motor current.</p>
 
 
         <p>One ADS1115 input wired to an ISENSE pin.</p>
+<p>Works with an <a href="https://pingoblin.github.io/ADS1115/"><code>pingoblin_ads1115.ADS1115</code></a>, or any
+ADC object with a <code>read_voltage(channel)</code> method that is safe to call from the monitor
+thread.</p>
 
 
 
@@ -2652,11 +2204,11 @@ divides by the duty to estimate the motor current.</p>
                 <code>adc</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ADS1115 (pingoblin_motor.sensors.ADS1115)" href="#pingoblin_motor.sensors.ADS1115">ADS1115</a></code>
+                  <code><span title="object">object</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            ADS1115" href="#pingoblin_motor.sensors.ADS1115"><code>ADS1115</code></a>.</p>
+                <p>The ADS1115, for example <code>pingoblin_ads1115.ADS1115(address=0x48, rate=860)</code>.</p>
               </div>
             </td>
             <td>
@@ -2698,7 +2250,7 @@ divides by the duty to estimate the motor current.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Channel out of range.</p>
+                <p>Channel out of range, or <code>adc</code> has no <code>read_voltage()</code> method.</p>
               </div>
             </td>
           </tr>
@@ -2722,6 +2274,31 @@ divides by the duty to estimate the motor current.</p>
 
 
 
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="pingoblin_motor.sensors.ADS1115Channel.MIN_RATE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">MIN_RATE</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#pingoblin_motor.sensors.ADS1115Channel.MIN_RATE" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">MIN_RATE</span> <span class="o">=</span> <span class="mi">475</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Slowest ADS1115 data rate (samples/s) that keeps stall and overload detection prompt.</p>
+
+    </div>
+
+</div>
 
 
 
@@ -3306,7 +2883,7 @@ For a motor drawing 1 A at 50 % duty, set 0.5.</p>
 
 
 <a href="#pingoblin_motor.sensors.make_sensor" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">make_sensor</span><span class="p">(</span><span class="n">adc</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            ADS1115 (pingoblin_motor.sensors.ADS1115)" href="#pingoblin_motor.sensors.ADS1115">ADS1115</a></span><span class="p">],</span> <span class="n">channel</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">],</span> <span class="n">samples</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            MotorCurrentSensor (pingoblin_motor.sensors.MotorCurrentSensor)" href="#pingoblin_motor.sensors.MotorCurrentSensor">MotorCurrentSensor</a></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">make_sensor</span><span class="p">(</span><span class="n">adc</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="object">object</span></span><span class="p">],</span> <span class="n">channel</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">],</span> <span class="n">samples</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            MotorCurrentSensor (pingoblin_motor.sensors.MotorCurrentSensor)" href="#pingoblin_motor.sensors.MotorCurrentSensor">MotorCurrentSensor</a></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3330,7 +2907,7 @@ For a motor drawing 1 A at 50 % duty, set 0.5.</p>
                 <code>adc</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="            ADS1115 (pingoblin_motor.sensors.ADS1115)" href="#pingoblin_motor.sensors.ADS1115">ADS1115</a>]</code>
+                  <code><span title="typing.Optional">Optional</span>[<span title="object">object</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">

@@ -1742,12 +1742,20 @@
 <p>The Raspberry Pi has no ADC, so use a PinGoblin ADS1115 board. Wire A_ISENSE and B_ISENSE
 (J3 pins 7, 8) to the ADS1115 inputs. One ADS1115 reads two boards, and up to four
 ADS1115 boards share the I2C bus (addresses 0x48–0x4B).</p>
+<p>The ADS1115 board has its own library, which this library uses to read it. Install it
+alongside this one (see <a href="../install/">Installation</a>): <code>pingoblin_ads1115</code> on the Raspberry
+Pi, or <code>ads1115.py</code> on a MicroPython board. Its documentation is at
+<a href="https://pingoblin.github.io/ADS1115/">pingoblin.github.io/ADS1115</a>.</p>
+<p>Create the ADS1115 with <code>rate=860</code> (860 samples per second). Slower rates make each reading
+take longer, so stall and overload detection respond more slowly; the library warns if the
+rate is below 475.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Raspberry Pi</label><label for="__tabbed_1_2">MicroPython</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADS1115</span><span class="p">,</span> <span class="n">MotorBoard</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_ads1115</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADS1115</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MotorBoard</span>
 
-<span class="n">adc</span> <span class="o">=</span> <span class="n">ADS1115</span><span class="p">(</span><span class="n">bus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="mh">0x48</span><span class="p">)</span>
+<span class="n">adc</span> <span class="o">=</span> <span class="n">ADS1115</span><span class="p">(</span><span class="n">bus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="mh">0x48</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mi">860</span><span class="p">)</span>
 <span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
                    <span class="n">adc</span><span class="o">=</span><span class="n">adc</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">board</span><span class="o">.</span><span class="n">motor_a</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="mi">70</span><span class="p">)</span>
@@ -1756,10 +1764,11 @@ ADS1115 boards share the I2C bus (addresses 0x48–0x4B).</p>
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">I2C</span><span class="p">,</span> <span class="n">Pin</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADS1115</span><span class="p">,</span> <span class="n">MotorBoard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ads1115</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADS1115</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pingoblin_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MotorBoard</span>
 
 <span class="n">i2c</span> <span class="o">=</span> <span class="n">I2C</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sda</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">21</span><span class="p">),</span> <span class="n">scl</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">22</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="mi">400000</span><span class="p">)</span>   <span class="c1"># Pico: I2C(0, sda=Pin(0), scl=Pin(1))</span>
-<span class="n">adc</span> <span class="o">=</span> <span class="n">ADS1115</span><span class="p">(</span><span class="n">i2c</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="mh">0x48</span><span class="p">)</span>
+<span class="n">adc</span> <span class="o">=</span> <span class="n">ADS1115</span><span class="p">(</span><span class="n">i2c</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="mh">0x48</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mi">860</span><span class="p">)</span>
 <span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">b_en</span><span class="o">=</span><span class="mi">27</span><span class="p">,</span> <span class="n">b_ph</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">sleep_pin</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">fault_pin</span><span class="o">=</span><span class="mi">39</span><span class="p">,</span>
                    <span class="n">adc</span><span class="o">=</span><span class="n">adc</span><span class="p">,</span> <span class="n">a_sense_channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_sense_channel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
