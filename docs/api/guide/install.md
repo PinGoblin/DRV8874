@@ -2,8 +2,7 @@
 
 ## Raspberry Pi
 
-The package needs Python 3.8+ and gpiozero. It is not on PyPI yet, so install it from
-the repository:
+The package needs Python 3.8 or later and gpiozero. Install it from the repository:
 
 ```bash
 git clone https://github.com/PinGoblin/DRV8874.git

@@ -22,14 +22,5 @@ any computer.
     board = MotorBoard(a_en=1, a_ph=2, pins=MockPins(), a_sensor=MockSensor())
     ```
 
-    The MicroPython file also runs under CPython, which is how its tests run.
-
-## Running the test suites
-
-```bash
-cd python && python -m pytest                 # Raspberry Pi package
-cd micropython && python -m pytest tests      # MicroPython module, under CPython
-```
-
-CI also runs a smoke test under the MicroPython Unix port, checks that the file
-precompiles with `mpy-cross`, and builds this documentation with `mkdocs build --strict`.
+    The MicroPython file also runs under desktop Python, so the same code can be tested on a
+    computer before it is copied to the board.

@@ -50,7 +50,7 @@ m.forward(50, duration=2)  # stop after 2 s (returns at once)
 m.forward(50, duration=2, wait=True)   # ... and block until it stops
 ```
 
-Useful motor options (pass in `motor_options=`, `a_options=` or `b_options=`):
+Motor options (pass in `motor_options=`, `a_options=` or `b_options=`):
 
 | Option | Default | Meaning |
 | --- | --- | --- |

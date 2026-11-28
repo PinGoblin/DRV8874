@@ -4,11 +4,6 @@ The MicroPython version is one file, `micropython/pingoblin_motor.py`, for ESP32
 Raspberry Pi Pico / Pico 2. It has the same classes and method names as the Raspberry Pi
 package.
 
-!!! warning "Status"
-    Tested off-target (CPython with mock pins, plus a static check for MicroPython-only
-    syntax and modules, and CI runs under the MicroPython Unix port). It has not yet been
-    run on a real ESP32 or Pico. Report problems as GitHub issues.
-
 ## How timing works (no threads)
 
 MicroPython has no `threading.Timer`, so timed runs (`duration=`), ramps (`ramp_time`) and

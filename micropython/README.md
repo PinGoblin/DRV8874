@@ -4,8 +4,6 @@ Single-file MicroPython library for the **PinGoblin DRV8874** dual DC motor driv
 
 **Documentation: <https://pingoblin.github.io/DRV8874/>**: see *API → Guide → MicroPython notes* and the *MicroPython reference*.
 
-> **Status:** tested off-target (CPython with mock pins) and under the MicroPython Unix port in CI. It has not yet been run on a real ESP32 or Pico. Please report problems as GitHub issues.
-
 ## Install
 
 Needs MicroPython 1.20 or later.
@@ -20,8 +18,6 @@ On an ESP32 without PSRAM, precompile the file and copy the `.mpy` (it leaves ou
 mpy-cross pingoblin_motor.py
 mpremote cp pingoblin_motor.mpy :
 ```
-
-CI also builds a `.mpy` for each push; download it from the workflow run's artifacts.
 
 ## Example (ESP32)
 

@@ -9,7 +9,7 @@ A shared pin is released when the last user closes it.
 | Backend | Use |
 |---|---|
 | [`GpiozeroBackend`][pingoblin_motor.backends.GpiozeroBackend] | Default on a Raspberry Pi (Pi 5 supported). Software PWM, or hardware PWM on GPIO12/13/18/19 |
-| [`MockBackend`][pingoblin_motor.backends.MockBackend] | No hardware: tests, dry runs and CI |
+| [`MockBackend`][pingoblin_motor.backends.MockBackend] | Testing and dry runs without hardware |
 """
 from __future__ import annotations
 
