@@ -1245,24 +1245,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Testing without hardware
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1279,36 +1261,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#running-the-test-suites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running the test suites
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1653,25 +1605,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#running-the-test-suites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running the test suites
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1709,16 +1642,11 @@ any computer.</p>
 
 <span class="n">board</span> <span class="o">=</span> <span class="n">MotorBoard</span><span class="p">(</span><span class="n">a_en</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">a_ph</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pins</span><span class="o">=</span><span class="n">MockPins</span><span class="p">(),</span> <span class="n">a_sensor</span><span class="o">=</span><span class="n">MockSensor</span><span class="p">())</span>
 </code></pre></div>
-<p>The MicroPython file also runs under CPython, which is how its tests run.</p>
+<p>The MicroPython file also runs under desktop Python, so the same code can be tested on a
+computer before it is copied to the board.</p>
 </div>
 </div>
 </div>
-<h2 id="running-the-test-suites">Running the test suites<a class="headerlink" href="#running-the-test-suites" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>python<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w">                 </span><span class="c1"># Raspberry Pi package</span>
-<span class="nb">cd</span><span class="w"> </span>micropython<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w">      </span><span class="c1"># MicroPython module, under CPython</span>
-</code></pre></div>
-<p>CI also runs a smoke test under the MicroPython Unix port, checks that the file
-precompiles with <code>mpy-cross</code>, and builds this documentation with <code>mkdocs build --strict</code>.</p>
 
 
 
